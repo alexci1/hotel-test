@@ -1,0 +1,13 @@
+docker exec -i postgres-db psql -U postgres -d postgres < 01-init.sql
+docker exec -i postgres-db psql -U postgres -d postgres < 02-habitaciones_usuarios.sql
+docker exec -i postgres-db psql -U postgres -d postgres < 03-huespedes_catalogo.sql
+docker exec -i postgres-db psql -U postgres -d postgres < 04-checkin_recursos.sql
+docker exec -i postgres-db psql -U postgres -d postgres < 05-pagos_recursos.sql
+docker exec -i postgres-db psql -U postgres -d postgres < 06-housekeeping_recursos.sql
+docker exec -i postgres-db psql -U postgres -d postgres < 07-reservas_recursos.sql
+docker exec -i postgres-db psql -U postgres -d postgres < 08-inventario_recursos.sql
+docker exec -i postgres-db psql -U postgres -d postgres < 09-notificaciones_recursos.sql
+docker exec -i postgres-db psql -U postgres -d postgres < 10-restaurante_recursos.sql
+docker exec -i postgres-db psql -U postgres -d postgres < 11-reportes_recursos.sql
+docker exec -i postgres-db psql -U postgres -d postgres < 12-autenticacion_recursos.sql
+docker exec -i postgres-db psql -U postgres -d postgres < 13-tarifas_recursos.sql

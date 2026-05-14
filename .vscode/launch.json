@@ -1,0 +1,142 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug Eureka",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/eureka",
+      "mainClass": "cl.hilton.eureka.HotelEurekaApplication",
+      "projectName": "cl-hilton-eureka",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-reservas",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-reservas",
+      "mainClass": "cl.hilton.reservas.HotelReservasApplication",
+      "projectName": "cl-hilton-reservas",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-habitaciones",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-habitaciones",
+      "mainClass": "cl.hilton.habitaciones.HotelHabitacionesApplication",
+      "projectName": "cl-hilton-habitaciones",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-huespedes",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-huespedes",
+      "mainClass": "cl.hilton.huespedes.HotelHuespedesApplication",
+      "projectName": "cl-hilton-huespedes",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-checkin",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-checkin",
+      "mainClass": "cl.hilton.checkin.HotelCheckinApplication",
+      "projectName": "cl-hilton-checkin",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-pagos",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-pagos",
+      "mainClass": "cl.hilton.pagos.HotelPagosApplication",
+      "projectName": "cl-hilton-pagos",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-housekeeping",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-housekeeping",
+      "mainClass": "cl.hilton.housekeeping.HotelHousekeepingApplication",
+      "projectName": "cl-hilton-housekeeping",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-restaurante",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-restaurante",
+      "mainClass": "cl.hilton.restaurante.HotelRestauranteApplication",
+      "projectName": "cl-hilton-restaurante",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-inventario",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-inventario",
+      "mainClass": "cl.hilton.inventario.HotelInventarioApplication",
+      "projectName": "cl-hilton-inventario",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-notificaciones",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-notificaciones",
+      "mainClass": "cl.hilton.notificaciones.HotelNotificacionesApplication",
+      "projectName": "cl-hilton-notificaciones",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-tarifas",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-tarifas",
+      "mainClass": "cl.hilton.tarifas.HotelTarifasApplication",
+      "projectName": "cl-hilton-tarifas",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-reportes",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-reportes",
+      "mainClass": "cl.hilton.reportes.HotelReportesApplication",
+      "projectName": "cl-hilton-reportes",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Debug ms-autenticacion",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ms-autenticacion",
+      "mainClass": "cl.hilton.autenticacion.HotelAutenticacionApplication",
+      "projectName": "cl-hilton-autenticacion",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug All Services",
+      "configurations": [
+        "Debug Eureka",
+        "Debug ms-reservas",
+        "Debug ms-habitaciones",
+        "Debug ms-huespedes",
+        "Debug ms-checkin",
+        "Debug ms-pagos",
+        "Debug ms-housekeeping",
+        "Debug ms-restaurante",
+        "Debug ms-inventario",
+        "Debug ms-notificaciones",
+        "Debug ms-tarifas",
+        "Debug ms-reportes",
+        "Debug ms-autenticacion"
+      ]
+    }
+  ]
+}
