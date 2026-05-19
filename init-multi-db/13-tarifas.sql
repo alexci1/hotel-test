@@ -22,7 +22,8 @@ DROP TABLE IF EXISTS proj_tipo_habitacion CASCADE;
 -- ------------------------------------------------------------
 
 CREATE TABLE proj_tipo_habitacion (
-    codigo         VARCHAR(40)  PRIMARY KEY,
+    codigo         VARCHAR(40)  PRIMARY KEY,+
+    
     descripcion    VARCHAR(100),
     capacidad_max  SMALLINT     NOT NULL,
     actualizado_en TIMESTAMPTZ  NOT NULL DEFAULT NOW()
