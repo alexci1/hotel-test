@@ -2,10 +2,7 @@ package cl.hilton.autenticacion.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,9 +11,12 @@ import java.util.List;
     name = "usuario",
     uniqueConstraints = {
         @UniqueConstraint(name = "uk_usuario_email", columnNames = "email")
+    },
+    indexes = {
+        @Index(name = "idx_usuario_rol",    columnList = "codigo_rol"),
+        @Index(name = "idx_usuario_activo", columnList = "activo")
     }
 )
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,6 +26,7 @@ public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @Column(name = "email", nullable = false, length = 120)
@@ -34,7 +35,7 @@ public class Usuario {
     @Column(name = "nombre_completo", nullable = false, length = 100)
     private String nombreCompleto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "codigo_rol", referencedColumnName = "codigo", nullable = false)
     private Rol rol;
 
@@ -44,15 +45,7 @@ public class Usuario {
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 
-    @CreatedDate
-    @Column(name = "creado_en", nullable = false, updatable = false)
-    private OffsetDateTime creadoEn;
-
-    @Column(name = "ultimo_acceso")
-    private OffsetDateTime ultimoAcceso;
-
     @Builder.Default
     @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
     private List<Sesion> sesiones = new ArrayList<>();
-
 }

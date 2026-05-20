@@ -2,11 +2,8 @@ package cl.hilton.pagos.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,11 +11,14 @@ import java.util.List;
 @Table(
     name = "factura",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uk_factura_numero",          columnNames = "numero_factura"),
-        @UniqueConstraint(name = "uk_factura_codigo_reserva",  columnNames = "codigo_reserva")
+        @UniqueConstraint(name = "uk_factura_numero",         columnNames = "numero_factura"),
+        @UniqueConstraint(name = "uk_factura_codigo_reserva", columnNames = "codigo_reserva")
+    },
+    indexes = {
+        @Index(name = "idx_factura_reserva", columnList = "codigo_reserva"),
+        @Index(name = "idx_factura_estado",  columnList = "estado")
     }
 )
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,16 +32,17 @@ public class Factura {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @Column(name = "numero_factura", nullable = false, length = 20)
     private String numeroFactura;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "codigo_reserva", referencedColumnName = "codigo_reserva", nullable = false)
     private ProjReserva reserva;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "email_huesped", referencedColumnName = "email", nullable = false)
     private ProjHuesped huesped;
 
@@ -52,10 +53,6 @@ public class Factura {
     @Column(name = "estado", nullable = false, length = 20)
     private Estado estado;
 
-    @CreatedDate
-    @Column(name = "emitida_en", nullable = false, updatable = false)
-    private OffsetDateTime emitidaEn;
-
     @Builder.Default
     @OneToMany(mappedBy = "factura", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Pago> pagos = new ArrayList<>();
@@ -63,6 +60,4 @@ public class Factura {
     @Builder.Default
     @OneToMany(mappedBy = "factura", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Cargo> cargos = new ArrayList<>();
-
-    
 }

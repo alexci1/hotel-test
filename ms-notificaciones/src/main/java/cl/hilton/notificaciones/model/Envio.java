@@ -10,6 +10,9 @@ import java.time.OffsetDateTime;
     name = "envio",
     uniqueConstraints = {
         @UniqueConstraint(name = "uk_envio_notificacion_id", columnNames = "notificacion_id")
+    },
+    indexes = {
+        @Index(name = "idx_envio_estado", columnList = "estado")
     }
 )
 @Getter
@@ -25,9 +28,10 @@ public class Envio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "notificacion_id", nullable = false)
     private Notificacion notificacion;
 
@@ -44,5 +48,4 @@ public class Envio {
     @Lob
     @Column(name = "error_msg")
     private String errorMsg;
-
 }

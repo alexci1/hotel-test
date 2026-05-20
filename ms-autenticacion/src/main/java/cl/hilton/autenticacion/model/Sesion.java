@@ -2,8 +2,6 @@ package cl.hilton.autenticacion.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.OffsetDateTime;
 
@@ -12,9 +10,13 @@ import java.time.OffsetDateTime;
     name = "sesion",
     uniqueConstraints = {
         @UniqueConstraint(name = "uk_sesion_token_hash", columnNames = "token_hash")
+    },
+    indexes = {
+        @Index(name = "idx_sesion_usuario", columnList = "email_usuario"),
+        @Index(name = "idx_sesion_expira",  columnList = "expira_en"),
+        @Index(name = "idx_sesion_activa",  columnList = "invalidada")
     }
 )
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,9 +26,10 @@ public class Sesion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "email_usuario", referencedColumnName = "email", nullable = false)
     private Usuario usuario;
 
@@ -42,12 +45,6 @@ public class Sesion {
     @Column(name = "expira_en", nullable = false)
     private OffsetDateTime expiraEn;
 
-    @CreatedDate
-    @Column(name = "creada_en", nullable = false, updatable = false)
-    private OffsetDateTime creadaEn;
-
     @Column(name = "invalidada", nullable = false)
     private Boolean invalidada;
-
-    
 }

@@ -2,15 +2,18 @@ package cl.hilton.pagos.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "cargo")
-@EntityListeners(AuditingEntityListener.class)
+@Table(
+    name = "cargo",
+    indexes = {
+        @Index(name = "idx_cargo_factura", columnList = "numero_factura"),
+        @Index(name = "idx_cargo_origen",  columnList = "origen")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,9 +27,10 @@ public class Cargo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "numero_factura", referencedColumnName = "numero_factura", nullable = false)
     private Factura factura;
 
@@ -40,9 +44,6 @@ public class Cargo {
     @Column(name = "origen", nullable = false, length = 30)
     private Origen origen;
 
-    @CreatedDate
-    @Column(name = "registrado_en", nullable = false, updatable = false)
+    @Column(name = "registrado_en", nullable = false)
     private OffsetDateTime registradoEn;
-
-    
 }

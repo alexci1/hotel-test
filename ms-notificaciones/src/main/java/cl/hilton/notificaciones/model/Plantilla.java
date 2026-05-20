@@ -11,6 +11,9 @@ import java.util.List;
     name = "plantilla",
     uniqueConstraints = {
         @UniqueConstraint(name = "uk_plantilla_codigo", columnNames = "codigo")
+    },
+    indexes = {
+        @Index(name = "idx_plantilla_canal", columnList = "canal")
     }
 )
 @Getter
@@ -26,6 +29,7 @@ public class Plantilla {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @Column(name = "codigo", nullable = false, length = 50)
@@ -48,5 +52,4 @@ public class Plantilla {
     @Builder.Default
     @OneToMany(mappedBy = "plantilla", fetch = FetchType.LAZY)
     private List<Notificacion> notificaciones = new ArrayList<>();
-
 }

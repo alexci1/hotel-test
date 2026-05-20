@@ -2,7 +2,6 @@ package cl.hilton.autenticacion.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.List;
         @UniqueConstraint(name = "uk_rol_codigo", columnNames = "codigo")
     }
 )
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,6 +22,7 @@ public class Rol {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @Column(name = "codigo", nullable = false, length = 30)
@@ -38,5 +37,4 @@ public class Rol {
     @Builder.Default
     @OneToMany(mappedBy = "rol", fetch = FetchType.LAZY)
     private List<Usuario> usuarios = new ArrayList<>();
-
 }
