@@ -1,4 +1,6 @@
-package com.hotel.inventario.entity;
+package cl.hilton.inventario.model;
+
+
 import jakarta.persistence.*;
 import lombok.*;
 
