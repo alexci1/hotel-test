@@ -1,13 +1,7 @@
 package com.hotel.inventario.entity;
-
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +10,11 @@ import java.util.List;
     name = "producto",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "uk_producto_codigo",
+            name = "uk_producto_codigo_producto",
             columnNames = "codigo_producto"
         )
     }
 )
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,37 +24,32 @@ public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_producto")
+    @Column(name = "id")
     private Integer id;
 
-    @Column(name = "codigo_producto", nullable = false, length = 50)
+    @Column(name = "codigo_producto", nullable = false, length = 30)
     private String codigoProducto;
 
-    @Column(name = "nombre", nullable = false, length = 120)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
-    @Column(name = "categoria", nullable = false, length = 80)
+    @Column(name = "categoria", nullable = false, length = 40)
     private String categoria;
 
-    @Column(name = "precio", nullable = false, precision = 10, scale = 2)
-    private BigDecimal precio;
+    @Column(name = "stock_actual", nullable = false)
+    private Integer stockActual;
 
-    @Column(name = "stock", nullable = false)
-    private Integer stock;
+    @Column(name = "stock_minimo", nullable = false)
+    private Integer stockMinimo;
 
-    @CreatedDate
-    @Column(name = "fecha_creacion", nullable = false, updatable = false)
-    private LocalDateTime fechaCreacion;
+    @Column(name = "unidad", nullable = false, length = 20)
+    private String unidad;
 
-    @LastModifiedDate
-    @Column(name = "fecha_modificacion")
-    private LocalDateTime fechaModificacion;
-
-    @OneToMany(
-        mappedBy = "producto",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
+    @OneToMany(mappedBy = "producto")
     @Builder.Default
     private List<Movimiento> movimientos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "producto")
+    @Builder.Default
+    private List<Minibar> minibares = new ArrayList<>();
 }

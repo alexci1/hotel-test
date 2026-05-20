@@ -1,16 +1,18 @@
+package cl.hilton.restaurante.model;
+
+
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Entity
 @Table(
     name = "mesa",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "uk_mesa_numero",
+            name = "uk_mesa_numero_mesa",
             columnNames = "numero_mesa"
         )
     }
@@ -24,19 +26,23 @@ public class Mesa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_mesa")
+    @Column(name = "id")
     private Integer id;
 
-    @Column(name = "numero_mesa", nullable = false)
-    private Integer numeroMesa;
+    @Column(name = "numero_mesa", nullable = false, length = 10)
+    private String numeroMesa;
 
     @Column(name = "capacidad", nullable = false)
-    private Integer capacidad;
+    private Short capacidad;
 
-    @Column(name = "estado", nullable = false, length = 50)
-    private String estado;
+    @Column(name = "zona", nullable = false, length = 40)
+    private String zona;
+
+    @Column(name = "disponible", nullable = false)
+    private Boolean disponible;
 
     @OneToMany(mappedBy = "mesa")
     @Builder.Default
     private List<Pedido> pedidos = new ArrayList<>();
 }
+
