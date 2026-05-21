@@ -1,4 +1,4 @@
-package model;
+package cl.hilton.reportes.model;
 
 import jakarta.persistence.*;
 import lombok.*;

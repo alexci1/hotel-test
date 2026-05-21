@@ -1,4 +1,4 @@
-package dto;
+package cl.hilton.reportes.dto;
 
 import lombok.*;
 
