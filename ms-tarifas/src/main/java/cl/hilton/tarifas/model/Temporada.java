@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class Temporada {
 
     @Id
@@ -33,4 +34,5 @@ public class Temporada {
 
     @OneToMany(mappedBy = "temporada")
     private List<Tarifa> tarifas;
+
 }
