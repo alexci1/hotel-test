@@ -1,9 +1,9 @@
 package cl.hilton.inventario.controller;
 
 
-import cl.triskledu.inventario.dto.request.ProductoRequest;
-import cl.triskledu.inventario.dto.response.ProductoResponse;
-import cl.triskledu.inventario.service.ProductoService;
+import cl.hilton.inventario.dto.ProductoRequest;
+import cl.hilton.inventario.dto.ProductoResponse;
+import cl.hilton.inventario.service.ProductoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

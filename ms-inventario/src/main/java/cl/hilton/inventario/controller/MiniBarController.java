@@ -1,9 +1,9 @@
 package cl.hilton.inventario.controller;
 
 
-import cl.triskledu.inventario.dto.request.MinibarRequest;
-import cl.triskledu.inventario.dto.response.MinibarResponse;
-import cl.triskledu.inventario.service.MinibarService;
+import cl.hilton.inventario.dto.MinibarRequest;
+import cl.hilton.inventario.dto.MinibarResponse;
+import cl.hilton.inventario.service.MinibarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

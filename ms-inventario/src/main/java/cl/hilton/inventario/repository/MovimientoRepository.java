@@ -1,5 +1,5 @@
 package cl.hilton.inventario.repository;
-import cl.triskledu.inventario.model.Movimiento;
+import cl.hilton.inventario.model.Movimiento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

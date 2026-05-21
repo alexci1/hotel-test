@@ -1,8 +1,8 @@
 package cl.hilton.inventario.controller;
 
-import cl.triskledu.inventario.dto.request.ProjHabitacionRequest;
-import cl.triskledu.inventario.dto.response.ProjHabitacionResponse;
-import cl.triskledu.inventario.service.ProjHabitacionService;
+import cl.hilton.inventario.dto.ProjHabitacionRequest;
+import cl.hilton.inventario.dto.ProjHabitacionResponse;
+import cl.hilton.inventario.service.ProjHabitacionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,9 +1,9 @@
 package cl.hilton.inventario.controller;
 
 
-import cl.triskledu.inventario.dto.request.MovimientoRequest;
-import cl.triskledu.inventario.dto.response.MovimientoResponse;
-import cl.triskledu.inventario.service.MovimientoService;
+import cl.hilton.inventario.dto.MovimientoRequest;
+import cl.hilton.inventario.dto.MovimientoResponse;
+import cl.hilton.inventario.service.MovimientoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
