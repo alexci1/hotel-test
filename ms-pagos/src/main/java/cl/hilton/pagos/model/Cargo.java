@@ -3,9 +3,6 @@ package cl.hilton.pagos.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-
 @Entity
 @Table(
     name = "cargo",
@@ -21,10 +18,6 @@ import java.time.OffsetDateTime;
 @Builder
 public class Cargo {
 
-    public enum Origen {
-        HOTEL, RESTAURANTE, MINIBAR, DANO, OTRO
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -37,13 +30,12 @@ public class Cargo {
     @Column(name = "concepto", nullable = false, length = 100)
     private String concepto;
 
-    @Column(name = "monto_usd", nullable = false, precision = 12, scale = 2)
-    private BigDecimal montoUsd;
+    @Column(name = "monto_usd", nullable = false)
+    private Integer montoUsd;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "origen", nullable = false, length = 30)
-    private Origen origen;
+    private String origen;
 
     @Column(name = "registrado_en", nullable = false)
-    private OffsetDateTime registradoEn;
+    private String registradoEn;
 }

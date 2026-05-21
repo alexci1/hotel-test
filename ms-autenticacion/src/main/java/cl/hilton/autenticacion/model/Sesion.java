@@ -3,8 +3,6 @@ package cl.hilton.autenticacion.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
-
 @Entity
 @Table(
     name = "sesion",
@@ -43,8 +41,8 @@ public class Sesion {
     private String userAgent;
 
     @Column(name = "expira_en", nullable = false)
-    private OffsetDateTime expiraEn;
+    private String expiraEn;
 
     @Column(name = "invalidada", nullable = false)
-    private Boolean invalidada;
+    private String invalidada;
 }

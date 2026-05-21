@@ -3,8 +3,6 @@ package cl.hilton.notificaciones.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
-
 @Entity
 @Table(
     name = "notificacion",
@@ -41,7 +39,7 @@ public class Notificacion {
     private String payloadJson;
 
     @Column(name = "creado_en", nullable = false)
-    private OffsetDateTime creadoEn;
+    private String creadoEn;
 
     @OneToOne(mappedBy = "notificacion", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Envio envio;

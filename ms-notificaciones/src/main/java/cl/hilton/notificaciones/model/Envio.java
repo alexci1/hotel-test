@@ -3,8 +3,6 @@ package cl.hilton.notificaciones.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
-
 @Entity
 @Table(
     name = "envio",
@@ -22,14 +20,10 @@ import java.time.OffsetDateTime;
 @Builder
 public class Envio {
 
-    public enum Estado {
-        PENDIENTE, ENVIADO, FALLIDO, RECHAZADO
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private Integer id;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "notificacion_id", nullable = false)
@@ -37,13 +31,13 @@ public class Envio {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false, length = 20)
-    private Estado estado;
+    private String estado;
 
     @Column(name = "intentos", nullable = false)
-    private Short intentos;
+    private Integer intentos;
 
     @Column(name = "enviado_en")
-    private OffsetDateTime enviadoEn;
+    private String enviadoEn;
 
     @Lob
     @Column(name = "error_msg")
