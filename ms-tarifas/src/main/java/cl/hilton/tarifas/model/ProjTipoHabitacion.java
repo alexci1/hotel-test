@@ -23,7 +23,7 @@ public class ProjTipoHabitacion {
     private String descripcion;
 
     @Column(name = "capacidad_max", nullable = false)
-    private Short capacidadMax;
+    private long capacidadMax;
 
     @Column(name = "actualizado_en", nullable = false)
     private OffsetDateTime actualizadoEn;
