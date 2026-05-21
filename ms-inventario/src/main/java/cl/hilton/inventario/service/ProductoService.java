@@ -1,6 +1,5 @@
 package cl.hilton.inventario.service;
 
-
 import cl.hilton.inventario.dto.ProductoRequest;
 import cl.hilton.inventario.dto.ProductoResponse;
 import cl.hilton.inventario.model.Producto;
@@ -17,29 +16,38 @@ public class ProductoService {
     private final ProductoRepository productoRepository;
 
     public List<ProductoResponse> listar() {
-        return productoRepository.findAll().stream().map(this::toResponse).toList();
+        return productoRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public ProductoResponse buscarPorId(Integer id) {
+    public ProductoResponse buscarPorId(Long id) {
         return toResponse(obtenerProducto(id));
     }
 
     public ProductoResponse buscarPorCodigo(String codigoProducto) {
         Producto producto = productoRepository.findByCodigoProducto(codigoProducto)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
         return toResponse(producto);
     }
 
     public List<ProductoResponse> buscarPorCategoria(String categoria) {
-        return productoRepository.findByCategoria(categoria).stream().map(this::toResponse).toList();
+        return productoRepository.findByCategoria(categoria).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public List<ProductoResponse> buscarPorNombre(String nombre) {
-        return productoRepository.findByNombreContainingIgnoreCase(nombre).stream().map(this::toResponse).toList();
+        return productoRepository.findByNombreContainingIgnoreCase(nombre).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public List<ProductoResponse> buscarStockMenorOIgual(Integer stock) {
-        return productoRepository.findByStockActualLessThanEqual(stock).stream().map(this::toResponse).toList();
+    public List<ProductoResponse> buscarStockMenorOIgual(Long stock) {
+        return productoRepository.findByStockActualLessThanEqual(stock).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public ProductoResponse crear(ProductoRequest request) {
@@ -59,7 +67,7 @@ public class ProductoService {
         return toResponse(productoRepository.save(producto));
     }
 
-    public ProductoResponse actualizar(Integer id, ProductoRequest request) {
+    public ProductoResponse actualizar(Long id, ProductoRequest request) {
         Producto producto = obtenerProducto(id);
 
         producto.setCodigoProducto(request.getCodigoProducto());
@@ -72,18 +80,19 @@ public class ProductoService {
         return toResponse(productoRepository.save(producto));
     }
 
-    public ProductoResponse ajustarStock(Integer id, Integer cantidad) {
+    public ProductoResponse ajustarStock(Long id, Long cantidad) {
         Producto producto = obtenerProducto(id);
         producto.setStockActual(producto.getStockActual() + cantidad);
+
         return toResponse(productoRepository.save(producto));
     }
 
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         Producto producto = obtenerProducto(id);
         productoRepository.delete(producto);
     }
 
-    private Producto obtenerProducto(Integer id) {
+    private Producto obtenerProducto(Long id) {
         return productoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
     }

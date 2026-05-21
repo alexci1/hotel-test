@@ -1,6 +1,5 @@
 package cl.hilton.restaurante.controller;
 
-
 import cl.hilton.restaurante.dto.ItemPedidoRequest;
 import cl.hilton.restaurante.dto.ItemPedidoResponse;
 import cl.hilton.restaurante.service.ItemPedidoService;
@@ -24,7 +23,7 @@ public class ItemPedidoController {
     }
 
     @GetMapping("/{id}")
-    public ItemPedidoResponse buscarPorId(@PathVariable Integer id) {
+    public ItemPedidoResponse buscarPorId(@PathVariable Long id) {
         return itemPedidoService.buscarPorId(id);
     }
 
@@ -45,14 +44,13 @@ public class ItemPedidoController {
     }
 
     @PutMapping("/{id}")
-    public ItemPedidoResponse actualizar(@PathVariable Integer id, @Valid @RequestBody ItemPedidoRequest request) {
+    public ItemPedidoResponse actualizar(@PathVariable Long id, @Valid @RequestBody ItemPedidoRequest request) {
         return itemPedidoService.actualizar(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable Integer id) {
+    public void eliminar(@PathVariable Long id) {
         itemPedidoService.eliminar(id);
     }
 }
-

@@ -1,6 +1,5 @@
 package cl.hilton.inventario.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,7 +26,7 @@ public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "codigo_producto", nullable = false, length = 30)
     private String codigoProducto;
@@ -39,10 +38,10 @@ public class Producto {
     private String categoria;
 
     @Column(name = "stock_actual", nullable = false)
-    private Integer stockActual;
+    private Long stockActual;
 
     @Column(name = "stock_minimo", nullable = false)
-    private Integer stockMinimo;
+    private Long stockMinimo;
 
     @Column(name = "unidad", nullable = false, length = 20)
     private String unidad;

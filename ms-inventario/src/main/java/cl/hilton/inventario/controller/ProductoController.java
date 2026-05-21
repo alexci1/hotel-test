@@ -1,6 +1,5 @@
 package cl.hilton.inventario.controller;
 
-
 import cl.hilton.inventario.dto.ProductoRequest;
 import cl.hilton.inventario.dto.ProductoResponse;
 import cl.hilton.inventario.service.ProductoService;
@@ -14,23 +13,33 @@ import java.util.List;
 @RequestMapping("/api/productos")
 @RequiredArgsConstructor
 public class ProductoController {
+
     private final ProductoService service;
 
     @GetMapping
-    public List<ProductoResponse> listar() { return service.listar(); }
+    public List<ProductoResponse> listar() {
+        return service.listar();
+    }
 
     @GetMapping("/{id}")
-    public ProductoResponse buscar(@PathVariable Integer id) { return service.buscarPorId(id); }
+    public ProductoResponse buscar(@PathVariable Long id) {
+        return service.buscarPorId(id);
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ProductoResponse crear(@Valid @RequestBody ProductoRequest request) { return service.crear(request); }
+    public ProductoResponse crear(@Valid @RequestBody ProductoRequest request) {
+        return service.crear(request);
+    }
 
     @PutMapping("/{id}")
-    public ProductoResponse actualizar(@PathVariable Integer id, @Valid @RequestBody ProductoRequest request) { return service.actualizar(id, request); }
+    public ProductoResponse actualizar(@PathVariable Long id, @Valid @RequestBody ProductoRequest request) {
+        return service.actualizar(id, request);
+    }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable Integer id) { service.eliminar(id); }
+    public void eliminar(@PathVariable Long id) {
+        service.eliminar(id);
+    }
 }
-

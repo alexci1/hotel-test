@@ -1,19 +1,23 @@
 package cl.hilton.restaurante.controller;
 
+import java.util.List;
 
 import cl.hilton.restaurante.dto.PedidoRequest;
 import cl.hilton.restaurante.dto.PedidoResponse;
 import cl.hilton.restaurante.service.PedidoService;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
 @RestController
 @RequestMapping("/api/pedidos")
-@RequiredArgsConstructor
 public class PedidoController {
 
     private final PedidoService pedidoService;
+
+    public PedidoController(PedidoService pedidoService) {
+        this.pedidoService = pedidoService;
+    }
 
     @GetMapping
     public List<PedidoResponse> listar() {
@@ -66,3 +70,4 @@ public class PedidoController {
     public void eliminar(@PathVariable Integer id) {
         pedidoService.eliminar(id);
     }
+}

@@ -1,6 +1,5 @@
 package cl.hilton.restaurante.service;
 
-
 import cl.hilton.restaurante.dto.ItemPedidoRequest;
 import cl.hilton.restaurante.dto.ItemPedidoResponse;
 import cl.hilton.restaurante.model.ItemPedido;
@@ -11,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ItemPedidoService {
@@ -19,20 +19,25 @@ public class ItemPedidoService {
     private final PedidoRepository pedidoRepository;
 
     public List<ItemPedidoResponse> listar() {
-        return itemPedidoRepository.findAll().stream().map(this::toResponse).toList();
+        return itemPedidoRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public ItemPedidoResponse buscarPorId(Integer id) {
+    public ItemPedidoResponse buscarPorId(Long id) {
         return toResponse(obtenerItem(id));
     }
 
     public List<ItemPedidoResponse> buscarPorPedido(String numeroPedido) {
-        return itemPedidoRepository.findByPedidoNumeroPedido(numeroPedido).stream().map(this::toResponse).toList();
+        return itemPedidoRepository.findByPedidoNumeroPedido(numeroPedido).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public List<ItemPedidoResponse> buscarPorNombreProducto(String nombreProducto) {
-        return itemPedidoRepository.findByNombreProductoContainingIgnoreCase(nombreProducto)
-                .stream().map(this::toResponse).toList();
+        return itemPedidoRepository.findByNombreProductoContainingIgnoreCase(nombreProducto).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public ItemPedidoResponse crear(ItemPedidoRequest request) {
@@ -50,8 +55,9 @@ public class ItemPedidoService {
         return toResponse(itemPedidoRepository.save(item));
     }
 
-    public ItemPedidoResponse actualizar(Integer id, ItemPedidoRequest request) {
+    public ItemPedidoResponse actualizar(Long id, ItemPedidoRequest request) {
         ItemPedido item = obtenerItem(id);
+
         Pedido pedido = pedidoRepository.findByNumeroPedido(request.getNumeroPedido())
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
 
@@ -64,12 +70,12 @@ public class ItemPedidoService {
         return toResponse(itemPedidoRepository.save(item));
     }
 
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         ItemPedido item = obtenerItem(id);
         itemPedidoRepository.delete(item);
     }
 
-    private ItemPedido obtenerItem(Integer id) {
+    private ItemPedido obtenerItem(Long id) {
         return itemPedidoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Item de pedido no encontrado"));
     }
@@ -85,4 +91,3 @@ public class ItemPedidoService {
                 .build();
     }
 }
-
