@@ -6,12 +6,7 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(
-    name = "tarifa",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"codigo_temporada", "tipo_habitacion"})
-    }
-)
+@Table(name = "tarifa")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,22 +16,17 @@ public class Tarifa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "codigo_temporada", referencedColumnName = "codigo", nullable = false)
-    private Temporada temporada;
+    @Column(name = "codigo", nullable = false, length = 40)
+    private String codigo;
 
-    @ManyToOne
-    @JoinColumn(name = "tipo_habitacion", referencedColumnName = "codigo", nullable = false)
-    private ProjTipoHabitacion tipoHabitacion;
-
-    @Column(name = "precio_noche_usd", nullable = false)
-    private BigDecimal precioNocheUsd;
-
-    @Column(name = "incluye_desayuno", nullable = false)
-    private Boolean incluyeDesayuno;
+    @Column(name = "precio_base_usd", nullable = false)
+    private BigDecimal precioBaseUsd;
 
     @Column(name = "activa", nullable = false)
     private Boolean activa;
+
+    @Column(name = "incluye_desayuno")
+    private Boolean incluyeDesayuno;
 }
