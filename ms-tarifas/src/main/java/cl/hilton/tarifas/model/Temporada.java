@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "temporada")
@@ -13,17 +12,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class Temporada {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(name = "codigo", nullable = false, length = 30, unique = true)
+    @Column(name = "codigo", nullable = false, length = 40)
     private String codigo;
 
-    @Column(name = "nombre", nullable = false, length = 80)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 
     @Column(name = "fecha_inicio", nullable = false)
@@ -32,7 +30,6 @@ public class Temporada {
     @Column(name = "fecha_fin", nullable = false)
     private LocalDate fechaFin;
 
-    @OneToMany(mappedBy = "temporada")
-    private List<Tarifa> tarifas;
-
+    @Column(name = "activa", nullable = false)
+    private Boolean activa;
 }
