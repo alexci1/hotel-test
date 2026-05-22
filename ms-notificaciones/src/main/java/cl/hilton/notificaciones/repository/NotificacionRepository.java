@@ -8,9 +8,9 @@ import org.springframework.stereotype.Repository;
 import cl.hilton.notificaciones.model.Notificacion;
 
 @Repository
-public interface NotificacionRepository extends JpaRepository<Notificacion,Long>{
-    
-    Optional<Notificacion> FindByEventoOrigen(String eventoOrigen);
+public interface NotificacionRepository extends JpaRepository<Notificacion, Long> {
+
+    Optional<Notificacion> findByEventoOrigen(String eventoOrigen);
 
     boolean existsByEventoOrigen(String eventoOrigen);
 }
