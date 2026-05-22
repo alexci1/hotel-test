@@ -29,7 +29,7 @@ CREATE TABLE huesped (
     nombre_completo VARCHAR(100) NOT NULL,
     telefono        VARCHAR(20),
     activo          BOOLEAN      NOT NULL DEFAULT TRUE,
-    creado_en       TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+    creado_en       DATE         NOT NULL DEFAULT CURRENT_DATE
 );
 COMMENT ON TABLE huesped IS 'Registro maestro de huéspedes. Publicado en Kafka topic: huesped.events';
 CREATE INDEX idx_huesped_email  ON huesped(email);
@@ -43,7 +43,7 @@ CREATE TABLE documento (
     tipo          VARCHAR(20)  NOT NULL
         CHECK (tipo IN ('PASAPORTE','DNI','RUT','CEDULA','OTRO')),
     numero        VARCHAR(40)  NOT NULL,
-    pais_emisor   CHAR(2)      NOT NULL,                  -- código ISO 3166-1 alpha-2
+    pais_emisor   VARCHAR(2)   NOT NULL,                  -- código ISO 3166-1 alpha-2
     vencimiento   DATE,
     CONSTRAINT uq_doc UNIQUE (tipo, numero, pais_emisor)
 );
@@ -52,13 +52,13 @@ CREATE INDEX idx_doc_email ON documento(email_huesped);
 
 -- Preferencias del huésped para personalizar la estancia
 CREATE TABLE preferencia (
-    id            SERIAL        PRIMARY KEY,
-    email_huesped VARCHAR(120)  NOT NULL UNIQUE
+    id             SERIAL       PRIMARY KEY,
+    email_huesped  VARCHAR(120) NOT NULL UNIQUE
         REFERENCES huesped(email) ON UPDATE CASCADE ON DELETE CASCADE,
-    piso_preferido SMALLINT,
-    tipo_cama     VARCHAR(30)   CHECK (tipo_cama IN ('MATRIMONIAL','TWIN','KING','QUEEN',NULL)),
-    alergias      TEXT,                                    -- texto libre, ej: 'mariscos, polvo'
-    observaciones TEXT
+    piso_preferido INTEGER,
+    tipo_cama      VARCHAR(30)  CHECK (tipo_cama IN ('MATRIMONIAL','TWIN','KING','QUEEN',NULL)),
+    alergias       VARCHAR(255),                                    -- texto libre, ej: 'mariscos, polvo'
+    observaciones  VARCHAR(255)
 );
 COMMENT ON TABLE preferencia IS 'Preferencias de estadía por huésped. Relación 1:1 con huesped.';
 

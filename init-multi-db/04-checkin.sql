@@ -31,7 +31,7 @@ CREATE TABLE proj_reserva (
     fecha_entrada     DATE         NOT NULL,
     fecha_salida      DATE         NOT NULL,
     estado            VARCHAR(20)  NOT NULL,
-    actualizado_en    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+    actualizado_en    DATE         NOT NULL DEFAULT CURRENT_DATE
 );
 COMMENT ON TABLE proj_reserva IS 'Réplica mínima de reservas recibida vía Kafka. Solo lectura.';
 CREATE INDEX idx_presereva_email ON proj_reserva(email_huesped);
@@ -41,7 +41,7 @@ CREATE INDEX idx_presereva_hab   ON proj_reserva(numero_habitacion);
 CREATE TABLE proj_huesped (
     email           VARCHAR(120) PRIMARY KEY,
     nombre_completo VARCHAR(100) NOT NULL,
-    actualizado_en  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+    actualizado_en  DATE         NOT NULL DEFAULT CURRENT_DATE
 );
 COMMENT ON TABLE proj_huesped IS 'Réplica mínima de huéspedes recibida vía Kafka. Solo lectura.';
 
@@ -57,7 +57,7 @@ CREATE TABLE checkin (
     email_huesped     VARCHAR(120) NOT NULL
         REFERENCES proj_huesped(email),
     numero_habitacion VARCHAR(10)  NOT NULL,
-    fecha_hora        TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    fecha_hora        DATE         NOT NULL DEFAULT CURRENT_DATE,
     realizado_por     VARCHAR(80)  NOT NULL                 -- email del recepcionista
 );
 COMMENT ON TABLE checkin IS 'Registro de ingresos al hotel. Publicado en Kafka topic: checkin.events';
@@ -69,9 +69,9 @@ CREATE TABLE checkout (
     id             SERIAL       PRIMARY KEY,
     codigo_reserva VARCHAR(20)  NOT NULL UNIQUE
         REFERENCES proj_reserva(codigo_reserva),
-    fecha_hora     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    fecha_hora     DATE         NOT NULL DEFAULT CURRENT_DATE,
     realizado_por  VARCHAR(80)  NOT NULL,
-    observaciones  TEXT
+    observaciones  VARCHAR(255)
 );
 COMMENT ON TABLE checkout IS 'Registro de salidas del hotel. Publicado en Kafka topic: checkout.events';
 
@@ -83,7 +83,7 @@ CREATE TABLE llave (
     activa            BOOLEAN     NOT NULL DEFAULT TRUE,
     codigo_reserva    VARCHAR(20)
         REFERENCES proj_reserva(codigo_reserva),
-    emitida_en        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    emitida_en        DATE        NOT NULL DEFAULT CURRENT_DATE
 );
 COMMENT ON TABLE llave IS 'Control de tarjetas/llaves por habitación. Se desactivan en checkout.';
 CREATE INDEX idx_llave_habitacion ON llave(numero_habitacion);
