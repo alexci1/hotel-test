@@ -1,113 +1,120 @@
 -- ============================================================
--- 06-housekeeping.sql
--- Microservicio: Housekeeping
--- Base de datos: housekeeping
--- Tablas maestras : tarea, asignacion, reporte
+-- 04-checkin.sql
+-- Microservicio: Check-in / Check-out
+-- Base de datos: checkin
+-- Tablas maestras : checkin, checkout, llave
 -- Tablas proyección (recibidas vía Kafka):
---   · proj_habitacion ← publicada por microservicio habitaciones
+--   · proj_reserva  ← publicada por microservicio reservas
+--   · proj_huesped  ← publicada por microservicio huespedes
 -- ============================================================
 
-\c housekeeping
+\c checkin
 
 -- ------------------------------------------------------------
 -- 1. ELIMINACIÓN en jerarquía inversa
 -- ------------------------------------------------------------
-DROP TABLE IF EXISTS reporte       CASCADE;
-DROP TABLE IF EXISTS asignacion    CASCADE;
-DROP TABLE IF EXISTS tarea         CASCADE;
-DROP TABLE IF EXISTS proj_habitacion CASCADE;
+DROP TABLE IF EXISTS llave        CASCADE;
+DROP TABLE IF EXISTS checkout     CASCADE;
+DROP TABLE IF EXISTS checkin      CASCADE;
+DROP TABLE IF EXISTS proj_reserva CASCADE;
+DROP TABLE IF EXISTS proj_huesped CASCADE;
 
 -- ------------------------------------------------------------
--- 2. TABLAS DE PROYECCIÓN
+-- 2. TABLAS DE PROYECCIÓN (sincronizadas por Kafka)
 -- ------------------------------------------------------------
 
-CREATE TABLE proj_habitacion (
-    numero_habitacion VARCHAR(10)  PRIMARY KEY,
-    tipo              VARCHAR(40)  NOT NULL,
-    piso              SMALLINT     NOT NULL,
-    actualizado_en    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+-- Proyección mínima de reservas: solo los campos necesarios para validar ingreso
+CREATE TABLE proj_reserva (
+    codigo_reserva    VARCHAR(20)  PRIMARY KEY,
+    email_huesped     VARCHAR(120) NOT NULL,
+    numero_habitacion VARCHAR(10)  NOT NULL,
+    fecha_entrada     DATE         NOT NULL,
+    fecha_salida      DATE         NOT NULL,
+    estado            VARCHAR(20)  NOT NULL,
+    actualizado_en    DATE         NOT NULL DEFAULT CURRENT_DATE
 );
-COMMENT ON TABLE proj_habitacion IS 'Réplica mínima de habitaciones recibida vía Kafka. Solo lectura.';
+COMMENT ON TABLE proj_reserva IS 'Réplica mínima de reservas recibida vía Kafka. Solo lectura.';
+CREATE INDEX idx_presereva_email ON proj_reserva(email_huesped);
+CREATE INDEX idx_presereva_hab   ON proj_reserva(numero_habitacion);
+
+-- Proyección mínima de huéspedes: nombre y email para bienvenida
+CREATE TABLE proj_huesped (
+    email           VARCHAR(120) PRIMARY KEY,
+    nombre_completo VARCHAR(100) NOT NULL,
+    actualizado_en  DATE         NOT NULL DEFAULT CURRENT_DATE
+);
+COMMENT ON TABLE proj_huesped IS 'Réplica mínima de huéspedes recibida vía Kafka. Solo lectura.';
 
 -- ------------------------------------------------------------
 -- 3. TABLAS MAESTRAS
 -- ------------------------------------------------------------
 
--- Catálogo de tareas de housekeeping
-CREATE TABLE tarea (
-    id              SERIAL       PRIMARY KEY,
-    codigo          VARCHAR(30)  NOT NULL UNIQUE,           -- clave de negocio: LIMPIEZA_COMPLETA, etc.
-    descripcion     TEXT,
-    duracion_min    SMALLINT     NOT NULL DEFAULT 30 CHECK (duracion_min > 0),
-    activa          BOOLEAN      NOT NULL DEFAULT TRUE
-);
-COMMENT ON TABLE tarea IS 'Catálogo de tipos de tarea de limpieza y mantenimiento.';
-
--- Asignación de tarea a habitación y camarero
-CREATE TABLE asignacion (
+-- Registro de check-in
+CREATE TABLE checkin (
     id                SERIAL       PRIMARY KEY,
-    numero_habitacion VARCHAR(10)  NOT NULL
-        REFERENCES proj_habitacion(numero_habitacion),
-    codigo_tarea      VARCHAR(30)  NOT NULL
-        REFERENCES tarea(codigo) ON UPDATE CASCADE,
-    email_camarero    VARCHAR(120) NOT NULL,                -- empleado responsable
-    fecha_programada  DATE         NOT NULL,
-    estado            VARCHAR(20)  NOT NULL DEFAULT 'PENDIENTE'
-        CHECK (estado IN ('PENDIENTE','EN_PROCESO','COMPLETADA','OMITIDA')),
-    prioridad         SMALLINT     NOT NULL DEFAULT 3 CHECK (prioridad BETWEEN 1 AND 5),  -- 1=urgente, 5=baja
-    iniciada_en       TIMESTAMPTZ,
-    completada_en     TIMESTAMPTZ
+    codigo_reserva    VARCHAR(20)  NOT NULL UNIQUE
+        REFERENCES proj_reserva(codigo_reserva),
+    email_huesped     VARCHAR(120) NOT NULL
+        REFERENCES proj_huesped(email),
+    numero_habitacion VARCHAR(10)  NOT NULL,
+    fecha_hora        DATE         NOT NULL DEFAULT CURRENT_DATE,
+    realizado_por     VARCHAR(80)  NOT NULL                 -- email del recepcionista
 );
-COMMENT ON TABLE asignacion IS 'Asignación de tareas de housekeeping por habitación y fecha.';
-CREATE INDEX idx_asig_habitacion ON asignacion(numero_habitacion);
-CREATE INDEX idx_asig_camarero   ON asignacion(email_camarero);
-CREATE INDEX idx_asig_fecha      ON asignacion(fecha_programada);
-CREATE INDEX idx_asig_estado     ON asignacion(estado);
+COMMENT ON TABLE checkin IS 'Registro de ingresos al hotel. Publicado en Kafka topic: checkin.events';
+CREATE INDEX idx_checkin_reserva  ON checkin(codigo_reserva);
+CREATE INDEX idx_checkin_habitacion ON checkin(numero_habitacion);
 
--- Reporte de inspección post-limpieza
-CREATE TABLE reporte (
-    id              SERIAL        PRIMARY KEY,
-    asignacion_id   INTEGER       NOT NULL UNIQUE
-        REFERENCES asignacion(id) ON DELETE CASCADE,
-    aprobado        BOOLEAN       NOT NULL DEFAULT FALSE,
-    observaciones   TEXT,
-    inspector       VARCHAR(120)  NOT NULL,
-    inspeccionado_en TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+-- Registro de check-out
+CREATE TABLE checkout (
+    id             SERIAL       PRIMARY KEY,
+    codigo_reserva VARCHAR(20)  NOT NULL UNIQUE
+        REFERENCES proj_reserva(codigo_reserva),
+    fecha_hora     DATE         NOT NULL DEFAULT CURRENT_DATE,
+    realizado_por  VARCHAR(80)  NOT NULL,
+    observaciones  VARCHAR(255)
 );
-COMMENT ON TABLE reporte IS 'Reporte de inspección de calidad post-tarea. 1:1 con asignacion.';
-CREATE INDEX idx_reporte_aprobado ON reporte(aprobado);
+COMMENT ON TABLE checkout IS 'Registro de salidas del hotel. Publicado en Kafka topic: checkout.events';
+
+-- Llaves/tarjetas magnéticas asignadas a la habitación
+CREATE TABLE llave (
+    id                SERIAL      PRIMARY KEY,
+    numero_habitacion VARCHAR(10) NOT NULL,
+    codigo_llave      VARCHAR(40) NOT NULL UNIQUE,         -- código físico de la tarjeta
+    activa            BOOLEAN     NOT NULL DEFAULT TRUE,
+    codigo_reserva    VARCHAR(20)
+        REFERENCES proj_reserva(codigo_reserva),
+    emitida_en        DATE        NOT NULL DEFAULT CURRENT_DATE
+);
+COMMENT ON TABLE llave IS 'Control de tarjetas/llaves por habitación. Se desactivan en checkout.';
+CREATE INDEX idx_llave_habitacion ON llave(numero_habitacion);
+CREATE INDEX idx_llave_activa     ON llave(activa);
 
 -- ------------------------------------------------------------
 -- 4. DATOS DE PRUEBA
 -- ------------------------------------------------------------
 
-INSERT INTO proj_habitacion (numero_habitacion, tipo, piso) VALUES
-    ('101', 'SIMPLE', 1),
-    ('102', 'SIMPLE', 1),
-    ('201', 'DOBLE',  2),
-    ('202', 'DOBLE',  2),
-    ('303', 'SUITE',  3),
-    ('PH1', 'SUITE',  5);
+INSERT INTO proj_reserva (codigo_reserva, email_huesped, numero_habitacion, fecha_entrada, fecha_salida, estado) VALUES
+    ('RES-20240601-0001', 'ana.garcia@email.com', '101', '2024-06-01', '2024-06-05', 'CONFIRMADA'),
+    ('RES-20240615-0002', 'carlos.m@email.com',   '202', '2024-06-15', '2024-06-20', 'CONFIRMADA'),
+    ('RES-20240701-0003', 'borde@test.com',        '303', '2024-07-01', '2024-07-02', 'PENDIENTE'),   -- caso borde: pendiente
+    ('RES-20240801-0004', 'empresa@corp.com',      '202', '2024-08-01', '2024-08-10', 'CANCELADA');   -- caso borde: cancelada
 
-INSERT INTO tarea (codigo, descripcion, duracion_min, activa) VALUES
-    ('LIMPIEZA_COMPLETA',   'Limpieza profunda con cambio de ropa de cama y toallas', 60, TRUE),
-    ('LIMPIEZA_RAPIDA',     'Tendido de cama, vaciado de basura y aseo de baño',      30, TRUE),
-    ('MANTENIMIENTO',       'Revisión y reparación de equipos o instalaciones',        90, TRUE),
-    ('INSPECCION',          'Revisión de habitación para ingreso de nuevo huésped',    15, TRUE),
-    ('OBSOLETA',            'Tarea descontinuada',                                     30, FALSE); -- caso borde: inactiva
+INSERT INTO proj_huesped (email, nombre_completo) VALUES
+    ('ana.garcia@email.com', 'Ana García López'),
+    ('carlos.m@email.com',   'Carlos Martínez Ruiz'),
+    ('borde@test.com',       'Usuario Borde Sin Tel'),
+    ('empresa@corp.com',     'Reserva Corporativa SA');
 
-INSERT INTO asignacion
-    (numero_habitacion, codigo_tarea, email_camarero, fecha_programada, estado, prioridad, iniciada_en, completada_en) VALUES
-    ('101', 'LIMPIEZA_COMPLETA', 'maria.h@hotel.com', '2024-06-05', 'COMPLETADA', 2,
-        '2024-06-05 09:00:00+00', '2024-06-05 10:05:00+00'),
-    ('102', 'LIMPIEZA_RAPIDA',   'juan.p@hotel.com',  '2024-06-05', 'COMPLETADA', 3,
-        '2024-06-05 10:30:00+00', '2024-06-05 11:00:00+00'),
-    ('202', 'MANTENIMIENTO',     'pedro.t@hotel.com', '2024-06-05', 'EN_PROCESO', 1,  -- caso borde: urgente
-        '2024-06-05 08:00:00+00', NULL),
-    ('303', 'INSPECCION',        'maria.h@hotel.com', '2024-07-01', 'PENDIENTE',  3, NULL, NULL),
-    ('PH1', 'LIMPIEZA_COMPLETA', 'juan.p@hotel.com',  '2024-06-01', 'OMITIDA',   5, NULL, NULL); -- caso borde: omitida
+INSERT INTO checkin (codigo_reserva, email_huesped, numero_habitacion, realizado_por) VALUES
+    ('RES-20240601-0001', 'ana.garcia@email.com', '101', 'recepcion@hotel.com'),
+    ('RES-20240615-0002', 'carlos.m@email.com',   '202', 'recepcion@hotel.com');
 
-INSERT INTO reporte (asignacion_id, aprobado, observaciones, inspector) VALUES
-    (1, TRUE,  NULL,                              'supervisor@hotel.com'),
-    (2, FALSE, 'Espejo del baño con manchas',      'supervisor@hotel.com'), -- caso borde: rechazada
-    (3, FALSE, 'En progreso, pendiente cierre',    'supervisor@hotel.com');  -- caso borde: mantenimiento abierto
+INSERT INTO checkout (codigo_reserva, realizado_por, observaciones) VALUES
+    ('RES-20240601-0001', 'recepcion@hotel.com', 'Salida sin novedades'),
+    ('RES-20240615-0002', 'recepcion@hotel.com', NULL);   -- caso borde: sin observaciones
+
+INSERT INTO llave (numero_habitacion, codigo_llave, activa, codigo_reserva) VALUES
+    ('101', 'CARD-101-A', FALSE, 'RES-20240601-0001'),   -- desactivada en checkout
+    ('202', 'CARD-202-B', FALSE, 'RES-20240615-0002'),   -- desactivada en checkout
+    ('303', 'CARD-303-A', TRUE,  'RES-20240701-0003'),   -- activa (huésped aún no llega)
+    ('303', 'CARD-303-B', FALSE, NULL);                  -- caso borde: llave huérfana inactiva
