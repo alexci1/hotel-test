@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MiniBarResponse {
+public class MinibarResponse {
 
     private Long id;
     private String numeroHabitacion;
