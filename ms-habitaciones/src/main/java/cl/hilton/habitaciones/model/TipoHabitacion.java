@@ -3,8 +3,6 @@ package cl.hilton.habitaciones.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-
 @Entity
 @Table(name = "tipo_habitacion")
 @Getter
@@ -16,21 +14,17 @@ public class TipoHabitacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(name = "codigo", nullable = false, length = 40, unique = true)
+    @Column(name = "codigo", nullable = false, unique = true, length = 40)
     private String codigo;
 
-    @Lob
-    @Column(name = "descripcion")
+    @Column(name = "descripcion", length = 200)
     private String descripcion;
 
     @Column(name = "capacidad_max", nullable = false)
-    private Short capacidadMax;
+    private Integer capacidadMax;
 
     @Column(name = "activo", nullable = false)
     private Boolean activo;
-
-    @OneToMany(mappedBy = "tipoHabitacion")
-    private List<Habitacion> habitaciones;
 }

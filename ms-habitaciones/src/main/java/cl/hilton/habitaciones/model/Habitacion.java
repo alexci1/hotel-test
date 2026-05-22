@@ -14,21 +14,18 @@ public class Habitacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(name = "numero_habitacion", nullable = false, length = 10, unique = true)
+    @Column(name = "numero_habitacion", nullable = false, unique = true, length = 10)
     private String numeroHabitacion;
 
     @Column(name = "piso", nullable = false)
-    private Short piso;
+    private Integer piso;
 
     @ManyToOne
-    @JoinColumn(name = "codigo_tipo", referencedColumnName = "codigo", nullable = false)
+    @JoinColumn(name = "tipo_habitacion_id", nullable = false)
     private TipoHabitacion tipoHabitacion;
 
     @Column(name = "activa", nullable = false)
     private Boolean activa;
-
-    @OneToOne(mappedBy = "habitacion")
-    private EstadoHabitacion estadoHabitacion;
 }

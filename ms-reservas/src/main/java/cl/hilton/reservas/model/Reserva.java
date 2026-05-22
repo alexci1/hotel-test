@@ -1,11 +1,9 @@
 package cl.hilton.reservas.model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "reserva")
@@ -18,16 +16,18 @@ public class Reserva {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(name = "codigo_reserva", nullable = false, length = 20, unique = true)
+    @Column(name = "codigo_reserva", nullable = false, unique = true, length = 20)
     private String codigoReserva;
 
-    @Column(name = "email_huesped", nullable = false, length = 120)
-    private String emailHuesped;
+    @ManyToOne
+    @JoinColumn(name = "email_huesped", referencedColumnName = "email", nullable = false)
+    private ProjHuesped huesped;
 
-    @Column(name = "numero_habitacion", nullable = false, length = 10)
-    private String numeroHabitacion;
+    @ManyToOne
+    @JoinColumn(name = "numero_habitacion", referencedColumnName = "numero_habitacion", nullable = false)
+    private ProjHabitacion habitacion;
 
     @Column(name = "fecha_entrada", nullable = false)
     private LocalDate fechaEntrada;
@@ -39,5 +39,5 @@ public class Reserva {
     private String estado;
 
     @Column(name = "creado_en", nullable = false)
-    private OffsetDateTime creadoEn;
+    private LocalDate creadoEn;
 }

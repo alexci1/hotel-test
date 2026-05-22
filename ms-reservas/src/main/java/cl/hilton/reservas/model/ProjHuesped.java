@@ -3,8 +3,7 @@ package cl.hilton.reservas.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
-import java.util.List;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "proj_huesped")
@@ -26,8 +25,5 @@ public class ProjHuesped {
     private String telefono;
 
     @Column(name = "actualizado_en", nullable = false)
-    private OffsetDateTime actualizadoEn;
-
-    @OneToMany(mappedBy = "huesped")
-    private List<Reserva> reservas;
+    private LocalDate actualizadoEn;
 }

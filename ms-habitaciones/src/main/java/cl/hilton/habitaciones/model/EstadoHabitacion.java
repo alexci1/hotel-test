@@ -3,7 +3,7 @@ package cl.hilton.habitaciones.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "estado_habitacion")
@@ -16,19 +16,18 @@ public class EstadoHabitacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "numero_habitacion", referencedColumnName = "numero_habitacion", nullable = false, unique = true)
+    @ManyToOne
+    @JoinColumn(name = "habitacion_id", nullable = false)
     private Habitacion habitacion;
 
-    @Column(name = "estado", nullable = false, length = 30)
+    @Column(name = "estado", nullable = false, length = 50)
     private String estado;
 
-    @Lob
-    @Column(name = "observacion")
+    @Column(name = "observacion", length = 200)
     private String observacion;
 
     @Column(name = "actualizado_en", nullable = false)
-    private OffsetDateTime actualizadoEn;
+    private LocalDate actualizadoEn;
 }

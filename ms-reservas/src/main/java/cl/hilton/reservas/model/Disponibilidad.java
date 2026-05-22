@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-
 @Entity
 @Table(
     name = "disponibilidad",
@@ -22,7 +21,7 @@ public class Disponibilidad {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "numero_habitacion", referencedColumnName = "numero_habitacion", nullable = false)

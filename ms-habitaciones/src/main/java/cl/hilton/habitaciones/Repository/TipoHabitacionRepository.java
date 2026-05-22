@@ -1,4 +1,4 @@
-package cl.hilton.habitaciones.Repository;
+package cl.hilton.habitaciones.repository;
 
 import cl.hilton.habitaciones.model.TipoHabitacion;
 import org.springframework.data.jpa.repository.JpaRepository;
