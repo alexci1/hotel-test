@@ -1,6 +1,5 @@
 package cl.hilton.inventario.service;
 
-
 import cl.hilton.inventario.dto.MinibarRequest;
 import cl.hilton.inventario.dto.MinibarResponse;
 import cl.hilton.inventario.model.Minibar;
@@ -23,34 +22,40 @@ public class MinibarService {
     private final ProjHabitacionRepository habitacionRepository;
 
     public List<MinibarResponse> listar() {
-        return minibarRepository.findAll().stream().map(this::toResponse).toList();
+        return minibarRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public MinibarResponse buscarPorId(Integer id) {
+    public MinibarResponse buscarPorId(Long id) {
         return toResponse(obtenerMinibar(id));
     }
 
     public List<MinibarResponse> buscarPorHabitacion(String numeroHabitacion) {
-        return minibarRepository.findByHabitacionNumeroHabitacion(numeroHabitacion)
-                .stream().map(this::toResponse).toList();
+        return minibarRepository.findByHabitacionNumeroHabitacion(numeroHabitacion).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public List<MinibarResponse> buscarPorProducto(String codigoProducto) {
-        return minibarRepository.findByProductoCodigoProducto(codigoProducto)
-                .stream().map(this::toResponse).toList();
+        return minibarRepository.findByProductoCodigoProducto(codigoProducto).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public MinibarResponse buscarPorHabitacionYProducto(String numeroHabitacion, String codigoProducto) {
         Minibar minibar = minibarRepository
                 .findByHabitacionNumeroHabitacionAndProductoCodigoProducto(numeroHabitacion, codigoProducto)
                 .orElseThrow(() -> new RuntimeException("Registro de minibar no encontrado"));
+
         return toResponse(minibar);
     }
 
     public MinibarResponse crear(MinibarRequest request) {
         if (minibarRepository.existsByHabitacionNumeroHabitacionAndProductoCodigoProducto(
                 request.getNumeroHabitacion(),
-                request.getCodigoProducto())) {
+                request.getCodigoProducto()
+        )) {
             throw new RuntimeException("El producto ya existe en el minibar de esa habitación");
         }
 
@@ -70,7 +75,7 @@ public class MinibarService {
         return toResponse(minibarRepository.save(minibar));
     }
 
-    public MinibarResponse actualizar(Integer id, MinibarRequest request) {
+    public MinibarResponse actualizar(Long id, MinibarRequest request) {
         Minibar minibar = obtenerMinibar(id);
 
         ProjHabitacion habitacion = habitacionRepository.findById(request.getNumeroHabitacion())
@@ -87,18 +92,19 @@ public class MinibarService {
         return toResponse(minibarRepository.save(minibar));
     }
 
-    public MinibarResponse actualizarCantidad(Integer id, Short cantidad) {
+    public MinibarResponse actualizarCantidad(Long id, Short cantidad) {
         Minibar minibar = obtenerMinibar(id);
         minibar.setCantidad(cantidad);
+
         return toResponse(minibarRepository.save(minibar));
     }
 
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         Minibar minibar = obtenerMinibar(id);
         minibarRepository.delete(minibar);
     }
 
-    private Minibar obtenerMinibar(Integer id) {
+    private Minibar obtenerMinibar(Long id) {
         return minibarRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Minibar no encontrado"));
     }

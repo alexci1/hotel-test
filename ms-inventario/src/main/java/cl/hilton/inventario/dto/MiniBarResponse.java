@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Builder
 public class MinibarResponse {
 
-    private Integer id;
+    private Long id;
     private String numeroHabitacion;
     private String codigoProducto;
     private String nombreProducto;

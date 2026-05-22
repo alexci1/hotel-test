@@ -1,6 +1,5 @@
 package cl.hilton.inventario.mapper;
 
-
 import cl.hilton.inventario.dto.MinibarRequest;
 import cl.hilton.inventario.dto.MinibarResponse;
 import cl.hilton.inventario.model.Minibar;
@@ -12,23 +11,23 @@ import org.springframework.stereotype.Component;
 public class MinibarMapper {
 
     public Minibar toEntity(MinibarRequest request, ProjHabitacion habitacion, Producto producto) {
-        return Minibar.builder()
-                .habitacion(habitacion)
-                .producto(producto)
-                .cantidad(request.getCantidad())
-                .precioUnitUsd(request.getPrecioUnitUsd())
-                .build();
+        Minibar minibar = new Minibar();
+        minibar.setHabitacion(habitacion);
+        minibar.setProducto(producto);
+        minibar.setCantidad(request.getCantidad());
+        minibar.setPrecioUnitUsd(request.getPrecioUnitUsd());
+        return minibar;
     }
 
     public MinibarResponse toResponse(Minibar minibar) {
-        return MinibarResponse.builder()
-                .id(minibar.getId())
-                .numeroHabitacion(minibar.getHabitacion().getNumeroHabitacion())
-                .codigoProducto(minibar.getProducto().getCodigoProducto())
-                .nombreProducto(minibar.getProducto().getNombre())
-                .cantidad(minibar.getCantidad())
-                .precioUnitUsd(minibar.getPrecioUnitUsd())
-                .build();
+        MinibarResponse response = new MinibarResponse();
+        response.setId(minibar.getId());
+        response.setNumeroHabitacion(minibar.getHabitacion().getNumeroHabitacion());
+        response.setCodigoProducto(minibar.getProducto().getCodigoProducto());
+        response.setNombreProducto(minibar.getProducto().getNombre());
+        response.setCantidad(minibar.getCantidad());
+        response.setPrecioUnitUsd(minibar.getPrecioUnitUsd());
+        return response;
     }
 
     public void updateEntity(Minibar minibar, MinibarRequest request, ProjHabitacion habitacion, Producto producto) {
@@ -38,4 +37,3 @@ public class MinibarMapper {
         minibar.setPrecioUnitUsd(request.getPrecioUnitUsd());
     }
 }
-
