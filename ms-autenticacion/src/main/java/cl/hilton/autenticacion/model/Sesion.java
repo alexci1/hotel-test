@@ -7,7 +7,7 @@ import lombok.*;
 
 @Entity
 @Table(
-    name = "sesion",
+    name = "sesiones",
     uniqueConstraints = {
         @UniqueConstraint(name = "uk_sesion_token_hash", columnNames = "token_hash")
     },

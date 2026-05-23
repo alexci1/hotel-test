@@ -5,9 +5,9 @@ import lombok.*;
 
 @Entity
 @Table(
-    name = "rol",
+    name = "roles",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uk_rol_codigo", columnNames = "codigo")
+        @UniqueConstraint(name = "uk_roles_codigo", columnNames = "codigo")
     }
 )
 @Getter
