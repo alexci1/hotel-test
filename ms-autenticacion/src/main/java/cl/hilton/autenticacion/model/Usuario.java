@@ -3,8 +3,6 @@ package cl.hilton.autenticacion.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(
@@ -36,7 +34,7 @@ public class Usuario {
     private String nombreCompleto;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "codigo_rol", referencedColumnName = "codigo", nullable = false)
+    @JoinColumn(name = "rol_codigo", referencedColumnName = "codigo", nullable = false)
     private Rol rol;
 
     @Column(name = "hash_password", nullable = false, length = 255)
@@ -45,7 +43,4 @@ public class Usuario {
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
-    private List<Sesion> sesiones = new ArrayList<>();
 }

@@ -12,5 +12,5 @@ public interface RolRepository extends JpaRepository<Rol, Long> {
 
     Optional<Rol> findByCodigo(String codigo);
 
-    //FIND BY EXISTS
+    boolean existsByCodigo(String codigo);
 }

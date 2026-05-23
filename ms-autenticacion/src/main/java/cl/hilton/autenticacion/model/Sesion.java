@@ -1,5 +1,7 @@
 package cl.hilton.autenticacion.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,20 +30,20 @@ public class Sesion {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "email_usuario", referencedColumnName = "email", nullable = false)
+    @JoinColumn(name = "usuario_email", referencedColumnName = "email", nullable = false)
     private Usuario usuario;
 
-    @Column(name = "token_hash", nullable = false, length = 255)
+    @Column(name = "token_hash", nullable = false, length = 255,unique = true)
     private String tokenHash;
 
     @Column(name = "ip_origen", nullable = false, length = 45)
     private String ipOrigen;
 
     @Column(name = "user_agent", length = 250)
-    private String userAgent;
+    private LocalDate userAgent;
 
     @Column(name = "expira_en", nullable = false)
-    private String expiraEn;
+    private LocalDate expiraEn;
 
     @Column(name = "invalidada", nullable = false)
     private String invalidada;
