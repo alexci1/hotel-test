@@ -11,7 +11,7 @@ import cl.hilton.autenticacion.dto.UsuarioResponse;
 import cl.hilton.autenticacion.model.Usuario;
 
 @Mapper(componentModel = "spring")
-public interface UsuarioMapper {
+public interface UsuarioMapper{
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "activo", ignore = true)
