@@ -1,19 +1,28 @@
 package cl.hilton.notificaciones.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
 @Table(
-    name = "plantilla",
+    name = "plantillas",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uk_plantilla_codigo", columnNames = "codigo")
-    },
-    indexes = {
-        @Index(name = "idx_plantilla_canal", columnList = "canal")
+        @UniqueConstraint(name = "uk_plantillas_codigo", columnNames = "codigo")
     }
 )
 @Getter
@@ -23,33 +32,27 @@ import java.util.List;
 @Builder
 public class Plantilla {
 
-    public enum Canal {
-        EMAIL, SMS, PUSH, WHATSAPP
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "codigo", nullable = false, length = 50)
+    @Column(name = "codigo", nullable = false, length = 50, unique = true)
     private String codigo;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "canal", nullable = false, length = 20)
-    private Canal canal;
+    private String canal;
 
     @Column(name = "asunto", length = 200)
     private String asunto;
 
-    @Lob
-    @Column(name = "cuerpo", nullable = false)
+    @Column(name = "cuerpo", nullable = false, length = 1000)
     private String cuerpo;
 
     @Column(name = "activa", nullable = false)
     private Boolean activa;
 
-    @Builder.Default
     @OneToMany(mappedBy = "plantilla", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Notificacion> notificaciones = new ArrayList<>();
 }
