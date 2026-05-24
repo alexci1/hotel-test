@@ -1,14 +1,23 @@
 package cl.hilton.checkin.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
-@Table(name = "proj_reserva")
+@Table(name = "proj_reservas")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +26,7 @@ import java.util.List;
 public class ProjReserva {
 
     @Id
-    @Column(name = "codigo_reserva", length = 20)
+    @Column(name = "codigo_reserva", nullable = false, length = 20)
     private String codigoReserva;
 
     @Column(name = "email_huesped", nullable = false, length = 120)
@@ -38,13 +47,11 @@ public class ProjReserva {
     @Column(name = "actualizado_en", nullable = false)
     private LocalDate actualizadoEn;
 
-    @OneToMany(mappedBy = "reserva")
-    @Builder.Default
-    private List<Checkin> checkins = new ArrayList<>();
+    @OneToOne(mappedBy = "reserva")
+    private Checkin checkin;
 
-    @OneToMany(mappedBy = "reserva")
-    @Builder.Default
-    private List<Checkout> checkouts = new ArrayList<>();
+    @OneToOne(mappedBy = "reserva")
+    private Checkout checkout;
 
     @OneToMany(mappedBy = "reserva")
     @Builder.Default
