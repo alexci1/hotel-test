@@ -1,16 +1,24 @@
 package cl.hilton.pagos.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(
-    name = "cargo",
-    indexes = {
-        @Index(name = "idx_cargo_factura", columnList = "numero_factura"),
-        @Index(name = "idx_cargo_origen",  columnList = "origen")
-    }
-)
+@Table(name = "cargos")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -37,5 +45,5 @@ public class Cargo {
     private String origen;
 
     @Column(name = "registrado_en", nullable = false)
-    private String registradoEn;
+    private LocalDate registradoEn;
 }
