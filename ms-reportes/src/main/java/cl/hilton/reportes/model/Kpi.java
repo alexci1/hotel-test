@@ -1,20 +1,25 @@
 package cl.hilton.reportes.model;
 
+import java.time.LocalDate;
 
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(
     name = "kpi",
     uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uk_kpi_nombre",
-            columnNames = "nombre"
-        )
+        @UniqueConstraint(name = "uk_kpi_nombre", columnNames = "nombre")
     }
 )
 @Getter
@@ -26,21 +31,20 @@ public class Kpi {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Integer id;
 
     @Column(name = "nombre", nullable = false, length = 80)
     private String nombre;
 
-    @Lob
-    @Column(name = "descripcion")
+    @Column(name = "descripcion", length = 255)
     private String descripcion;
 
-    @Column(name = "valor_actual", precision = 15, scale = 4)
-    private BigDecimal valorActual;
+    @Column(name = "valor_actual")
+    private Integer valorActual;
 
-    @Column(name = "valor_objetivo", precision = 15, scale = 4)
-    private BigDecimal valorObjetivo;
+    @Column(name = "valor_objetivo")
+    private Integer valorObjetivo;
 
     @Column(name = "unidad", length = 30)
     private String unidad;
@@ -49,5 +53,5 @@ public class Kpi {
     private String periodo;
 
     @Column(name = "actualizado_en", nullable = false)
-    private OffsetDateTime actualizadoEn;
+    private LocalDate actualizadoEn;
 }
