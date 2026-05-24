@@ -45,6 +45,12 @@ CREATE TABLE estados_habitacion (
     actualizado_en DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
+CREATE INDEX idx_tipos_habitacion_activo ON tipos_habitacion(activo);
+CREATE INDEX idx_habitaciones_codigo_tipo ON habitaciones(codigo_tipo);
+CREATE INDEX idx_habitaciones_activa ON habitaciones(activa);
+CREATE INDEX idx_estados_habitacion_numero_habitacion ON estados_habitacion(numero_habitacion);
+CREATE INDEX idx_estados_habitacion_estado ON estados_habitacion(estado);
+
 -- 3. DATOS DE PRUEBA
 
 INSERT INTO proj_tarifas (tipo_habitacion, precio_base_usd) VALUES
