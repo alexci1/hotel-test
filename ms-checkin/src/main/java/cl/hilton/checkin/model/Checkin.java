@@ -1,18 +1,29 @@
 package cl.hilton.checkin.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(
-    name = "checkin",
+    name = "checkins",
     uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uk_checkin_codigo_reserva",
-            columnNames = "codigo_reserva"
-        )
+        @UniqueConstraint(name = "uk_checkins_codigo_reserva", columnNames = "codigo_reserva")
     }
 )
 @Getter
@@ -24,23 +35,15 @@ public class Checkin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(
-        name = "codigo_reserva",
-        referencedColumnName = "codigo_reserva",
-        nullable = false
-    )
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "codigo_reserva", referencedColumnName = "codigo_reserva", nullable = false, unique = true)
     private ProjReserva reserva;
 
-    @ManyToOne
-    @JoinColumn(
-        name = "email_huesped",
-        referencedColumnName = "email",
-        nullable = false
-    )
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "email_huesped", referencedColumnName = "email", nullable = false)
     private ProjHuesped huesped;
 
     @Column(name = "numero_habitacion", nullable = false, length = 10)
