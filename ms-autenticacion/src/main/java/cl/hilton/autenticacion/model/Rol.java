@@ -22,7 +22,7 @@ public class Rol {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "codigo", nullable = false, length = 30,unique = true)
+    @Column(name = "codigo", nullable = false, length = 30)
     private String codigo;
 
     @Column(name = "descripcion", length = 100)

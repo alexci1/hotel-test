@@ -1,5 +1,7 @@
 package cl.hilton.autenticacion.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,11 +10,11 @@ import lombok.*;
 @Table(
     name = "usuarios",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uk_usuario_email", columnNames = "email")
+        @UniqueConstraint(name = "uk_usuarios_email", columnNames = "email")
     },
     indexes = {
-        @Index(name = "idx_usuario_rol",    columnList = "codigo_rol"),
-        @Index(name = "idx_usuario_activo", columnList = "activo")
+        @Index(name = "idx_usuarios_rol_codigo",    columnList = "rol_codigo"),
+        @Index(name = "idx_usuarios_activo", columnList = "activo")
     }
 )
 @Getter
@@ -42,5 +44,11 @@ public class Usuario {
 
     @Column(name = "activo", nullable = false)
     private Boolean activo;
+
+    @Column(name = "creado_en",nullable = false)
+    private LocalDate creadoEn;
+
+    @Column(name = "ultimo_acceso",nullable = false)
+    private LocalDate ultimoAcceso;
 
 }

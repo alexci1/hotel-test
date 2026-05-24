@@ -9,12 +9,12 @@ import lombok.*;
 @Table(
     name = "sesiones",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uk_sesion_token_hash", columnNames = "token_hash")
+        @UniqueConstraint(name = "uk_sesiones_token_hash", columnNames = "token_hash")
     },
     indexes = {
-        @Index(name = "idx_sesion_usuario", columnList = "email_usuario"),
-        @Index(name = "idx_sesion_expira",  columnList = "expira_en"),
-        @Index(name = "idx_sesion_activa",  columnList = "invalidada")
+        @Index(name = "idx_sesiones_usuario", columnList = "email_usuario"),
+        @Index(name = "idx_sesiones_expira",  columnList = "expira_en"),
+        @Index(name = "idx_sesiones_activa",  columnList = "invalidada")
     }
 )
 @Getter
