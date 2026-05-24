@@ -40,11 +40,14 @@ public class Sesion {
     private String ipOrigen;
 
     @Column(name = "user_agent", length = 250)
-    private LocalDate userAgent;
+    private String userAgent;
 
     @Column(name = "expira_en", nullable = false)
     private LocalDate expiraEn;
 
+    @Column(name = "creada_en", nullable = false)
+    private LocalDate creadaEn;
+
     @Column(name = "invalidada", nullable = false)
-    private String invalidada;
+    private Boolean invalidada;
 }

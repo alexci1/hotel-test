@@ -9,7 +9,7 @@ import cl.hilton.autenticacion.model.Rol;
 
 @Repository
 public interface RolRepository extends JpaRepository<Rol, Long> {
-
+    
     Optional<Rol> findByCodigo(String codigo);
 
     boolean existsByCodigo(String codigo);

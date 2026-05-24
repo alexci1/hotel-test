@@ -2,6 +2,7 @@ package cl.hilton.autenticacion.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -18,10 +19,15 @@ public class UsuarioRequest {
     private String nombreCompleto;
 
     @NotBlank(message = "El rol es obligatorio")
-    @Size(max = 30, message = "El rol no puede superar los 30 caracteres")
+    @Pattern(
+        regexp = "ADMIN|GERENCIA|RECEPCION|HOUSEKEEPING|RESTAURANTE|BODEGA|SOLO LECTURA|INACTIVO",
+        message = "El tipo de rol debe ser:ADMIN, GERENCIA, RECEPCION, HOUSEKEEPING, RESTAURANTE, BODEGA, SOLO LECTURA o INACTIVO"
+    )
     private String rol;
 
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(max = 255, message = "La contraseña no puede superar los 255 caracteres")
     private String hashPassword;
+
+    private Boolean activo;
 }
