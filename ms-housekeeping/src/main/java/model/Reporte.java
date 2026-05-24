@@ -1,12 +1,30 @@
 package cl.hilton.housekeeping.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
-@Table(name = "reporte")
+@Table(
+    name = "reportes",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_reportes_asignacion_id", columnNames = "asignacion_id")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,16 +34,11 @@ public class Reporte {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(
-        name = "asignacion_id",
-        referencedColumnName = "id",
-        nullable = false,
-        unique = true
-    )
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "asignacion_id", referencedColumnName = "id", nullable = false, unique = true)
     private Asignacion asignacion;
 
     @Column(name = "aprobado", nullable = false)
