@@ -1,13 +1,24 @@
 package cl.hilton.inventario.model;
 
+import java.time.LocalDate;
 
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.time.OffsetDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(name = "movimiento")
+@Table(name = "movimientos")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,15 +28,11 @@ public class Movimiento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+    @Column(name = "id", nullable = false)
+    private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "codigo_producto",
-        referencedColumnName = "codigo_producto",
-        nullable = false
-    )
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "codigo_producto", referencedColumnName = "codigo_producto", nullable = false)
     private Producto producto;
 
     @Column(name = "tipo", nullable = false, length = 20)
@@ -41,5 +48,5 @@ public class Movimiento {
     private String registradoPor;
 
     @Column(name = "registrado_en", nullable = false)
-    private OffsetDateTime registradoEn;
+    private LocalDate registradoEn;
 }
