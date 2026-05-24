@@ -1,24 +1,38 @@
 package cl.hilton.tarifas.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
-@Table(name = "descuento")
+@Table(
+    name = "descuentos",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_descuentos_codigo_descuento", columnNames = "codigo_descuento")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class Descuento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @Column(name = "id", nullable = false)
+    private Long id;
 
     @Column(name = "codigo_descuento", nullable = false, length = 30, unique = true)
     private String codigoDescuento;
@@ -27,7 +41,7 @@ public class Descuento {
     private String descripcion;
 
     @Column(name = "porcentaje", nullable = false)
-    private BigDecimal porcentaje;
+    private Integer porcentaje;
 
     @Column(name = "aplica_a", length = 40)
     private String aplicaA;
