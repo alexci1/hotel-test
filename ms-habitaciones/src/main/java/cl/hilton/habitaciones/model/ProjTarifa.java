@@ -1,13 +1,19 @@
 package cl.hilton.habitaciones.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.time.LocalDate;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(name = "proj_tarifa")
+@Table(name = "proj_tarifas")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,8 +26,8 @@ public class ProjTarifa {
     private String tipoHabitacion;
 
     @Column(name = "precio_base_usd", nullable = false)
-    private BigDecimal precioBaseUsd;
+    private Integer precioBaseUsd;
 
     @Column(name = "actualizado_en", nullable = false)
-    private OffsetDateTime actualizadoEn;
+    private LocalDate actualizadoEn;
 }
