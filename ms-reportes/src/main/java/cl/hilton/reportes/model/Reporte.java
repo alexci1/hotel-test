@@ -1,19 +1,27 @@
 package cl.hilton.reportes.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
 @Table(
-    name = "reporte",
+    name = "reportes",
     uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uk_reporte_codigo",
-            columnNames = "codigo"
-        )
+        @UniqueConstraint(name = "uk_reportes_codigo", columnNames = "codigo")
     }
 )
 @Getter
@@ -25,17 +33,16 @@ public class Reporte {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "codigo", nullable = false, length = 50)
+    @Column(name = "codigo", nullable = false, length = 50, unique = true)
     private String codigo;
 
     @Column(name = "nombre", nullable = false, length = 120)
     private String nombre;
 
-    @Lob
-    @Column(name = "descripcion")
+    @Column(name = "descripcion", length = 255)
     private String descripcion;
 
     @Column(name = "tipo", nullable = false, length = 30)
