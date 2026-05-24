@@ -1,285 +1,113 @@
--- ============================================================
--- 01-reservas.sql
--- Microservicio: Reservas
--- Base de datos: reservas
--- Tablas maestras : reserva, disponibilidad, cancelacion
--- Tablas proyección (recibidas vía Kafka):
---   · proj_habitacion   ← publicada por microservicio habitaciones
---   · proj_huesped      ← publicada por microservicio huespedes
--- ============================================================
+/* ============================================================
+   ARCHIVO: 07-reservas.sql
+   Microservicio: reservas
+   Responsabilidad: administrar reservas, disponibilidades y cancelaciones.
+   ============================================================ */
 
-\c reservas
+\c reservas;
 
--- ------------------------------------------------------------
--- 1. ELIMINACIÓN en jerarquía inversa (hijos antes que padres)
--- ------------------------------------------------------------
-DROP TABLE IF EXISTS cancelacion      CASCADE;
-DROP TABLE IF EXISTS disponibilidad   CASCADE;
-DROP TABLE IF EXISTS reserva          CASCADE;
--- Proyecciones
-DROP TABLE IF EXISTS proj_habitacion  CASCADE;
-DROP TABLE IF EXISTS proj_huesped     CASCADE;
+-- 1. ELIMINACIÓN EN JERARQUÍA INVERSA
+DROP TABLE IF EXISTS cancelaciones CASCADE;
+DROP TABLE IF EXISTS disponibilidades CASCADE;
+DROP TABLE IF EXISTS reservas CASCADE;
+DROP TABLE IF EXISTS proj_habitaciones CASCADE;
+DROP TABLE IF EXISTS proj_huespedes CASCADE;
 
--- ------------------------------------------------------------
--- 2. TABLAS MAESTRAS
--- ------------------------------------------------------------
+-- 2. TABLAS DE PROYECCIÓN
 
--- Proyección local de huéspedes sincronizada desde Kafka
--- Clave de negocio: email (no usamos IDs externos)
-CREATE TABLE proj_huesped (
-    email              VARCHAR(120) PRIMARY KEY,
-
-    nombre_completo    VARCHAR(100) NOT NULL,
-
-    telefono           VARCHAR(20),
-
-    actualizado_en     DATE NOT NULL DEFAULT CURRENT_DATE
+CREATE TABLE proj_huespedes (
+    email VARCHAR(120) PRIMARY KEY,
+    nombre_completo VARCHAR(100) NOT NULL,
+    telefono VARCHAR(20),
+    actualizado_en DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
--- ============================================================
--- TABLA: PROJ_HABITACION
--- ============================================================
-
-CREATE TABLE proj_habitacion (
-    numero_habitacion    VARCHAR(10) PRIMARY KEY,
-
-    tipo                 VARCHAR(40) NOT NULL,
-
-    activa               BOOLEAN NOT NULL DEFAULT TRUE,
-
-    actualizado_en       DATE NOT NULL DEFAULT CURRENT_DATE
+CREATE TABLE proj_habitaciones (
+    numero_habitacion VARCHAR(10) PRIMARY KEY,
+    tipo VARCHAR(40) NOT NULL,
+    activa BOOLEAN NOT NULL DEFAULT TRUE,
+    actualizado_en DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
--- ============================================================
--- TABLA: RESERVA
--- ============================================================
+-- 3. TABLAS MAESTRAS
 
-CREATE TABLE reserva (
-    id                     SERIAL PRIMARY KEY,
-
-    codigo_reserva         VARCHAR(20) NOT NULL UNIQUE,
-
-    email_huesped          VARCHAR(120) NOT NULL,
-
-    numero_habitacion      VARCHAR(10) NOT NULL,
-
-    fecha_entrada          DATE NOT NULL,
-
-    fecha_salida           DATE NOT NULL,
-
-    estado                 VARCHAR(20) NOT NULL DEFAULT 'PENDIENTE'
-        CHECK (
-            estado IN (
-                'PENDIENTE',
-                'CONFIRMADA',
-                'CANCELADA',
-                'COMPLETADA'
-            )
-        ),
-
-    creado_en              DATE NOT NULL DEFAULT CURRENT_DATE,
-
-    CONSTRAINT fk_reserva_huesped
-    FOREIGN KEY (email_huesped)
-    REFERENCES proj_huesped(email)
-    ON UPDATE CASCADE,
-
-    CONSTRAINT fk_reserva_habitacion
-    FOREIGN KEY (numero_habitacion)
-    REFERENCES proj_habitacion(numero_habitacion)
-    ON UPDATE CASCADE,
-
-    CONSTRAINT chk_fechas
-    CHECK (fecha_salida > fecha_entrada)
+CREATE TABLE reservas (
+    id SERIAL PRIMARY KEY,
+    codigo_reserva VARCHAR(20) NOT NULL UNIQUE,
+    email_huesped VARCHAR(120) NOT NULL REFERENCES proj_huespedes(email) ON UPDATE CASCADE,
+    numero_habitacion VARCHAR(10) NOT NULL REFERENCES proj_habitaciones(numero_habitacion) ON UPDATE CASCADE,
+    fecha_entrada DATE NOT NULL,
+    fecha_salida DATE NOT NULL,
+    estado VARCHAR(20) NOT NULL DEFAULT 'PENDIENTE'
+        CHECK (estado IN ('PENDIENTE','CONFIRMADA','CANCELADA','COMPLETADA')),
+    creado_en DATE NOT NULL DEFAULT CURRENT_DATE,
+    CONSTRAINT chk_reservas_fechas CHECK (fecha_salida > fecha_entrada)
 );
 
--- ============================================================
--- TABLA: DISPONIBILIDAD
--- ============================================================
-
-CREATE TABLE disponibilidad (
-    id                     SERIAL PRIMARY KEY,
-
-    numero_habitacion      VARCHAR(10) NOT NULL,
-
-    fecha                  DATE NOT NULL,
-
-    disponible             BOOLEAN NOT NULL DEFAULT TRUE,
-
-    CONSTRAINT fk_disponibilidad_habitacion
-    FOREIGN KEY (numero_habitacion)
-    REFERENCES proj_habitacion(numero_habitacion)
-    ON UPDATE CASCADE,
-
-    CONSTRAINT uq_disp
-    UNIQUE (numero_habitacion, fecha)
+CREATE TABLE disponibilidades (
+    id SERIAL PRIMARY KEY,
+    numero_habitacion VARCHAR(10) NOT NULL REFERENCES proj_habitaciones(numero_habitacion) ON UPDATE CASCADE,
+    fecha DATE NOT NULL,
+    disponible BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT uq_disponibilidades UNIQUE (numero_habitacion, fecha)
 );
 
--- ============================================================
--- TABLA: CANCELACION
--- ============================================================
-
-CREATE TABLE cancelacion (
-    id                    SERIAL PRIMARY KEY,
-
-    codigo_reserva        VARCHAR(20) NOT NULL UNIQUE,
-
-    motivo                VARCHAR(200),
-
-    cancelado_por         VARCHAR(80),
-
-    cancelado_en          DATE NOT NULL DEFAULT CURRENT_DATE,
-
-    penalidad_usd         NUMERIC(10,2) NOT NULL DEFAULT 0.00
-        CHECK (penalidad_usd >= 0),
-
-    CONSTRAINT fk_cancelacion_reserva
-    FOREIGN KEY (codigo_reserva)
-    REFERENCES reserva(codigo_reserva)
-    ON UPDATE CASCADE
+CREATE TABLE cancelaciones (
+    id SERIAL PRIMARY KEY,
+    codigo_reserva VARCHAR(20) NOT NULL UNIQUE REFERENCES reservas(codigo_reserva) ON UPDATE CASCADE,
+    motivo VARCHAR(200),
+    cancelado_por VARCHAR(80),
+    cancelado_en DATE NOT NULL DEFAULT CURRENT_DATE,
+    penalidad_usd INTEGER NOT NULL DEFAULT 0 CHECK (penalidad_usd >= 0)
 );
 
--- ============================================================
--- INSERTS: PROJ_HUESPED
--- ============================================================
+CREATE INDEX idx_proj_huespedes_nombre_completo ON proj_huespedes(nombre_completo);
+CREATE INDEX idx_proj_habitaciones_tipo ON proj_habitaciones(tipo);
+CREATE INDEX idx_proj_habitaciones_activa ON proj_habitaciones(activa);
 
-INSERT INTO proj_huesped
-(email, nombre_completo, telefono)
-VALUES
+CREATE INDEX idx_reservas_codigo_reserva ON reservas(codigo_reserva);
+CREATE INDEX idx_reservas_email_huesped ON reservas(email_huesped);
+CREATE INDEX idx_reservas_numero_habitacion ON reservas(numero_habitacion);
+CREATE INDEX idx_reservas_estado ON reservas(estado);
+CREATE INDEX idx_reservas_fecha_entrada ON reservas(fecha_entrada);
+CREATE INDEX idx_reservas_fecha_salida ON reservas(fecha_salida);
 
-('ana.garcia@email.com',
-'Ana Garcia Lopez',
-'+56912345678'),
+CREATE INDEX idx_disponibilidades_numero_habitacion ON disponibilidades(numero_habitacion);
+CREATE INDEX idx_disponibilidades_fecha ON disponibilidades(fecha);
+CREATE INDEX idx_disponibilidades_disponible ON disponibilidades(disponible);
 
-('carlos.m@email.com',
-'Carlos Martinez',
-'+56998765432'),
+CREATE INDEX idx_cancelaciones_codigo_reserva ON cancelaciones(codigo_reserva);
+CREATE INDEX idx_cancelaciones_cancelado_en ON cancelaciones(cancelado_en);
 
-('borde@test.com',
-'Usuario Borde',
-NULL),
+-- 4. DATOS DE PRUEBA
 
-('empresa@corp.com',
-'Reserva Corporativa',
-'+56900000001');
+INSERT INTO proj_huespedes (email, nombre_completo, telefono) VALUES
+('ana.garcia@email.com', 'Ana Garcia Lopez', '+56912345678'),
+('carlos.m@email.com', 'Carlos Martinez', '+56998765432'),
+('borde@test.com', 'Usuario Borde', NULL),
+('empresa@corp.com', 'Reserva Corporativa', '+56900000001');
 
--- ============================================================
--- INSERTS: PROJ_HABITACION
--- ============================================================
+INSERT INTO proj_habitaciones (numero_habitacion, tipo, activa) VALUES
+('101', 'SIMPLE', TRUE),
+('202', 'DOBLE', TRUE),
+('303', 'SUITE', TRUE),
+('404', 'SIMPLE', FALSE);
 
-INSERT INTO proj_habitacion
-(numero_habitacion, tipo, activa)
-VALUES
+INSERT INTO reservas (codigo_reserva, email_huesped, numero_habitacion, fecha_entrada, fecha_salida, estado) VALUES
+('RES-20240601-0001', 'ana.garcia@email.com', '101', '2024-06-01', '2024-06-05', 'CONFIRMADA'),
+('RES-20240615-0002', 'carlos.m@email.com', '202', '2024-06-15', '2024-06-20', 'CONFIRMADA'),
+('RES-20240701-0003', 'borde@test.com', '303', '2024-07-01', '2024-07-02', 'PENDIENTE'),
+('RES-20240801-0004', 'empresa@corp.com', '202', '2024-08-01', '2024-08-10', 'CANCELADA');
 
-('101',
-'SIMPLE',
-TRUE),
+INSERT INTO disponibilidades (numero_habitacion, fecha, disponible) VALUES
+('101', '2024-06-01', FALSE),
+('101', '2024-06-02', FALSE),
+('101', '2024-06-03', FALSE),
+('101', '2024-06-04', FALSE),
+('202', '2024-06-15', FALSE),
+('202', '2024-06-16', FALSE),
+('303', '2024-07-01', FALSE),
+('101', '2024-07-15', TRUE);
 
-('202',
-'DOBLE',
-TRUE),
-
-('303',
-'SUITE',
-TRUE),
-
-('404',
-'SIMPLE',
-FALSE);
-
--- ============================================================
--- INSERTS: RESERVA
--- ============================================================
-
-INSERT INTO reserva
-(codigo_reserva,
-email_huesped,
-numero_habitacion,
-fecha_entrada,
-fecha_salida,
-estado)
-VALUES
-
-('RES-20240601-0001',
-'ana.garcia@email.com',
-'101',
-'2024-06-01',
-'2024-06-05',
-'CONFIRMADA'),
-
-('RES-20240615-0002',
-'carlos.m@email.com',
-'202',
-'2024-06-15',
-'2024-06-20',
-'CONFIRMADA'),
-
-('RES-20240701-0003',
-'borde@test.com',
-'303',
-'2024-07-01',
-'2024-07-02',
-'PENDIENTE'),
-
-('RES-20240801-0004',
-'empresa@corp.com',
-'202',
-'2024-08-01',
-'2024-08-10',
-'CANCELADA');
-
--- ============================================================
--- INSERTS: DISPONIBILIDAD
--- ============================================================
-
-INSERT INTO disponibilidad
-(numero_habitacion, fecha, disponible)
-VALUES
-
-('101',
-'2024-06-01',
-FALSE),
-
-('101',
-'2024-06-02',
-FALSE),
-
-('101',
-'2024-06-03',
-FALSE),
-
-('101',
-'2024-06-04',
-FALSE),
-
-('202',
-'2024-06-15',
-FALSE),
-
-('202',
-'2024-06-16',
-FALSE),
-
-('303',
-'2024-07-01',
-FALSE),
-
-('101',
-'2024-07-15',
-TRUE);
-
--- ============================================================
--- INSERTS: CANCELACION
--- ============================================================
-
-INSERT INTO cancelacion
-(codigo_reserva,
-motivo,
-cancelado_por,
-penalidad_usd)
-VALUES
-
-('RES-20240801-0004',
-'Cambio de planes del cliente',
-'agente@hotel.com',
-50.00);
+INSERT INTO cancelaciones (codigo_reserva, motivo, cancelado_por, penalidad_usd) VALUES
+('RES-20240801-0004', 'Cambio de planes del cliente', 'agente@hotel.com', 50);
