@@ -1,16 +1,26 @@
 package cl.hilton.huespedes.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(
-    name = "preferencia",
+    name = "preferencias",
     uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uk_preferencia_email_huesped",
-            columnNames = "email_huesped"
-        )
+        @UniqueConstraint(name = "uk_preferencias_email_huesped", columnNames = "email_huesped")
     }
 )
 @Getter
@@ -22,19 +32,15 @@ public class Preferencia {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(
-        name = "email_huesped",
-        referencedColumnName = "email",
-        nullable = false
-    )
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "email_huesped", referencedColumnName = "email", nullable = false, unique = true)
     private Huesped huesped;
 
     @Column(name = "piso_preferido")
-    private Long pisoPreferido;
+    private Integer pisoPreferido;
 
     @Column(name = "tipo_cama", length = 30)
     private String tipoCama;
