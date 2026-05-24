@@ -30,6 +30,7 @@ public class SesionRequest {
     @NotNull(message = "La fecha de expiracion es obligatoria")
     private LocalDate expiraEn;
 
+    @NotNull(message = "La fecha de creacion es obligatoria")
     private LocalDate creadaEn;
 
     private Boolean invalidada;
