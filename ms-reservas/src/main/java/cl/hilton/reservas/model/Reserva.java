@@ -1,12 +1,31 @@
 package cl.hilton.reservas.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
-@Table(name = "reserva")
+@Table(
+    name = "reservas",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_reservas_codigo_reserva", columnNames = "codigo_reserva")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,16 +35,17 @@ public class Reserva {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "codigo_reserva", nullable = false, unique = true, length = 20)
+    @Column(name = "codigo_reserva", nullable = false, length = 20, unique = true)
     private String codigoReserva;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "email_huesped", referencedColumnName = "email", nullable = false)
     private ProjHuesped huesped;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "numero_habitacion", referencedColumnName = "numero_habitacion", nullable = false)
     private ProjHabitacion habitacion;
 
@@ -40,4 +60,7 @@ public class Reserva {
 
     @Column(name = "creado_en", nullable = false)
     private LocalDate creadoEn;
+
+    @OneToOne(mappedBy = "reserva")
+    private Cancelacion cancelacion;
 }
