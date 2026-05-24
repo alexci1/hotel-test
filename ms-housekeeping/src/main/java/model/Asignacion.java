@@ -1,12 +1,25 @@
 package cl.hilton.housekeeping.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
-@Table(name = "asignacion")
+@Table(name = "asignaciones")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,23 +29,15 @@ public class Asignacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(
-        name = "numero_habitacion",
-        referencedColumnName = "numero_habitacion",
-        nullable = false
-    )
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "numero_habitacion", referencedColumnName = "numero_habitacion", nullable = false)
     private ProjHabitacion habitacion;
 
-    @ManyToOne
-    @JoinColumn(
-        name = "codigo_tarea",
-        referencedColumnName = "codigo",
-        nullable = false
-    )
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "codigo_tarea", referencedColumnName = "codigo", nullable = false)
     private Tarea tarea;
 
     @Column(name = "email_camarero", nullable = false, length = 120)
@@ -45,7 +50,7 @@ public class Asignacion {
     private String estado;
 
     @Column(name = "prioridad", nullable = false)
-    private Long prioridad;
+    private Integer prioridad;
 
     @Column(name = "iniciada_en")
     private LocalDate iniciadaEn;
