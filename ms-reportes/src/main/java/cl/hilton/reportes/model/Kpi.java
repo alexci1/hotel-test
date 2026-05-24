@@ -17,9 +17,9 @@ import lombok.Setter;
 
 @Entity
 @Table(
-    name = "kpi",
+    name = "kpis",
     uniqueConstraints = {
-        @UniqueConstraint(name = "uk_kpi_nombre", columnNames = "nombre")
+        @UniqueConstraint(name = "uk_kpis_nombre", columnNames = "nombre")
     }
 )
 @Getter
@@ -34,7 +34,7 @@ public class Kpi {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "nombre", nullable = false, length = 80)
+    @Column(name = "nombre", nullable = false, length = 80, unique = true)
     private String nombre;
 
     @Column(name = "descripcion", length = 255)
