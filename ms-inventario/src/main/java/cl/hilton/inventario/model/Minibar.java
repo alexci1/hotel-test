@@ -1,18 +1,26 @@
 package cl.hilton.inventario.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.math.BigDecimal;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(
-    name = "minibar",
+    name = "minibares",
     uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uq_minibar",
-            columnNames = {"numero_habitacion", "codigo_producto"}
-        )
+        @UniqueConstraint(name = "uq_minibares", columnNames = {"numero_habitacion", "codigo_producto"})
     }
 )
 @Getter
@@ -24,28 +32,20 @@ public class Minibar {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "numero_habitacion",
-        referencedColumnName = "numero_habitacion",
-        nullable = false
-    )
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "numero_habitacion", referencedColumnName = "numero_habitacion", nullable = false)
     private ProjHabitacion habitacion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "codigo_producto",
-        referencedColumnName = "codigo_producto",
-        nullable = false
-    )
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "codigo_producto", referencedColumnName = "codigo_producto", nullable = false)
     private Producto producto;
 
     @Column(name = "cantidad", nullable = false)
-    private Short cantidad;
+    private Integer cantidad;
 
-    @Column(name = "precio_unit_usd", nullable = false, precision = 8, scale = 2)
-    private BigDecimal precioUnitUsd;
+    @Column(name = "precio_unit_usd", nullable = false)
+    private Integer precioUnitUsd;
 }
