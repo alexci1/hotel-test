@@ -6,9 +6,8 @@ import lombok.Data;
 
 @Data
 public class SesionResponse {
-
     private Long id;
-    private String usuario;
+    private String usuarioEmail;
     private String tokenHash;
     private String ipOrigen;
     private String userAgent;
