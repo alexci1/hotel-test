@@ -1,14 +1,22 @@
 package cl.hilton.housekeeping.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
-@Table(name = "proj_habitacion")
+@Table(name = "proj_habitaciones")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,14 +25,14 @@ import java.util.List;
 public class ProjHabitacion {
 
     @Id
-    @Column(name = "numero_habitacion", length = 10)
+    @Column(name = "numero_habitacion", nullable = false, length = 10)
     private String numeroHabitacion;
 
     @Column(name = "tipo", nullable = false, length = 40)
     private String tipo;
 
     @Column(name = "piso", nullable = false)
-    private Long piso;
+    private Integer piso;
 
     @Column(name = "actualizado_en", nullable = false)
     private LocalDate actualizadoEn;
