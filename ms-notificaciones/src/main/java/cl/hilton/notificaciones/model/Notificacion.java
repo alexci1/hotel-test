@@ -1,16 +1,26 @@
 package cl.hilton.notificaciones.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.time.LocalDate;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(
-    name = "notificacion",
-    indexes = {
-        @Index(name = "idx_noti_huesped", columnList = "email_huesped"),
-        @Index(name = "idx_noti_evento",  columnList = "evento_origen")
-    }
-)
+@Table(name = "notificaciones")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,12 +44,11 @@ public class Notificacion {
     @Column(name = "evento_origen", nullable = false, length = 80)
     private String eventoOrigen;
 
-    @Lob
-    @Column(name = "payload_json")
+    @Column(name = "payload_json", length = 500)
     private String payloadJson;
 
     @Column(name = "creado_en", nullable = false)
-    private String creadoEn;
+    private LocalDate creadoEn;
 
     @OneToOne(mappedBy = "notificacion", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Envio envio;
