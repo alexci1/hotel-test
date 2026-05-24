@@ -1,18 +1,28 @@
 package cl.hilton.checkin.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(
-    name = "checkout",
+    name = "checkouts",
     uniqueConstraints = {
-        @UniqueConstraint(
-            name = "uk_checkout_codigo_reserva",
-            columnNames = "codigo_reserva"
-        )
+        @UniqueConstraint(name = "uk_checkouts_codigo_reserva", columnNames = "codigo_reserva")
     }
 )
 @Getter
@@ -24,15 +34,11 @@ public class Checkout {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(
-        name = "codigo_reserva",
-        referencedColumnName = "codigo_reserva",
-        nullable = false
-    )
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "codigo_reserva", referencedColumnName = "codigo_reserva", nullable = false, unique = true)
     private ProjReserva reserva;
 
     @Column(name = "fecha_hora", nullable = false)
