@@ -1,14 +1,20 @@
 package cl.hilton.pagos.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(name = "proj_reserva")
+@Table(name = "proj_reservas")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,7 +38,9 @@ public class ProjReserva {
     @Column(name = "fecha_salida", nullable = false)
     private LocalDate fechaSalida;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "reserva", fetch = FetchType.LAZY)
-    private List<Factura> facturas = new ArrayList<>();
+    @Column(name = "actualizado_en", nullable = false)
+    private LocalDate actualizadoEn;
+
+    @OneToOne(mappedBy = "reserva")
+    private Factura factura;
 }
