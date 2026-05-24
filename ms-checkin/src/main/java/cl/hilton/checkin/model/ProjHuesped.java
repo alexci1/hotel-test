@@ -1,14 +1,22 @@
 package cl.hilton.checkin.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 @Entity
-@Table(name = "proj_huesped")
+@Table(name = "proj_huespedes")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +25,7 @@ import java.util.List;
 public class ProjHuesped {
 
     @Id
-    @Column(name = "email", length = 120)
+    @Column(name = "email", nullable = false, length = 120)
     private String email;
 
     @Column(name = "nombre_completo", nullable = false, length = 100)
