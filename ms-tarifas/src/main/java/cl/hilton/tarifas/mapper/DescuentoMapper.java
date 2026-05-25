@@ -12,6 +12,9 @@ public class DescuentoMapper {
                 .codigoDescuento(request.getCodigoDescuento())
                 .descripcion(request.getDescripcion())
                 .porcentaje(request.getPorcentaje())
+                .aplicaA(request.getAplicaA())
+                .validoDesde(request.getValidoDesde())
+                .validoHasta(request.getValidoHasta())
                 .activo(request.getActivo())
                 .build();
     }
@@ -24,6 +27,9 @@ public class DescuentoMapper {
         response.setCodigoDescuento(descuento.getCodigoDescuento());
         response.setDescripcion(descuento.getDescripcion());
         response.setPorcentaje(descuento.getPorcentaje());
+        response.setAplicaA(descuento.getAplicaA());
+        response.setValidoDesde(descuento.getValidoDesde());
+        response.setValidoHasta(descuento.getValidoHasta());
         response.setActivo(descuento.getActivo());
 
         return response;
