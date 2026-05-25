@@ -2,7 +2,7 @@ package cl.hilton.tarifas.dto;
 
 import lombok.Data;
 
-import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 public class DescuentoResponse {
@@ -13,7 +13,13 @@ public class DescuentoResponse {
 
     private String descripcion;
 
-    private BigDecimal porcentaje;
+    private Integer porcentaje;
+
+    private String aplicaA;
+
+    private LocalDate validoDesde;
+
+    private LocalDate validoHasta;
 
     private Boolean activo;
 }
