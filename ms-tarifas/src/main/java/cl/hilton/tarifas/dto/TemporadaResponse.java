@@ -16,6 +16,4 @@ public class TemporadaResponse {
     private LocalDate fechaInicio;
 
     private LocalDate fechaFin;
-
-    private Boolean activa;
 }
