@@ -2,19 +2,17 @@ package cl.hilton.inventario.dto;
 
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MinibarResponse {
+public class MiniBarResponse {
 
     private Long id;
     private String numeroHabitacion;
     private String codigoProducto;
     private String nombreProducto;
-    private Short cantidad;
-    private BigDecimal precioUnitUsd;
+    private Integer cantidad;
+    private Integer precioUnitUsd;
 }
