@@ -15,8 +15,9 @@ public interface UsuarioMapper{
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "activo", ignore = true)
+    @Mapping(target = "creadoEn", ignore = true)
+    @Mapping(target = "ultimoAcceso", ignore = true)
     @Mapping(target = "rol", ignore = true)
-    @Mapping(target = "sesiones", ignore = true)
     Usuario toEntity(UsuarioRequest request);
 
     @Mapping(target = "rol", source = "rol.codigo")
@@ -26,7 +27,8 @@ public interface UsuarioMapper{
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "activo", ignore = true)
+    @Mapping(target = "creadoEn", ignore = true)
+    @Mapping(target = "ultimoAcceso", ignore = true)
     @Mapping(target = "rol", ignore = true)
-    @Mapping(target = "sesiones", ignore = true)
     void updateEntity(UsuarioRequest request, @MappingTarget Usuario usuario);
 }
