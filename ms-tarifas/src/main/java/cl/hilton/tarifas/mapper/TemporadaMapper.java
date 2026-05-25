@@ -13,7 +13,6 @@ public class TemporadaMapper {
                 .nombre(request.getNombre())
                 .fechaInicio(request.getFechaInicio())
                 .fechaFin(request.getFechaFin())
-                .activa(request.getActiva())
                 .build();
     }
 
@@ -26,7 +25,6 @@ public class TemporadaMapper {
         response.setNombre(temporada.getNombre());
         response.setFechaInicio(temporada.getFechaInicio());
         response.setFechaFin(temporada.getFechaFin());
-        response.setActiva(temporada.getActiva());
 
         return response;
     }
