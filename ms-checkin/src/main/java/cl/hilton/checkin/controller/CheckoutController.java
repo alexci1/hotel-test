@@ -41,7 +41,10 @@ public class CheckoutController {
     }
 
     @PutMapping("/{id}")
-    public CheckoutResponse actualizar(@PathVariable Long id, @Valid @RequestBody CheckoutRequest request) {
+    public CheckoutResponse actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody CheckoutRequest request
+    ) {
         return checkoutService.actualizar(id, request);
     }
 

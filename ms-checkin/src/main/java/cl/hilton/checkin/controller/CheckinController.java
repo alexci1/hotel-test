@@ -46,7 +46,10 @@ public class CheckinController {
     }
 
     @PutMapping("/{id}")
-    public CheckinResponse actualizar(@PathVariable Long id, @Valid @RequestBody CheckinRequest request) {
+    public CheckinResponse actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody CheckinRequest request
+    ) {
         return checkinService.actualizar(id, request);
     }
 

@@ -51,12 +51,18 @@ public class LlaveController {
     }
 
     @PutMapping("/{id}")
-    public LlaveResponse actualizar(@PathVariable Long id, @Valid @RequestBody LlaveRequest request) {
+    public LlaveResponse actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody LlaveRequest request
+    ) {
         return llaveService.actualizar(id, request);
     }
 
     @PatchMapping("/{id}/estado")
-    public LlaveResponse cambiarEstado(@PathVariable Long id, @RequestParam Boolean activa) {
+    public LlaveResponse cambiarEstado(
+            @PathVariable Long id,
+            @RequestParam Boolean activa
+    ) {
         return llaveService.cambiarEstado(id, activa);
     }
 
