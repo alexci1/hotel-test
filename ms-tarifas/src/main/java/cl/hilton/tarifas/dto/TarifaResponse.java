@@ -2,18 +2,18 @@ package cl.hilton.tarifas.dto;
 
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 @Data
 public class TarifaResponse {
 
     private Long id;
 
-    private String codigo;
+    private String codigoTemporada;
 
-    private BigDecimal precioBaseUsd;
+    private String codigoTipoHabitacion;
 
-    private Boolean activa;
+    private Integer precioNocheUsd;
 
     private Boolean incluyeDesayuno;
+
+    private Boolean activa;
 }
