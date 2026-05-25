@@ -1,7 +1,6 @@
 package cl.hilton.restaurante.dto;
-import lombok.*;
 
-import java.math.BigDecimal;
+import lombok.*;
 
 @Getter
 @Setter
@@ -10,10 +9,10 @@ import java.math.BigDecimal;
 @Builder
 public class ItemPedidoResponse {
 
-    private Integer id;
+    private Long id;
     private String numeroPedido;
     private String nombreProducto;
-    private Short cantidad;
-    private BigDecimal precioUnitUsd;
+    private Integer cantidad;
+    private Integer precioUnitUsd;
     private String observacion;
 }

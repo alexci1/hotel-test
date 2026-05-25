@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -22,7 +23,7 @@ public class KpiController {
     }
 
     @GetMapping("/{id}")
-    public KpiResponse buscarPorId(@PathVariable Integer id) {
+    public KpiResponse buscarPorId(@PathVariable Long id) {
         return kpiService.buscarPorId(id);
     }
 
@@ -53,14 +54,13 @@ public class KpiController {
     }
 
     @PutMapping("/{id}")
-    public KpiResponse actualizar(@PathVariable Integer id, @Valid @RequestBody KpiRequest request) {
+    public KpiResponse actualizar(@PathVariable Long id, @Valid @RequestBody KpiRequest request) {
         return kpiService.actualizar(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable Integer id) {
+    public void eliminar(@PathVariable Long id) {
         kpiService.eliminar(id);
     }
 }
-

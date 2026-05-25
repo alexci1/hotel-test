@@ -1,10 +1,6 @@
 package cl.hilton.inventario.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
@@ -17,7 +13,7 @@ public class ProductoResponse {
     private String codigoProducto;
     private String nombre;
     private String categoria;
-    private Long stockActual;
-    private Long stockMinimo;
+    private Integer stockActual;
+    private Integer stockMinimo;
     private String unidad;
 }

@@ -7,7 +7,7 @@ import cl.hilton.inventario.repository.ProjHabitacionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -36,7 +36,7 @@ public class ProjHabitacionService {
         ProjHabitacion habitacion = ProjHabitacion.builder()
                 .numeroHabitacion(request.getNumeroHabitacion())
                 .tipo(request.getTipo())
-                .actualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : OffsetDateTime.now())
+                .actualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : LocalDate.now())
                 .build();
 
         return toResponse(habitacionRepository.save(habitacion));
@@ -46,7 +46,7 @@ public class ProjHabitacionService {
         ProjHabitacion habitacion = obtenerHabitacion(numeroHabitacion);
 
         habitacion.setTipo(request.getTipo());
-        habitacion.setActualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : OffsetDateTime.now());
+        habitacion.setActualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : LocalDate.now());
 
         return toResponse(habitacionRepository.save(habitacion));
     }
@@ -69,5 +69,3 @@ public class ProjHabitacionService {
                 .build();
     }
 }
-
-

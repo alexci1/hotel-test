@@ -25,7 +25,7 @@ public class PedidoController {
     }
 
     @GetMapping("/{id}")
-    public PedidoResponse buscarPorId(@PathVariable Integer id) {
+    public PedidoResponse buscarPorId(@PathVariable Long id) {
         return pedidoService.buscarPorId(id);
     }
 
@@ -56,18 +56,18 @@ public class PedidoController {
     }
 
     @PutMapping("/{id}")
-    public PedidoResponse actualizar(@PathVariable Integer id, @Valid @RequestBody PedidoRequest request) {
+    public PedidoResponse actualizar(@PathVariable Long id, @Valid @RequestBody PedidoRequest request) {
         return pedidoService.actualizar(id, request);
     }
 
     @PatchMapping("/{id}/estado")
-    public PedidoResponse cambiarEstado(@PathVariable Integer id, @RequestParam String estado) {
+    public PedidoResponse cambiarEstado(@PathVariable Long id, @RequestParam String estado) {
         return pedidoService.cambiarEstado(id, estado);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable Integer id) {
+    public void eliminar(@PathVariable Long id) {
         pedidoService.eliminar(id);
     }
 }

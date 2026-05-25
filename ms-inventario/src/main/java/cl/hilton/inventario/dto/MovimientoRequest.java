@@ -3,7 +3,7 @@ package cl.hilton.inventario.dto;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -30,5 +30,5 @@ public class MovimientoRequest {
     @Size(max = 120)
     private String registradoPor;
 
-    private OffsetDateTime registradoEn;
+    private LocalDate registradoEn;
 }

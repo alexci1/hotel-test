@@ -1,12 +1,13 @@
 package cl.hilton.inventario.controller;
 
-import cl.hilton.inventario.dto.MinibarRequest;
-import cl.hilton.inventario.dto.MinibarResponse;
-import cl.hilton.inventario.service.MinibarService;
+import cl.hilton.inventario.dto.MiniBarRequest;
+import cl.hilton.inventario.dto.MiniBarResponse;
+import cl.hilton.inventario.service.MiniBarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -14,26 +15,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MiniBarController {
 
-    private final MinibarService service;
+    private final MiniBarService service;
 
     @GetMapping
-    public List<MinibarResponse> listar() {
+    public List<MiniBarResponse> listar() {
         return service.listar();
     }
 
     @GetMapping("/{id}")
-    public MinibarResponse buscar(@PathVariable Long id) {
+    public MiniBarResponse buscar(@PathVariable Long id) {
         return service.buscarPorId(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public MinibarResponse crear(@Valid @RequestBody MinibarRequest request) {
+    public MiniBarResponse crear(@Valid @RequestBody MiniBarRequest request) {
         return service.crear(request);
     }
 
     @PutMapping("/{id}")
-    public MinibarResponse actualizar(@PathVariable Long id, @Valid @RequestBody MinibarRequest request) {
+    public MiniBarResponse actualizar(@PathVariable Long id, @Valid @RequestBody MiniBarRequest request) {
         return service.actualizar(id, request);
     }
 

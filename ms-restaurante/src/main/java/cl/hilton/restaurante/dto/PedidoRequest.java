@@ -3,8 +3,7 @@ package cl.hilton.restaurante.dto;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -29,8 +28,8 @@ public class PedidoRequest {
     private String estado;
 
     @NotNull
-    @DecimalMin(value = "0.00")
-    private BigDecimal totalUsd;
+    @Min(0)
+    private Integer totalUsd;
 
-    private OffsetDateTime creadoEn;
+    private LocalDate creadoEn;
 }

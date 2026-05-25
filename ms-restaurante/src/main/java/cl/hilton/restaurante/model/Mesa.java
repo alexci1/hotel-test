@@ -34,7 +34,7 @@ public class Mesa {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Column(name = "numero_mesa", nullable = false, length = 10, unique = true)
     private String numeroMesa;

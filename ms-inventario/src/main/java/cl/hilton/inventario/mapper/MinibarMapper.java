@@ -1,39 +1,39 @@
 package cl.hilton.inventario.mapper;
 
-import cl.hilton.inventario.dto.MinibarRequest;
-import cl.hilton.inventario.dto.MinibarResponse;
-import cl.hilton.inventario.model.Minibar;
+import cl.hilton.inventario.dto.MiniBarRequest;
+import cl.hilton.inventario.dto.MiniBarResponse;
+import cl.hilton.inventario.model.MiniBar;
 import cl.hilton.inventario.model.Producto;
 import cl.hilton.inventario.model.ProjHabitacion;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MinibarMapper {
+public class MiniBarMapper {
 
-    public Minibar toEntity(MinibarRequest request, ProjHabitacion habitacion, Producto producto) {
-        Minibar minibar = new Minibar();
-        minibar.setHabitacion(habitacion);
-        minibar.setProducto(producto);
-        minibar.setCantidad(request.getCantidad());
-        minibar.setPrecioUnitUsd(request.getPrecioUnitUsd());
-        return minibar;
+    public MiniBar toEntity(MiniBarRequest request, ProjHabitacion habitacion, Producto producto) {
+        return MiniBar.builder()
+                .habitacion(habitacion)
+                .producto(producto)
+                .cantidad(request.getCantidad())
+                .precioUnitUsd(request.getPrecioUnitUsd())
+                .build();
     }
 
-    public MinibarResponse toResponse(Minibar minibar) {
-        MinibarResponse response = new MinibarResponse();
-        response.setId(minibar.getId());
-        response.setNumeroHabitacion(minibar.getHabitacion().getNumeroHabitacion());
-        response.setCodigoProducto(minibar.getProducto().getCodigoProducto());
-        response.setNombreProducto(minibar.getProducto().getNombre());
-        response.setCantidad(minibar.getCantidad());
-        response.setPrecioUnitUsd(minibar.getPrecioUnitUsd());
-        return response;
+    public MiniBarResponse toResponse(MiniBar miniBar) {
+        return MiniBarResponse.builder()
+                .id(miniBar.getId())
+                .numeroHabitacion(miniBar.getHabitacion().getNumeroHabitacion())
+                .codigoProducto(miniBar.getProducto().getCodigoProducto())
+                .nombreProducto(miniBar.getProducto().getNombre())
+                .cantidad(miniBar.getCantidad())
+                .precioUnitUsd(miniBar.getPrecioUnitUsd())
+                .build();
     }
 
-    public void updateEntity(Minibar minibar, MinibarRequest request, ProjHabitacion habitacion, Producto producto) {
-        minibar.setHabitacion(habitacion);
-        minibar.setProducto(producto);
-        minibar.setCantidad(request.getCantidad());
-        minibar.setPrecioUnitUsd(request.getPrecioUnitUsd());
+    public void updateEntity(MiniBar miniBar, MiniBarRequest request, ProjHabitacion habitacion, Producto producto) {
+        miniBar.setHabitacion(habitacion);
+        miniBar.setProducto(producto);
+        miniBar.setCantidad(request.getCantidad());
+        miniBar.setPrecioUnitUsd(request.getPrecioUnitUsd());
     }
 }

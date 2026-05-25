@@ -1,11 +1,11 @@
 package cl.hilton.inventario.service;
 
-import cl.hilton.inventario.dto.MinibarRequest;
-import cl.hilton.inventario.dto.MinibarResponse;
-import cl.hilton.inventario.model.Minibar;
+import cl.hilton.inventario.dto.MiniBarRequest;
+import cl.hilton.inventario.dto.MiniBarResponse;
+import cl.hilton.inventario.model.MiniBar;
 import cl.hilton.inventario.model.Producto;
 import cl.hilton.inventario.model.ProjHabitacion;
-import cl.hilton.inventario.repository.MinibarRepository;
+import cl.hilton.inventario.repository.MiniBarRepository;
 import cl.hilton.inventario.repository.ProductoRepository;
 import cl.hilton.inventario.repository.ProjHabitacionRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,44 +15,44 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class MinibarService {
+public class MiniBarService {
 
-    private final MinibarRepository minibarRepository;
+    private final MiniBarRepository miniBarRepository;
     private final ProductoRepository productoRepository;
     private final ProjHabitacionRepository habitacionRepository;
 
-    public List<MinibarResponse> listar() {
-        return minibarRepository.findAll().stream()
+    public List<MiniBarResponse> listar() {
+        return miniBarRepository.findAll().stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public MinibarResponse buscarPorId(Long id) {
-        return toResponse(obtenerMinibar(id));
+    public MiniBarResponse buscarPorId(Long id) {
+        return toResponse(obtenerMiniBar(id));
     }
 
-    public List<MinibarResponse> buscarPorHabitacion(String numeroHabitacion) {
-        return minibarRepository.findByHabitacionNumeroHabitacion(numeroHabitacion).stream()
+    public List<MiniBarResponse> buscarPorHabitacion(String numeroHabitacion) {
+        return miniBarRepository.findByHabitacionNumeroHabitacion(numeroHabitacion).stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public List<MinibarResponse> buscarPorProducto(String codigoProducto) {
-        return minibarRepository.findByProductoCodigoProducto(codigoProducto).stream()
+    public List<MiniBarResponse> buscarPorProducto(String codigoProducto) {
+        return miniBarRepository.findByProductoCodigoProducto(codigoProducto).stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public MinibarResponse buscarPorHabitacionYProducto(String numeroHabitacion, String codigoProducto) {
-        Minibar minibar = minibarRepository
+    public MiniBarResponse buscarPorHabitacionYProducto(String numeroHabitacion, String codigoProducto) {
+        MiniBar miniBar = miniBarRepository
                 .findByHabitacionNumeroHabitacionAndProductoCodigoProducto(numeroHabitacion, codigoProducto)
                 .orElseThrow(() -> new RuntimeException("Registro de minibar no encontrado"));
 
-        return toResponse(minibar);
+        return toResponse(miniBar);
     }
 
-    public MinibarResponse crear(MinibarRequest request) {
-        if (minibarRepository.existsByHabitacionNumeroHabitacionAndProductoCodigoProducto(
+    public MiniBarResponse crear(MiniBarRequest request) {
+        if (miniBarRepository.existsByHabitacionNumeroHabitacionAndProductoCodigoProducto(
                 request.getNumeroHabitacion(),
                 request.getCodigoProducto()
         )) {
@@ -65,18 +65,18 @@ public class MinibarService {
         Producto producto = productoRepository.findByCodigoProducto(request.getCodigoProducto())
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-        Minibar minibar = Minibar.builder()
+        MiniBar miniBar = MiniBar.builder()
                 .habitacion(habitacion)
                 .producto(producto)
                 .cantidad(request.getCantidad())
                 .precioUnitUsd(request.getPrecioUnitUsd())
                 .build();
 
-        return toResponse(minibarRepository.save(minibar));
+        return toResponse(miniBarRepository.save(miniBar));
     }
 
-    public MinibarResponse actualizar(Long id, MinibarRequest request) {
-        Minibar minibar = obtenerMinibar(id);
+    public MiniBarResponse actualizar(Long id, MiniBarRequest request) {
+        MiniBar miniBar = obtenerMiniBar(id);
 
         ProjHabitacion habitacion = habitacionRepository.findById(request.getNumeroHabitacion())
                 .orElseThrow(() -> new RuntimeException("Habitación no encontrada"));
@@ -84,39 +84,39 @@ public class MinibarService {
         Producto producto = productoRepository.findByCodigoProducto(request.getCodigoProducto())
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-        minibar.setHabitacion(habitacion);
-        minibar.setProducto(producto);
-        minibar.setCantidad(request.getCantidad());
-        minibar.setPrecioUnitUsd(request.getPrecioUnitUsd());
+        miniBar.setHabitacion(habitacion);
+        miniBar.setProducto(producto);
+        miniBar.setCantidad(request.getCantidad());
+        miniBar.setPrecioUnitUsd(request.getPrecioUnitUsd());
 
-        return toResponse(minibarRepository.save(minibar));
+        return toResponse(miniBarRepository.save(miniBar));
     }
 
-    public MinibarResponse actualizarCantidad(Long id, Short cantidad) {
-        Minibar minibar = obtenerMinibar(id);
-        minibar.setCantidad(cantidad);
+    public MiniBarResponse actualizarCantidad(Long id, Integer cantidad) {
+        MiniBar miniBar = obtenerMiniBar(id);
+        miniBar.setCantidad(cantidad);
 
-        return toResponse(minibarRepository.save(minibar));
+        return toResponse(miniBarRepository.save(miniBar));
     }
 
     public void eliminar(Long id) {
-        Minibar minibar = obtenerMinibar(id);
-        minibarRepository.delete(minibar);
+        MiniBar miniBar = obtenerMiniBar(id);
+        miniBarRepository.delete(miniBar);
     }
 
-    private Minibar obtenerMinibar(Long id) {
-        return minibarRepository.findById(id)
+    private MiniBar obtenerMiniBar(Long id) {
+        return miniBarRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Minibar no encontrado"));
     }
 
-    private MinibarResponse toResponse(Minibar minibar) {
-        return MinibarResponse.builder()
-                .id(minibar.getId())
-                .numeroHabitacion(minibar.getHabitacion().getNumeroHabitacion())
-                .codigoProducto(minibar.getProducto().getCodigoProducto())
-                .nombreProducto(minibar.getProducto().getNombre())
-                .cantidad(minibar.getCantidad())
-                .precioUnitUsd(minibar.getPrecioUnitUsd())
+    private MiniBarResponse toResponse(MiniBar miniBar) {
+        return MiniBarResponse.builder()
+                .id(miniBar.getId())
+                .numeroHabitacion(miniBar.getHabitacion().getNumeroHabitacion())
+                .codigoProducto(miniBar.getProducto().getCodigoProducto())
+                .nombreProducto(miniBar.getProducto().getNombre())
+                .cantidad(miniBar.getCantidad())
+                .precioUnitUsd(miniBar.getPrecioUnitUsd())
                 .build();
     }
 }

@@ -1,12 +1,9 @@
 package cl.hilton.reportes.dto;
 
-
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 
 @Getter
 @Setter
@@ -27,10 +24,10 @@ public class MetricaRequest {
     private String nombreMetrica;
 
     @NotNull
-    private BigDecimal valor;
+    private Integer valor;
 
     @Size(max = 30)
     private String unidad;
 
-    private OffsetDateTime calculadoEn;
+    private LocalDate calculadoEn;
 }

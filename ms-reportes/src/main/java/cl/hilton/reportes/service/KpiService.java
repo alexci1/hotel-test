@@ -1,16 +1,14 @@
 package cl.hilton.reportes.service;
 
-
 import cl.hilton.reportes.dto.KpiRequest;
 import cl.hilton.reportes.dto.KpiResponse;
 import cl.hilton.reportes.model.Kpi;
 import cl.hilton.reportes.repository.KpiRepository;
 import lombok.RequiredArgsConstructor;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,29 +17,38 @@ public class KpiService {
     private final KpiRepository kpiRepository;
 
     public List<KpiResponse> listar() {
-        return kpiRepository.findAll().stream().map(this::toResponse).toList();
+        return kpiRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public KpiResponse buscarPorId(Integer id) {
+    public KpiResponse buscarPorId(Long id) {
         return toResponse(obtenerKpi(id));
     }
 
     public KpiResponse buscarPorNombreExacto(String nombre) {
         Kpi kpi = kpiRepository.findByNombre(nombre)
                 .orElseThrow(() -> new RuntimeException("KPI no encontrado"));
+
         return toResponse(kpi);
     }
 
     public List<KpiResponse> buscarPorNombre(String nombre) {
-        return kpiRepository.findByNombreContainingIgnoreCase(nombre).stream().map(this::toResponse).toList();
+        return kpiRepository.findByNombreContainingIgnoreCase(nombre).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public List<KpiResponse> buscarPorPeriodo(String periodo) {
-        return kpiRepository.findByPeriodo(periodo).stream().map(this::toResponse).toList();
+        return kpiRepository.findByPeriodo(periodo).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public List<KpiResponse> buscarPorUnidad(String unidad) {
-        return kpiRepository.findByUnidad(unidad).stream().map(this::toResponse).toList();
+        return kpiRepository.findByUnidad(unidad).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public KpiResponse crear(KpiRequest request) {
@@ -56,13 +63,13 @@ public class KpiService {
                 .valorObjetivo(request.getValorObjetivo())
                 .unidad(request.getUnidad())
                 .periodo(request.getPeriodo())
-                .actualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : OffsetDateTime.now())
+                .actualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : LocalDate.now())
                 .build();
 
         return toResponse(kpiRepository.save(kpi));
     }
 
-    public KpiResponse actualizar(Integer id, KpiRequest request) {
+    public KpiResponse actualizar(Long id, KpiRequest request) {
         Kpi kpi = obtenerKpi(id);
 
         kpi.setNombre(request.getNombre());
@@ -71,17 +78,17 @@ public class KpiService {
         kpi.setValorObjetivo(request.getValorObjetivo());
         kpi.setUnidad(request.getUnidad());
         kpi.setPeriodo(request.getPeriodo());
-        kpi.setActualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : OffsetDateTime.now());
+        kpi.setActualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : LocalDate.now());
 
         return toResponse(kpiRepository.save(kpi));
     }
 
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         Kpi kpi = obtenerKpi(id);
         kpiRepository.delete(kpi);
     }
 
-    private Kpi obtenerKpi(Integer id) {
+    private Kpi obtenerKpi(Long id) {
         return kpiRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("KPI no encontrado"));
     }

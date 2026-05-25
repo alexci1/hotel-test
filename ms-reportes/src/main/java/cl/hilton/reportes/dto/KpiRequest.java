@@ -1,11 +1,9 @@
 package cl.hilton.reportes.dto;
 
-
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -18,11 +16,12 @@ public class KpiRequest {
     @Size(max = 80)
     private String nombre;
 
+    @Size(max = 255)
     private String descripcion;
 
-    private BigDecimal valorActual;
+    private Integer valorActual;
 
-    private BigDecimal valorObjetivo;
+    private Integer valorObjetivo;
 
     @Size(max = 30)
     private String unidad;
@@ -31,5 +30,5 @@ public class KpiRequest {
     @Size(max = 20)
     private String periodo;
 
-    private OffsetDateTime actualizadoEn;
+    private LocalDate actualizadoEn;
 }

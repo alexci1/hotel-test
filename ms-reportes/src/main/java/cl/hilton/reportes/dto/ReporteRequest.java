@@ -1,4 +1,5 @@
 package cl.hilton.reportes.dto;
+
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -17,6 +18,7 @@ public class ReporteRequest {
     @Size(max = 120)
     private String nombre;
 
+    @Size(max = 255)
     private String descripcion;
 
     @NotBlank

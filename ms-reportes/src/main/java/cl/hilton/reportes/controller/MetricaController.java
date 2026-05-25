@@ -1,6 +1,5 @@
 package cl.hilton.reportes.controller;
 
-
 import cl.hilton.reportes.dto.MetricaRequest;
 import cl.hilton.reportes.dto.MetricaResponse;
 import cl.hilton.reportes.service.MetricaService;
@@ -9,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -25,7 +25,7 @@ public class MetricaController {
     }
 
     @GetMapping("/{id}")
-    public MetricaResponse buscarPorId(@PathVariable Integer id) {
+    public MetricaResponse buscarPorId(@PathVariable Long id) {
         return metricaService.buscarPorId(id);
     }
 
@@ -36,14 +36,16 @@ public class MetricaController {
 
     @GetMapping("/periodo")
     public List<MetricaResponse> buscarPorPeriodo(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodo) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodo
+    ) {
         return metricaService.buscarPorPeriodo(periodo);
     }
 
     @GetMapping("/rango")
     public List<MetricaResponse> buscarPorRangoFechas(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta
+    ) {
         return metricaService.buscarPorRangoFechas(desde, hasta);
     }
 
@@ -59,13 +61,13 @@ public class MetricaController {
     }
 
     @PutMapping("/{id}")
-    public MetricaResponse actualizar(@PathVariable Integer id, @Valid @RequestBody MetricaRequest request) {
+    public MetricaResponse actualizar(@PathVariable Long id, @Valid @RequestBody MetricaRequest request) {
         return metricaService.actualizar(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable Integer id) {
+    public void eliminar(@PathVariable Long id) {
         metricaService.eliminar(id);
     }
 }

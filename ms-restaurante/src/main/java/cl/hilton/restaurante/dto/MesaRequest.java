@@ -1,4 +1,5 @@
 package cl.hilton.restaurante.dto;
+
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -16,7 +17,7 @@ public class MesaRequest {
     @NotNull
     @Min(1)
     @Max(20)
-    private Short capacidad;
+    private Integer capacidad;
 
     @NotBlank
     @Size(max = 40)
@@ -25,4 +26,3 @@ public class MesaRequest {
     @NotNull
     private Boolean disponible;
 }
-

@@ -1,6 +1,5 @@
 package cl.hilton.inventario.mapper;
 
-
 import cl.hilton.inventario.dto.MovimientoRequest;
 import cl.hilton.inventario.dto.MovimientoResponse;
 import cl.hilton.inventario.model.Movimiento;
@@ -43,4 +42,3 @@ public class MovimientoMapper {
         movimiento.setRegistradoEn(request.getRegistradoEn());
     }
 }
-

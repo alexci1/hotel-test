@@ -4,12 +4,12 @@ import cl.hilton.restaurante.model.Pedido;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
+public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     Optional<Pedido> findByNumeroPedido(String numeroPedido);
 
@@ -21,7 +21,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
 
     List<Pedido> findByHuespedEmail(String emailHuesped);
 
-    List<Pedido> findByCreadoEnBetween(OffsetDateTime desde, OffsetDateTime hasta);
+    List<Pedido> findByCreadoEnBetween(LocalDate desde, LocalDate hasta);
 
     List<Pedido> findByMesaNumeroMesaAndEstado(String numeroMesa, String estado);
 

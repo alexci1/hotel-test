@@ -1,6 +1,5 @@
 package cl.hilton.restaurante.service;
 
-
 import cl.hilton.restaurante.dto.ProjHuespedRequest;
 import cl.hilton.restaurante.dto.ProjHuespedResponse;
 import cl.hilton.restaurante.model.ProjHuesped;
@@ -8,7 +7,7 @@ import cl.hilton.restaurante.repository.ProjHuespedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -18,7 +17,9 @@ public class ProjHuespedService {
     private final ProjHuespedRepository huespedRepository;
 
     public List<ProjHuespedResponse> listar() {
-        return huespedRepository.findAll().stream().map(this::toResponse).toList();
+        return huespedRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public ProjHuespedResponse buscarPorEmail(String email) {
@@ -26,11 +27,15 @@ public class ProjHuespedService {
     }
 
     public List<ProjHuespedResponse> buscarPorHabitacion(String numeroHabitacion) {
-        return huespedRepository.findByNumeroHabitacion(numeroHabitacion).stream().map(this::toResponse).toList();
+        return huespedRepository.findByNumeroHabitacion(numeroHabitacion).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public List<ProjHuespedResponse> buscarPorNombre(String nombre) {
-        return huespedRepository.findByNombreCompletoContainingIgnoreCase(nombre).stream().map(this::toResponse).toList();
+        return huespedRepository.findByNombreCompletoContainingIgnoreCase(nombre).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public ProjHuespedResponse crear(ProjHuespedRequest request) {
@@ -42,7 +47,7 @@ public class ProjHuespedService {
                 .email(request.getEmail())
                 .nombreCompleto(request.getNombreCompleto())
                 .numeroHabitacion(request.getNumeroHabitacion())
-                .actualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : OffsetDateTime.now())
+                .actualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : LocalDate.now())
                 .build();
 
         return toResponse(huespedRepository.save(huesped));
@@ -53,7 +58,7 @@ public class ProjHuespedService {
 
         huesped.setNombreCompleto(request.getNombreCompleto());
         huesped.setNumeroHabitacion(request.getNumeroHabitacion());
-        huesped.setActualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : OffsetDateTime.now());
+        huesped.setActualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : LocalDate.now());
 
         return toResponse(huespedRepository.save(huesped));
     }

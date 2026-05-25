@@ -1,9 +1,8 @@
 package cl.hilton.inventario.dto;
 
-
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -14,5 +13,5 @@ public class ProjHabitacionResponse {
 
     private String numeroHabitacion;
     private String tipo;
-    private OffsetDateTime actualizadoEn;
+    private LocalDate actualizadoEn;
 }

@@ -9,9 +9,9 @@ import lombok.*;
 @Builder
 public class MesaResponse {
 
-    private Integer id;
+    private Long id;
     private String numeroMesa;
-    private Short capacidad;
+    private Integer capacidad;
     private String zona;
     private Boolean disponible;
 }

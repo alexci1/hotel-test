@@ -7,12 +7,10 @@ import cl.hilton.reportes.model.Reporte;
 import cl.hilton.reportes.repository.MetricaRepository;
 import cl.hilton.reportes.repository.ReporteRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.List;
-
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -22,32 +20,45 @@ public class MetricaService {
     private final ReporteRepository reporteRepository;
 
     public List<MetricaResponse> listar() {
-        return metricaRepository.findAll().stream().map(this::toResponse).toList();
+        return metricaRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public MetricaResponse buscarPorId(Integer id) {
+    public MetricaResponse buscarPorId(Long id) {
         return toResponse(obtenerMetrica(id));
     }
 
     public List<MetricaResponse> buscarPorReporte(String codigoReporte) {
-        return metricaRepository.findByReporteCodigo(codigoReporte).stream().map(this::toResponse).toList();
+        return metricaRepository.findByReporteCodigo(codigoReporte).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public List<MetricaResponse> buscarPorPeriodo(LocalDate periodo) {
-        return metricaRepository.findByPeriodo(periodo).stream().map(this::toResponse).toList();
+        return metricaRepository.findByPeriodo(periodo).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public List<MetricaResponse> buscarPorRangoFechas(LocalDate desde, LocalDate hasta) {
-        return metricaRepository.findByPeriodoBetween(desde, hasta).stream().map(this::toResponse).toList();
+        return metricaRepository.findByPeriodoBetween(desde, hasta).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public List<MetricaResponse> buscarPorNombreMetrica(String nombreMetrica) {
-        return metricaRepository.findByNombreMetrica(nombreMetrica).stream().map(this::toResponse).toList();
+        return metricaRepository.findByNombreMetrica(nombreMetrica).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public MetricaResponse crear(MetricaRequest request) {
         if (metricaRepository.existsByReporteCodigoAndPeriodoAndNombreMetrica(
-                request.getCodigoReporte(), request.getPeriodo(), request.getNombreMetrica())) {
+                request.getCodigoReporte(),
+                request.getPeriodo(),
+                request.getNombreMetrica()
+        )) {
             throw new RuntimeException("Ya existe esa métrica para el reporte y período indicado");
         }
 
@@ -60,14 +71,15 @@ public class MetricaService {
                 .nombreMetrica(request.getNombreMetrica())
                 .valor(request.getValor())
                 .unidad(request.getUnidad())
-                .calculadoEn(request.getCalculadoEn() != null ? request.getCalculadoEn() : OffsetDateTime.now())
+                .calculadoEn(request.getCalculadoEn() != null ? request.getCalculadoEn() : LocalDate.now())
                 .build();
 
         return toResponse(metricaRepository.save(metrica));
     }
 
-    public MetricaResponse actualizar(Integer id, MetricaRequest request) {
+    public MetricaResponse actualizar(Long id, MetricaRequest request) {
         Metrica metrica = obtenerMetrica(id);
+
         Reporte reporte = reporteRepository.findByCodigo(request.getCodigoReporte())
                 .orElseThrow(() -> new RuntimeException("Reporte no encontrado"));
 
@@ -81,12 +93,12 @@ public class MetricaService {
         return toResponse(metricaRepository.save(metrica));
     }
 
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         Metrica metrica = obtenerMetrica(id);
         metricaRepository.delete(metrica);
     }
 
-    private Metrica obtenerMetrica(Integer id) {
+    private Metrica obtenerMetrica(Long id) {
         return metricaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Métrica no encontrada"));
     }

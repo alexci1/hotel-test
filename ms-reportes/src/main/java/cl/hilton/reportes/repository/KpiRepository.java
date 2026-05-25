@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface KpiRepository extends JpaRepository<Kpi, Integer> {
+public interface KpiRepository extends JpaRepository<Kpi, Long> {
 
     Optional<Kpi> findByNombre(String nombre);
 

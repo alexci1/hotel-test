@@ -3,8 +3,6 @@ package cl.hilton.restaurante.dto;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,11 +20,12 @@ public class ItemPedidoRequest {
 
     @NotNull
     @Min(1)
-    private Short cantidad;
+    private Integer cantidad;
 
     @NotNull
-    @DecimalMin(value = "0.00")
-    private BigDecimal precioUnitUsd;
+    @Min(0)
+    private Integer precioUnitUsd;
 
+    @Size(max = 255)
     private String observacion;
 }

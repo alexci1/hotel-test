@@ -1,6 +1,5 @@
 package cl.hilton.inventario.service;
 
-
 import cl.hilton.inventario.dto.MovimientoRequest;
 import cl.hilton.inventario.dto.MovimientoResponse;
 import cl.hilton.inventario.model.Movimiento;
@@ -10,7 +9,7 @@ import cl.hilton.inventario.repository.ProductoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -24,7 +23,7 @@ public class MovimientoService {
         return movimientoRepository.findAll().stream().map(this::toResponse).toList();
     }
 
-    public MovimientoResponse buscarPorId(Integer id) {
+    public MovimientoResponse buscarPorId(Long id) {
         return toResponse(obtenerMovimiento(id));
     }
 
@@ -41,7 +40,7 @@ public class MovimientoService {
         return movimientoRepository.findByRegistradoPor(registradoPor).stream().map(this::toResponse).toList();
     }
 
-    public List<MovimientoResponse> buscarPorFechas(OffsetDateTime desde, OffsetDateTime hasta) {
+    public List<MovimientoResponse> buscarPorFechas(LocalDate desde, LocalDate hasta) {
         return movimientoRepository.findByRegistradoEnBetween(desde, hasta)
                 .stream().map(this::toResponse).toList();
     }
@@ -56,14 +55,15 @@ public class MovimientoService {
                 .cantidad(request.getCantidad())
                 .motivo(request.getMotivo())
                 .registradoPor(request.getRegistradoPor())
-                .registradoEn(request.getRegistradoEn() != null ? request.getRegistradoEn() : OffsetDateTime.now())
+                .registradoEn(request.getRegistradoEn() != null ? request.getRegistradoEn() : LocalDate.now())
                 .build();
 
         return toResponse(movimientoRepository.save(movimiento));
     }
 
-    public MovimientoResponse actualizar(Integer id, MovimientoRequest request) {
+    public MovimientoResponse actualizar(Long id, MovimientoRequest request) {
         Movimiento movimiento = obtenerMovimiento(id);
+
         Producto producto = productoRepository.findByCodigoProducto(request.getCodigoProducto())
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
@@ -77,12 +77,12 @@ public class MovimientoService {
         return toResponse(movimientoRepository.save(movimiento));
     }
 
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         Movimiento movimiento = obtenerMovimiento(id);
         movimientoRepository.delete(movimiento);
     }
 
-    private Movimiento obtenerMovimiento(Integer id) {
+    private Movimiento obtenerMovimiento(Long id) {
         return movimientoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Movimiento no encontrado"));
     }
@@ -100,4 +100,3 @@ public class MovimientoService {
                 .build();
     }
 }
-

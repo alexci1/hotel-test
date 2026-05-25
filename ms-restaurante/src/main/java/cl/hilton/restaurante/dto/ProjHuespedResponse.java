@@ -2,7 +2,7 @@ package cl.hilton.restaurante.dto;
 
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -14,5 +14,5 @@ public class ProjHuespedResponse {
     private String email;
     private String nombreCompleto;
     private String numeroHabitacion;
-    private OffsetDateTime actualizadoEn;
+    private LocalDate actualizadoEn;
 }

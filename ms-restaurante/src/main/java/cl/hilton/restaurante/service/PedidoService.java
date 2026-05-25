@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -24,29 +24,38 @@ public class PedidoService {
     private final ProjHuespedRepository huespedRepository;
 
     public List<PedidoResponse> listar() {
-        return pedidoRepository.findAll().stream().map(this::toResponse).toList();
+        return pedidoRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public PedidoResponse buscarPorId(Integer id) {
+    public PedidoResponse buscarPorId(Long id) {
         return toResponse(obtenerPedido(id));
     }
 
     public PedidoResponse buscarPorNumeroPedido(String numeroPedido) {
         Pedido pedido = pedidoRepository.findByNumeroPedido(numeroPedido)
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+
         return toResponse(pedido);
     }
 
     public List<PedidoResponse> buscarPorEstado(String estado) {
-        return pedidoRepository.findByEstado(estado).stream().map(this::toResponse).toList();
+        return pedidoRepository.findByEstado(estado).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public List<PedidoResponse> buscarPorMesa(String numeroMesa) {
-        return pedidoRepository.findByMesaNumeroMesa(numeroMesa).stream().map(this::toResponse).toList();
+        return pedidoRepository.findByMesaNumeroMesa(numeroMesa).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public List<PedidoResponse> buscarPorHuesped(String email) {
-        return pedidoRepository.findByHuespedEmail(email).stream().map(this::toResponse).toList();
+        return pedidoRepository.findByHuespedEmail(email).stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public PedidoResponse crear(PedidoRequest request) {
@@ -54,24 +63,38 @@ public class PedidoService {
             throw new RuntimeException("Ya existe un pedido con ese número");
         }
 
+        Mesa mesa = obtenerMesaOpcional(request.getNumeroMesa());
+        ProjHuesped huesped = obtenerHuespedOpcional(request.getEmailHuesped());
+
+        if (mesa == null && huesped == null) {
+            throw new RuntimeException("El pedido debe tener mesa o huésped");
+        }
+
         Pedido pedido = Pedido.builder()
                 .numeroPedido(request.getNumeroPedido())
-                .mesa(obtenerMesaOpcional(request.getNumeroMesa()))
-                .huesped(obtenerHuespedOpcional(request.getEmailHuesped()))
+                .mesa(mesa)
+                .huesped(huesped)
                 .estado(request.getEstado())
                 .totalUsd(request.getTotalUsd())
-                .creadoEn(request.getCreadoEn() != null ? request.getCreadoEn() : OffsetDateTime.now())
+                .creadoEn(request.getCreadoEn() != null ? request.getCreadoEn() : LocalDate.now())
                 .build();
 
         return toResponse(pedidoRepository.save(pedido));
     }
 
-    public PedidoResponse actualizar(Integer id, PedidoRequest request) {
+    public PedidoResponse actualizar(Long id, PedidoRequest request) {
         Pedido pedido = obtenerPedido(id);
 
+        Mesa mesa = obtenerMesaOpcional(request.getNumeroMesa());
+        ProjHuesped huesped = obtenerHuespedOpcional(request.getEmailHuesped());
+
+        if (mesa == null && huesped == null) {
+            throw new RuntimeException("El pedido debe tener mesa o huésped");
+        }
+
         pedido.setNumeroPedido(request.getNumeroPedido());
-        pedido.setMesa(obtenerMesaOpcional(request.getNumeroMesa()));
-        pedido.setHuesped(obtenerHuespedOpcional(request.getEmailHuesped()));
+        pedido.setMesa(mesa);
+        pedido.setHuesped(huesped);
         pedido.setEstado(request.getEstado());
         pedido.setTotalUsd(request.getTotalUsd());
         pedido.setCreadoEn(request.getCreadoEn() != null ? request.getCreadoEn() : pedido.getCreadoEn());
@@ -79,13 +102,14 @@ public class PedidoService {
         return toResponse(pedidoRepository.save(pedido));
     }
 
-    public PedidoResponse cambiarEstado(Integer id, String estado) {
+    public PedidoResponse cambiarEstado(Long id, String estado) {
         Pedido pedido = obtenerPedido(id);
         pedido.setEstado(estado);
+
         return toResponse(pedidoRepository.save(pedido));
     }
 
-    public void eliminar(Integer id) {
+    public void eliminar(Long id) {
         Pedido pedido = obtenerPedido(id);
         pedidoRepository.delete(pedido);
     }
@@ -94,6 +118,7 @@ public class PedidoService {
         if (!StringUtils.hasText(numeroMesa)) {
             return null;
         }
+
         return mesaRepository.findByNumeroMesa(numeroMesa)
                 .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
     }
@@ -102,11 +127,12 @@ public class PedidoService {
         if (!StringUtils.hasText(email)) {
             return null;
         }
+
         return huespedRepository.findById(email)
                 .orElseThrow(() -> new RuntimeException("Huésped no encontrado"));
     }
 
-    private Pedido obtenerPedido(Integer id) {
+    private Pedido obtenerPedido(Long id) {
         return pedidoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
     }
@@ -124,4 +150,3 @@ public class PedidoService {
                 .build();
     }
 }
-

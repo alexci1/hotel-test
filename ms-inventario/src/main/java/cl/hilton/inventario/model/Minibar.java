@@ -28,7 +28,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Minibar {
+public class MiniBar {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

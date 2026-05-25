@@ -60,5 +60,5 @@ public class Producto {
 
     @OneToMany(mappedBy = "producto")
     @Builder.Default
-    private List<Minibar> minibares = new ArrayList<>();
+    private List<MiniBar> minibares = new ArrayList<>();
 }

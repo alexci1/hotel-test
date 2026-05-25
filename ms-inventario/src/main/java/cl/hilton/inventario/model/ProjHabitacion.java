@@ -36,5 +36,5 @@ public class ProjHabitacion {
 
     @OneToMany(mappedBy = "habitacion")
     @Builder.Default
-    private List<Minibar> minibares = new ArrayList<>();
+    private List<MiniBar> minibares = new ArrayList<>();
 }

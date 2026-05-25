@@ -18,11 +18,11 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     List<Producto> findByUnidad(String unidad);
 
-    List<Producto> findByStockActualLessThanEqual(Long stockActual);
+    List<Producto> findByStockActualLessThanEqual(Integer stockActual);
 
-    List<Producto> findByStockActualLessThan(Long stockActual);
+    List<Producto> findByStockActualLessThan(Integer stockActual);
 
-    List<Producto> findByStockActualGreaterThan(Long stockActual);
+    List<Producto> findByStockActualGreaterThan(Integer stockActual);
 
     List<Producto> findByNombreContainingIgnoreCase(String nombre);
 }

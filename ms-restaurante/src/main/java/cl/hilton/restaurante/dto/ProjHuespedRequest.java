@@ -1,8 +1,9 @@
 package cl.hilton.restaurante.dto;
+
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -23,5 +24,5 @@ public class ProjHuespedRequest {
     @Size(max = 10)
     private String numeroHabitacion;
 
-    private OffsetDateTime actualizadoEn;
+    private LocalDate actualizadoEn;
 }

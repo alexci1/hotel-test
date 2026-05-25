@@ -6,10 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
-public interface MetricaRepository extends JpaRepository<Metrica, Integer> {
+public interface MetricaRepository extends JpaRepository<Metrica, Long> {
 
     List<Metrica> findByReporteCodigo(String codigoReporte);
 
@@ -18,12 +17,6 @@ public interface MetricaRepository extends JpaRepository<Metrica, Integer> {
     List<Metrica> findByPeriodoBetween(LocalDate desde, LocalDate hasta);
 
     List<Metrica> findByNombreMetrica(String nombreMetrica);
-
-    Optional<Metrica> findByReporteCodigoAndPeriodoAndNombreMetrica(
-            String codigoReporte,
-            LocalDate periodo,
-            String nombreMetrica
-    );
 
     boolean existsByReporteCodigoAndPeriodoAndNombreMetrica(
             String codigoReporte,

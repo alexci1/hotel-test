@@ -2,8 +2,7 @@ package cl.hilton.restaurante.dto;
 
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -12,12 +11,12 @@ import java.time.OffsetDateTime;
 @Builder
 public class PedidoResponse {
 
-    private Integer id;
+    private Long id;
     private String numeroPedido;
     private String numeroMesa;
     private String emailHuesped;
     private String nombreHuesped;
     private String estado;
-    private BigDecimal totalUsd;
-    private OffsetDateTime creadoEn;
+    private Integer totalUsd;
+    private LocalDate creadoEn;
 }

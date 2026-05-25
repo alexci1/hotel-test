@@ -24,11 +24,11 @@ public class ProductoRequest {
 
     @NotNull
     @Min(0)
-    private Long stockActual;
+    private Integer stockActual;
 
     @NotNull
     @Min(0)
-    private Long stockMinimo;
+    private Integer stockMinimo;
 
     @NotBlank
     @Size(max = 20)

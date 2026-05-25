@@ -3,14 +3,12 @@ package cl.hilton.inventario.dto;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MinibarRequest {
+public class MiniBarRequest {
 
     @NotBlank
     @Size(max = 10)
@@ -22,9 +20,9 @@ public class MinibarRequest {
 
     @NotNull
     @Min(0)
-    private Short cantidad;
+    private Integer cantidad;
 
     @NotNull
-    @DecimalMin(value = "0.00")
-    private BigDecimal precioUnitUsd;
+    @Min(0)
+    private Integer precioUnitUsd;
 }

@@ -2,8 +2,7 @@ package cl.hilton.reportes.dto;
 
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -12,12 +11,12 @@ import java.time.OffsetDateTime;
 @Builder
 public class KpiResponse {
 
-    private Integer id;
+    private Long id;
     private String nombre;
     private String descripcion;
-    private BigDecimal valorActual;
-    private BigDecimal valorObjetivo;
+    private Integer valorActual;
+    private Integer valorObjetivo;
     private String unidad;
     private String periodo;
-    private OffsetDateTime actualizadoEn;
+    private LocalDate actualizadoEn;
 }

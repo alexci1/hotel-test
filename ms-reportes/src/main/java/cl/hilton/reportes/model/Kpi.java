@@ -32,7 +32,7 @@ public class Kpi {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @Column(name = "nombre", nullable = false, length = 80, unique = true)
     private String nombre;

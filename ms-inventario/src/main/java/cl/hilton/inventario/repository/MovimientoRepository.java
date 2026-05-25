@@ -1,15 +1,14 @@
 package cl.hilton.inventario.repository;
+
 import cl.hilton.inventario.model.Movimiento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface MovimientoRepository extends JpaRepository<Movimiento, Integer> {
-
-    List<Movimiento> findByProductoCodigoProducto(String codigoProducto);
+public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
 
     List<Movimiento> findByProductoCodigoProductoOrderByRegistradoEnDesc(String codigoProducto);
 
@@ -17,12 +16,9 @@ public interface MovimientoRepository extends JpaRepository<Movimiento, Integer>
 
     List<Movimiento> findByRegistradoPor(String registradoPor);
 
-    List<Movimiento> findByRegistradoEnBetween(OffsetDateTime desde, OffsetDateTime hasta);
-
-    List<Movimiento> findByProductoCodigoProductoAndTipo(String codigoProducto, String tipo);
-
-    List<Movimiento> findByCantidadLessThan(Integer cantidad);
+    List<Movimiento> findByRegistradoEnBetween(LocalDate desde, LocalDate hasta);
 
     List<Movimiento> findByCantidadGreaterThan(Integer cantidad);
-}
 
+    List<Movimiento> findByCantidadLessThan(Integer cantidad);
+}

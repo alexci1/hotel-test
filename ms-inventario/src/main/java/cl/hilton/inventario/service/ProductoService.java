@@ -44,7 +44,7 @@ public class ProductoService {
                 .toList();
     }
 
-    public List<ProductoResponse> buscarStockMenorOIgual(Long stock) {
+    public List<ProductoResponse> buscarStockMenorOIgual(Integer stock) {
         return productoRepository.findByStockActualLessThanEqual(stock).stream()
                 .map(this::toResponse)
                 .toList();
@@ -80,7 +80,7 @@ public class ProductoService {
         return toResponse(productoRepository.save(producto));
     }
 
-    public ProductoResponse ajustarStock(Long id, Long cantidad) {
+    public ProductoResponse ajustarStock(Long id, Integer cantidad) {
         Producto producto = obtenerProducto(id);
         producto.setStockActual(producto.getStockActual() + cantidad);
 
