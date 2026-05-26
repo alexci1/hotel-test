@@ -29,7 +29,7 @@ public class NotificacionController {
     }
 
     @GetMapping("/evento/{eventoOrigen}")
-    public NotificacionResponse findByEventoOrigen(@PathVariable String eventoOrigen) {
+    public List<NotificacionResponse> findByEventoOrigen(@PathVariable String eventoOrigen) {
         return notificacionService.findByEventoOrigen(eventoOrigen);
     }
 
