@@ -1,6 +1,6 @@
 package cl.hilton.notificaciones.service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -35,16 +35,11 @@ public class NotificacionService {
         return notificacionMapper.toResponse(notificacion);
     }
 
-    public NotificacionResponse findByEventoOrigen(String eventoOrigen) {
-        Notificacion notificacion = notificacionRepository.findByEventoOrigen(eventoOrigen)
-                .orElseThrow(() -> new EntityNotFoundException("Notificacion no encontrada con evento origen: " + eventoOrigen));
-
-        return notificacionMapper.toResponse(notificacion);
+    public List<NotificacionResponse> findByEventoOrigen(String eventoOrigen) {
+        return notificacionMapper.toResponseList(notificacionRepository.findByEventoOrigen(eventoOrigen));
     }
 
     public NotificacionResponse create(NotificacionRequest request) {
-        validarEventoOrigenUnico(request.getEventoOrigen());
-
         Plantilla plantilla = plantillaRepository.findByCodigo(request.getCodigoPlantilla())
                 .orElseThrow(() -> new EntityNotFoundException("Plantilla no encontrada con codigo: " + request.getCodigoPlantilla()));
 
@@ -54,7 +49,7 @@ public class NotificacionService {
         Notificacion notificacion = notificacionMapper.toEntity(request);
         notificacion.setPlantilla(plantilla);
         notificacion.setHuesped(huesped);
-        notificacion.setCreadoEn(LocalDateTime.now().toString());
+        notificacion.setCreadoEn(LocalDate.now());
 
         Notificacion notificacionGuardada = notificacionRepository.save(notificacion);
 
@@ -63,10 +58,6 @@ public class NotificacionService {
 
     public NotificacionResponse update(Long id, NotificacionRequest request) {
         Notificacion notificacion = getNotificacionById(id);
-
-        if (!notificacion.getEventoOrigen().equalsIgnoreCase(request.getEventoOrigen())) {
-            validarEventoOrigenUnico(request.getEventoOrigen());
-        }
 
         Plantilla plantilla = plantillaRepository.findByCodigo(request.getCodigoPlantilla())
                 .orElseThrow(() -> new EntityNotFoundException("Plantilla no encontrada con codigo: " + request.getCodigoPlantilla()));
@@ -91,11 +82,5 @@ public class NotificacionService {
     private Notificacion getNotificacionById(Long id) {
         return notificacionRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Notificacion no encontrada con id: " + id));
-    }
-
-    private void validarEventoOrigenUnico(String eventoOrigen) {
-        if (notificacionRepository.existsByEventoOrigen(eventoOrigen)) {
-            throw new IllegalArgumentException("Ya existe una notificacion con evento origen: " + eventoOrigen);
-        }
     }
 }
