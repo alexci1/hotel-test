@@ -1,9 +1,10 @@
 package cl.hilton.reservas.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-
-import java.math.BigDecimal;
 
 @Data
 public class CancelacionRequest {
@@ -18,5 +19,6 @@ public class CancelacionRequest {
     private String canceladoPor;
 
     @NotNull(message = "La penalidad es obligatoria")
-    private BigDecimal penalidadUsd;
+    @Min(value = 0, message = "La penalidad no puede ser negativa")
+    private Integer penalidadUsd;
 }
