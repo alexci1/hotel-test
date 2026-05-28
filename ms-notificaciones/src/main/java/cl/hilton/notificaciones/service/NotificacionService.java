@@ -39,6 +39,18 @@ public class NotificacionService {
         return notificacionMapper.toResponseList(notificacionRepository.findByEventoOrigen(eventoOrigen));
     }
 
+    public List<NotificacionResponse> findByCodigoPlantilla(String codigoPlantilla) {
+        return notificacionMapper.toResponseList(notificacionRepository.findByPlantillaCodigo(codigoPlantilla));
+    }
+
+    public List<NotificacionResponse> findByEmailHuesped(String emailHuesped) {
+        return notificacionMapper.toResponseList(notificacionRepository.findByHuespedEmail(emailHuesped));
+    }
+
+    public List<NotificacionResponse> findByCreadoEn(LocalDate creadoEn) {
+        return notificacionMapper.toResponseList(notificacionRepository.findByCreadoEn(creadoEn));
+    }
+
     public NotificacionResponse create(NotificacionRequest request) {
         Plantilla plantilla = plantillaRepository.findByCodigo(request.getCodigoPlantilla())
                 .orElseThrow(() -> new EntityNotFoundException("Plantilla no encontrada con codigo: " + request.getCodigoPlantilla()));
