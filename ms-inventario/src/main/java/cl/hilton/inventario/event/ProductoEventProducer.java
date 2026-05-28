@@ -1,14 +1,9 @@
 package cl.hilton.inventario.event;
 
-import cl.hilton.common.event.ProductoCreatedEvent;
-import cl.hilton.common.event.ProductoDeletedEvent;
-import cl.hilton.common.event.ProductoUpdatedEvent;
-import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ProductoEventProducer {
 
     public static final String PRODUCTO_CREATED_TOPIC = "producto.created";
@@ -17,15 +12,19 @@ public class ProductoEventProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publishCreated(ProductoCreatedEvent event) {
-        kafkaTemplate.send(PRODUCTO_CREATED_TOPIC, event.getCodigoProducto(), event);
+    public ProductoEventProducer(KafkaTemplate<String, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publishUpdated(ProductoUpdatedEvent event) {
-        kafkaTemplate.send(PRODUCTO_UPDATED_TOPIC, event.getCodigoProducto(), event);
+    public void publishCreated(String key, Object event) {
+        kafkaTemplate.send(PRODUCTO_CREATED_TOPIC, key, event);
     }
 
-    public void publishDeleted(ProductoDeletedEvent event) {
-        kafkaTemplate.send(PRODUCTO_DELETED_TOPIC, event.getCodigoProducto(), event);
+    public void publishUpdated(String key, Object event) {
+        kafkaTemplate.send(PRODUCTO_UPDATED_TOPIC, key, event);
+    }
+
+    public void publishDeleted(String key, Object event) {
+        kafkaTemplate.send(PRODUCTO_DELETED_TOPIC, key, event);
     }
 }
