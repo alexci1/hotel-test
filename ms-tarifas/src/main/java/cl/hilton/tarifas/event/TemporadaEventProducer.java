@@ -1,14 +1,9 @@
 package cl.hilton.tarifas.event;
 
-import cl.hilton.common.event.TemporadaCreatedEvent;
-import cl.hilton.common.event.TemporadaDeletedEvent;
-import cl.hilton.common.event.TemporadaUpdatedEvent;
-import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class TemporadaEventProducer {
 
     public static final String TEMPORADA_CREATED_TOPIC = "temporada.created";
@@ -17,15 +12,19 @@ public class TemporadaEventProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publishCreated(TemporadaCreatedEvent event) {
-        kafkaTemplate.send(TEMPORADA_CREATED_TOPIC, event.getCodigo(), event);
+    public TemporadaEventProducer(KafkaTemplate<String, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publishUpdated(TemporadaUpdatedEvent event) {
-        kafkaTemplate.send(TEMPORADA_UPDATED_TOPIC, event.getCodigo(), event);
+    public void publishCreated(String key, Object event) {
+        kafkaTemplate.send(TEMPORADA_CREATED_TOPIC, key, event);
     }
 
-    public void publishDeleted(TemporadaDeletedEvent event) {
-        kafkaTemplate.send(TEMPORADA_DELETED_TOPIC, event.getCodigo(), event);
+    public void publishUpdated(String key, Object event) {
+        kafkaTemplate.send(TEMPORADA_UPDATED_TOPIC, key, event);
+    }
+
+    public void publishDeleted(String key, Object event) {
+        kafkaTemplate.send(TEMPORADA_DELETED_TOPIC, key, event);
     }
 }
