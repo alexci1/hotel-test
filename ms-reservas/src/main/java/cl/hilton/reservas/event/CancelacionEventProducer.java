@@ -1,14 +1,9 @@
 package cl.hilton.reservas.event;
 
-import cl.hilton.common.event.CancelacionCreatedEvent;
-import cl.hilton.common.event.CancelacionDeletedEvent;
-import cl.hilton.common.event.CancelacionUpdatedEvent;
-import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class CancelacionEventProducer {
 
     public static final String CANCELACION_CREATED_TOPIC = "cancelacion.created";
@@ -17,15 +12,19 @@ public class CancelacionEventProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publishCreated(CancelacionCreatedEvent event) {
-        kafkaTemplate.send(CANCELACION_CREATED_TOPIC, event.getCodigoReserva(), event);
+    public CancelacionEventProducer(KafkaTemplate<String, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publishUpdated(CancelacionUpdatedEvent event) {
-        kafkaTemplate.send(CANCELACION_UPDATED_TOPIC, event.getCodigoReserva(), event);
+    public void publishCreated(String key, Object event) {
+        kafkaTemplate.send(CANCELACION_CREATED_TOPIC, key, event);
     }
 
-    public void publishDeleted(CancelacionDeletedEvent event) {
-        kafkaTemplate.send(CANCELACION_DELETED_TOPIC, event.getCodigoReserva(), event);
+    public void publishUpdated(String key, Object event) {
+        kafkaTemplate.send(CANCELACION_UPDATED_TOPIC, key, event);
+    }
+
+    public void publishDeleted(String key, Object event) {
+        kafkaTemplate.send(CANCELACION_DELETED_TOPIC, key, event);
     }
 }
