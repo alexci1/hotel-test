@@ -1,6 +1,6 @@
 package cl.hilton.pagos.service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -36,13 +36,21 @@ public class PagoService {
         return pagoMapper.toResponseList(pagoRepository.findByFacturaNumeroFactura(numeroFactura));
     }
 
+    public List<PagoResponse> findByMetodo(String metodo) {
+        return pagoMapper.toResponseList(pagoRepository.findByMetodo(metodo));
+    }
+
+    public List<PagoResponse> findByPagadoEn(LocalDate pagadoEn) {
+        return pagoMapper.toResponseList(pagoRepository.findByPagadoEn(pagadoEn));
+    }
+
     public PagoResponse create(PagoRequest request) {
         Factura factura = facturaRepository.findByNumeroFactura(request.getNumeroFactura())
                 .orElseThrow(() -> new EntityNotFoundException("Factura no encontrada con numero: " + request.getNumeroFactura()));
 
         Pago pago = pagoMapper.toEntity(request);
         pago.setFactura(factura);
-        pago.setPagadoEn(LocalDateTime.now().toString());
+        pago.setPagadoEn(LocalDate.now());
 
         Pago pagoGuardado = pagoRepository.save(pago);
 
