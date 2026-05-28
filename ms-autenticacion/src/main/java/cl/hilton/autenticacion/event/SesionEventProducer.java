@@ -1,14 +1,9 @@
 package cl.hilton.autenticacion.event;
 
-import cl.hilton.common.event.SesionCreatedEvent;
-import cl.hilton.common.event.SesionDeletedEvent;
-import cl.hilton.common.event.SesionUpdatedEvent;
-import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class SesionEventProducer {
 
     public static final String SESION_CREATED_TOPIC = "sesion.created";
@@ -17,15 +12,19 @@ public class SesionEventProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publishCreated(SesionCreatedEvent event) {
-        kafkaTemplate.send(SESION_CREATED_TOPIC, event.getUsuarioEmail(), event);
+    public SesionEventProducer(KafkaTemplate<String, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publishUpdated(SesionUpdatedEvent event) {
-        kafkaTemplate.send(SESION_UPDATED_TOPIC, event.getUsuarioEmail(), event);
+    public void publishCreated(String key, Object event) {
+        kafkaTemplate.send(SESION_CREATED_TOPIC, key, event);
     }
 
-    public void publishDeleted(SesionDeletedEvent event) {
-        kafkaTemplate.send(SESION_DELETED_TOPIC, event.getUsuarioEmail(), event);
+    public void publishUpdated(String key, Object event) {
+        kafkaTemplate.send(SESION_UPDATED_TOPIC, key, event);
+    }
+
+    public void publishDeleted(String key, Object event) {
+        kafkaTemplate.send(SESION_DELETED_TOPIC, key, event);
     }
 }
