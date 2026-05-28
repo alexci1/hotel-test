@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -53,10 +54,10 @@ public class Huesped {
     @Column(name = "creado_en", nullable = false)
     private LocalDate creadoEn;
 
-    @OneToMany(mappedBy = "huesped")
+    @OneToMany(mappedBy = "huesped", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Documento> documentos = new ArrayList<>();
 
-    @OneToOne(mappedBy = "huesped")
+    @OneToOne(mappedBy = "huesped", cascade = CascadeType.ALL, orphanRemoval = true)
     private Preferencia preferencia;
 }
