@@ -1,5 +1,6 @@
 package cl.hilton.autenticacion.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -38,6 +39,14 @@ public class UsuarioService {
         return usuarioMapper.toResponse(usuario);
     }
 
+    public List<UsuarioResponse> findByRolCodigo(String rolCodigo) {
+        return usuarioMapper.toResponseList(usuarioRepository.findByRolCodigo(rolCodigo));
+    }
+
+    public List<UsuarioResponse> findByActivo(Boolean activo) {
+        return usuarioMapper.toResponseList(usuarioRepository.findByActivo(activo));
+    }
+
     public UsuarioResponse create(UsuarioRequest request) {
         validarEmailUnico(request.getEmail());
 
@@ -46,7 +55,8 @@ public class UsuarioService {
 
         Usuario usuario = usuarioMapper.toEntity(request);
         usuario.setRol(rol);
-        usuario.setActivo(true);
+        usuario.setActivo(request.getActivo() != null ? request.getActivo() : true);
+        usuario.setCreadoEn(LocalDate.now());
 
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
 
@@ -55,6 +65,7 @@ public class UsuarioService {
 
     public UsuarioResponse update(Long id, UsuarioRequest request) {
         Usuario usuario = getUsuarioById(id);
+        Boolean activoActual = usuario.getActivo();
 
         if (!usuario.getEmail().equalsIgnoreCase(request.getEmail())) {
             validarEmailUnico(request.getEmail());
@@ -65,6 +76,7 @@ public class UsuarioService {
 
         usuarioMapper.updateEntity(request, usuario);
         usuario.setRol(rol);
+        usuario.setActivo(request.getActivo() != null ? request.getActivo() : activoActual);
 
         Usuario usuarioActualizado = usuarioRepository.save(usuario);
 
