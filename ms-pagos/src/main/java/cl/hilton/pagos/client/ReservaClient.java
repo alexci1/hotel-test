@@ -1,24 +1,25 @@
 package cl.hilton.pagos.client;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import cl.hilton.pagos.dto.ProjReservaResponse;
+
 @FeignClient(name = "ms-reservas")
 public interface ReservaClient {
 
-    @GetMapping("/reservas")
-    List<Map<String, Object>> listar();
+    @GetMapping("/api/v1/reservas")
+    List<ProjReservaResponse> listar();
 
-    @GetMapping("/reservas/{id}")
-    Map<String, Object> buscarPorId(@PathVariable("id") Long id);
+    @GetMapping("/api/v1/reservas/{id}")
+    ProjReservaResponse buscarPorId(@PathVariable("id") Long id);
 
-    @GetMapping("/reservas/codigo/{codigoReserva}")
-    Map<String, Object> buscarPorCodigoReserva(@PathVariable("codigoReserva") String codigoReserva);
+    @GetMapping("/api/v1/reservas/codigo/{codigoReserva}")
+    ProjReservaResponse buscarPorCodigoReserva(@PathVariable("codigoReserva") String codigoReserva);
 
-    @GetMapping("/reservas/estado/{estado}")
-    List<Map<String, Object>> buscarPorEstado(@PathVariable("estado") String estado);
+    @GetMapping("/api/v1/reservas/estado/{estado}")
+    List<ProjReservaResponse> buscarPorEstado(@PathVariable("estado") String estado);
 }
