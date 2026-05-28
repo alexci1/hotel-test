@@ -1,5 +1,7 @@
 package cl.hilton.notificaciones.dto;
 
+import java.time.LocalDate;
+
 import lombok.Data;
 
 @Data
@@ -10,5 +12,5 @@ public class NotificacionResponse {
     private String emailHuesped;
     private String eventoOrigen;
     private String payloadJson;
-    private String creadoEn;
+    private LocalDate creadoEn;
 }
