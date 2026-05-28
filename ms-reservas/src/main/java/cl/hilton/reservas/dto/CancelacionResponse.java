@@ -1,9 +1,8 @@
 package cl.hilton.reservas.dto;
 
-import lombok.Data;
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import lombok.Data;
 
 @Data
 public class CancelacionResponse {
@@ -13,5 +12,5 @@ public class CancelacionResponse {
     private String motivo;
     private String canceladoPor;
     private LocalDate canceladoEn;
-    private BigDecimal penalidadUsd;
+    private Integer penalidadUsd;
 }
