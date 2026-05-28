@@ -1,14 +1,9 @@
 package cl.hilton.reservas.event;
 
-import cl.hilton.common.event.ReservaCreatedEvent;
-import cl.hilton.common.event.ReservaDeletedEvent;
-import cl.hilton.common.event.ReservaUpdatedEvent;
-import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class ReservaEventProducer {
 
     public static final String RESERVA_CREATED_TOPIC = "reserva.created";
@@ -17,15 +12,19 @@ public class ReservaEventProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publishCreated(ReservaCreatedEvent event) {
-        kafkaTemplate.send(RESERVA_CREATED_TOPIC, event.getCodigoReserva(), event);
+    public ReservaEventProducer(KafkaTemplate<String, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publishUpdated(ReservaUpdatedEvent event) {
-        kafkaTemplate.send(RESERVA_UPDATED_TOPIC, event.getCodigoReserva(), event);
+    public void publishCreated(String key, Object event) {
+        kafkaTemplate.send(RESERVA_CREATED_TOPIC, key, event);
     }
 
-    public void publishDeleted(ReservaDeletedEvent event) {
-        kafkaTemplate.send(RESERVA_DELETED_TOPIC, event.getCodigoReserva(), event);
+    public void publishUpdated(String key, Object event) {
+        kafkaTemplate.send(RESERVA_UPDATED_TOPIC, key, event);
+    }
+
+    public void publishDeleted(String key, Object event) {
+        kafkaTemplate.send(RESERVA_DELETED_TOPIC, key, event);
     }
 }
