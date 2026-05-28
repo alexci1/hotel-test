@@ -1,5 +1,7 @@
 package cl.hilton.pagos.dto;
 
+import java.time.LocalDate;
+
 import lombok.Data;
 
 @Data
@@ -10,5 +12,5 @@ public class PagoResponse {
     private Integer montoUsd;
     private String metodo;
     private String referencia;
-    private String pagadoEn;
+    private LocalDate pagadoEn;
 }
