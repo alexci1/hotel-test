@@ -1,14 +1,9 @@
 package cl.hilton.restaurante.event;
 
-import cl.hilton.common.event.PedidoCreatedEvent;
-import cl.hilton.common.event.PedidoDeletedEvent;
-import cl.hilton.common.event.PedidoUpdatedEvent;
-import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class PedidoRestauranteEventProducer {
 
     public static final String PEDIDO_CREATED_TOPIC = "pedido.created";
@@ -17,15 +12,19 @@ public class PedidoRestauranteEventProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publishCreated(PedidoCreatedEvent event) {
-        kafkaTemplate.send(PEDIDO_CREATED_TOPIC, event.getNumeroPedido(), event);
+    public PedidoRestauranteEventProducer(KafkaTemplate<String, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publishUpdated(PedidoUpdatedEvent event) {
-        kafkaTemplate.send(PEDIDO_UPDATED_TOPIC, event.getNumeroPedido(), event);
+    public void publishCreated(String key, Object event) {
+        kafkaTemplate.send(PEDIDO_CREATED_TOPIC, key, event);
     }
 
-    public void publishDeleted(PedidoDeletedEvent event) {
-        kafkaTemplate.send(PEDIDO_DELETED_TOPIC, event.getNumeroPedido(), event);
+    public void publishUpdated(String key, Object event) {
+        kafkaTemplate.send(PEDIDO_UPDATED_TOPIC, key, event);
+    }
+
+    public void publishDeleted(String key, Object event) {
+        kafkaTemplate.send(PEDIDO_DELETED_TOPIC, key, event);
     }
 }
