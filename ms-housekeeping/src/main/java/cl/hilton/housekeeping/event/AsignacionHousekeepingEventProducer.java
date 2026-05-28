@@ -1,35 +1,26 @@
 package cl.hilton.housekeeping.event;
 
-import cl.hilton.common.event.AsignacionCreatedEvent;
-import cl.hilton.common.event.AsignacionDeletedEvent;
-import cl.hilton.common.event.AsignacionUpdatedEvent;
-import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class AsignacionHousekeepingEventProducer {
-
-    public static final String ASIGNACION_CREATED_TOPIC = "asignacion.created";
-    public static final String ASIGNACION_UPDATED_TOPIC = "asignacion.updated";
-    public static final String ASIGNACION_DELETED_TOPIC = "asignacion.deleted";
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publishCreated(AsignacionCreatedEvent event) {
-        kafkaTemplate.send(ASIGNACION_CREATED_TOPIC, buildKey(event.getNumeroHabitacion(), event.getCodigoTarea()), event);
+    public AsignacionHousekeepingEventProducer(KafkaTemplate<String, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publishUpdated(AsignacionUpdatedEvent event) {
-        kafkaTemplate.send(ASIGNACION_UPDATED_TOPIC, buildKey(event.getNumeroHabitacion(), event.getCodigoTarea()), event);
+    public void publishCreated(String key, Object event) {
+        kafkaTemplate.send("asignacion.created", key, event);
     }
 
-    public void publishDeleted(AsignacionDeletedEvent event) {
-        kafkaTemplate.send(ASIGNACION_DELETED_TOPIC, buildKey(event.getNumeroHabitacion(), event.getCodigoTarea()), event);
+    public void publishUpdated(String key, Object event) {
+        kafkaTemplate.send("asignacion.updated", key, event);
     }
 
-    private String buildKey(String numeroHabitacion, String codigoTarea) {
-        return numeroHabitacion + "-" + codigoTarea;
+    public void publishDeleted(String key, Object event) {
+        kafkaTemplate.send("asignacion.deleted", key, event);
     }
 }
