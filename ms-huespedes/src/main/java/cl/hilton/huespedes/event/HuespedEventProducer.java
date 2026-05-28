@@ -1,14 +1,9 @@
 package cl.hilton.huespedes.event;
 
-import cl.hilton.common.event.HuespedCreatedEvent;
-import cl.hilton.common.event.HuespedDeletedEvent;
-import cl.hilton.common.event.HuespedUpdatedEvent;
-import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class HuespedEventProducer {
 
     public static final String HUESPED_CREATED_TOPIC = "huesped.created";
@@ -17,15 +12,19 @@ public class HuespedEventProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publishCreated(HuespedCreatedEvent event) {
-        kafkaTemplate.send(HUESPED_CREATED_TOPIC, event.getEmail(), event);
+    public HuespedEventProducer(KafkaTemplate<String, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publishUpdated(HuespedUpdatedEvent event) {
-        kafkaTemplate.send(HUESPED_UPDATED_TOPIC, event.getEmail(), event);
+    public void publishCreated(String key, Object event) {
+        kafkaTemplate.send(HUESPED_CREATED_TOPIC, key, event);
     }
 
-    public void publishDeleted(HuespedDeletedEvent event) {
-        kafkaTemplate.send(HUESPED_DELETED_TOPIC, event.getEmail(), event);
+    public void publishUpdated(String key, Object event) {
+        kafkaTemplate.send(HUESPED_UPDATED_TOPIC, key, event);
+    }
+
+    public void publishDeleted(String key, Object event) {
+        kafkaTemplate.send(HUESPED_DELETED_TOPIC, key, event);
     }
 }
