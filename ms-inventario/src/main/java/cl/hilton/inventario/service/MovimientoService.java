@@ -1,16 +1,19 @@
 package cl.hilton.inventario.service;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import cl.hilton.inventario.dto.MovimientoRequest;
 import cl.hilton.inventario.dto.MovimientoResponse;
+import cl.hilton.inventario.mapper.MovimientoMapper;
 import cl.hilton.inventario.model.Movimiento;
 import cl.hilton.inventario.model.Producto;
 import cl.hilton.inventario.repository.MovimientoRepository;
 import cl.hilton.inventario.repository.ProductoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,85 +21,117 @@ public class MovimientoService {
 
     private final MovimientoRepository movimientoRepository;
     private final ProductoRepository productoRepository;
+    private final MovimientoMapper movimientoMapper;
 
-    public List<MovimientoResponse> listar() {
-        return movimientoRepository.findAll().stream().map(this::toResponse).toList();
+    public List<MovimientoResponse> findAll() {
+        return movimientoMapper.toResponseList(movimientoRepository.findAll());
     }
 
-    public MovimientoResponse buscarPorId(Long id) {
-        return toResponse(obtenerMovimiento(id));
+    public MovimientoResponse findById(Long id) {
+        Movimiento movimiento = getMovimientoById(id);
+        return movimientoMapper.toResponse(movimiento);
     }
 
-    public List<MovimientoResponse> buscarPorProducto(String codigoProducto) {
-        return movimientoRepository.findByProductoCodigoProductoOrderByRegistradoEnDesc(codigoProducto)
-                .stream().map(this::toResponse).toList();
+    public List<MovimientoResponse> findByCodigoProducto(String codigoProducto) {
+        return movimientoMapper.toResponseList(movimientoRepository.findByProductoCodigoProductoOrderByRegistradoEnDesc(codigoProducto));
     }
 
-    public List<MovimientoResponse> buscarPorTipo(String tipo) {
-        return movimientoRepository.findByTipo(tipo).stream().map(this::toResponse).toList();
+    public List<MovimientoResponse> findByTipo(String tipo) {
+        return movimientoMapper.toResponseList(movimientoRepository.findByTipo(tipo));
     }
 
-    public List<MovimientoResponse> buscarPorRegistradoPor(String registradoPor) {
-        return movimientoRepository.findByRegistradoPor(registradoPor).stream().map(this::toResponse).toList();
+    public List<MovimientoResponse> findByRegistradoPor(String registradoPor) {
+        return movimientoMapper.toResponseList(movimientoRepository.findByRegistradoPor(registradoPor));
     }
 
-    public List<MovimientoResponse> buscarPorFechas(LocalDate desde, LocalDate hasta) {
-        return movimientoRepository.findByRegistradoEnBetween(desde, hasta)
-                .stream().map(this::toResponse).toList();
+    public List<MovimientoResponse> findByRegistradoEn(LocalDate registradoEn) {
+        return movimientoMapper.toResponseList(movimientoRepository.findByRegistradoEn(registradoEn));
     }
 
-    public MovimientoResponse crear(MovimientoRequest request) {
-        Producto producto = productoRepository.findByCodigoProducto(request.getCodigoProducto())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-
-        Movimiento movimiento = Movimiento.builder()
-                .producto(producto)
-                .tipo(request.getTipo())
-                .cantidad(request.getCantidad())
-                .motivo(request.getMotivo())
-                .registradoPor(request.getRegistradoPor())
-                .registradoEn(request.getRegistradoEn() != null ? request.getRegistradoEn() : LocalDate.now())
-                .build();
-
-        return toResponse(movimientoRepository.save(movimiento));
+    public List<MovimientoResponse> findByRangoFechas(LocalDate desde, LocalDate hasta) {
+        return movimientoMapper.toResponseList(movimientoRepository.findByRegistradoEnBetween(desde, hasta));
     }
 
-    public MovimientoResponse actualizar(Long id, MovimientoRequest request) {
-        Movimiento movimiento = obtenerMovimiento(id);
+    public List<MovimientoResponse> findByCantidadGreaterThan(Integer cantidad) {
+        return movimientoMapper.toResponseList(movimientoRepository.findByCantidadGreaterThan(cantidad));
+    }
 
-        Producto producto = productoRepository.findByCodigoProducto(request.getCodigoProducto())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+    public List<MovimientoResponse> findByCantidadLessThan(Integer cantidad) {
+        return movimientoMapper.toResponseList(movimientoRepository.findByCantidadLessThan(cantidad));
+    }
 
+    public MovimientoResponse create(MovimientoRequest request) {
+        validarCantidad(request.getCantidad());
+
+        Producto producto = getProductoByCodigo(request.getCodigoProducto());
+        aplicarMovimientoStock(producto, request.getCantidad());
+
+        Movimiento movimiento = movimientoMapper.toEntity(request);
         movimiento.setProducto(producto);
-        movimiento.setTipo(request.getTipo());
-        movimiento.setCantidad(request.getCantidad());
-        movimiento.setMotivo(request.getMotivo());
-        movimiento.setRegistradoPor(request.getRegistradoPor());
-        movimiento.setRegistradoEn(request.getRegistradoEn() != null ? request.getRegistradoEn() : movimiento.getRegistradoEn());
+        movimiento.setRegistradoEn(LocalDate.now());
 
-        return toResponse(movimientoRepository.save(movimiento));
+        productoRepository.save(producto);
+        Movimiento movimientoGuardado = movimientoRepository.save(movimiento);
+
+        return movimientoMapper.toResponse(movimientoGuardado);
     }
 
-    public void eliminar(Long id) {
-        Movimiento movimiento = obtenerMovimiento(id);
+    public MovimientoResponse update(Long id, MovimientoRequest request) {
+        validarCantidad(request.getCantidad());
+
+        Movimiento movimiento = getMovimientoById(id);
+        Producto productoAnterior = movimiento.getProducto();
+        revertirMovimientoStock(productoAnterior, movimiento.getCantidad());
+
+        Producto productoNuevo = getProductoByCodigo(request.getCodigoProducto());
+        aplicarMovimientoStock(productoNuevo, request.getCantidad());
+
+        movimientoMapper.updateEntity(request, movimiento);
+        movimiento.setProducto(productoNuevo);
+
+        productoRepository.save(productoAnterior);
+        if (!productoAnterior.getCodigoProducto().equalsIgnoreCase(productoNuevo.getCodigoProducto())) {
+            productoRepository.save(productoNuevo);
+        }
+
+        Movimiento movimientoActualizado = movimientoRepository.save(movimiento);
+
+        return movimientoMapper.toResponse(movimientoActualizado);
+    }
+
+    public void deleteById(Long id) {
+        Movimiento movimiento = getMovimientoById(id);
+        Producto producto = movimiento.getProducto();
+        revertirMovimientoStock(producto, movimiento.getCantidad());
+        productoRepository.save(producto);
         movimientoRepository.delete(movimiento);
     }
 
-    private Movimiento obtenerMovimiento(Long id) {
+    private Movimiento getMovimientoById(Long id) {
         return movimientoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Movimiento no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Movimiento no encontrado con id: " + id));
     }
 
-    private MovimientoResponse toResponse(Movimiento movimiento) {
-        return MovimientoResponse.builder()
-                .id(movimiento.getId())
-                .codigoProducto(movimiento.getProducto().getCodigoProducto())
-                .nombreProducto(movimiento.getProducto().getNombre())
-                .tipo(movimiento.getTipo())
-                .cantidad(movimiento.getCantidad())
-                .motivo(movimiento.getMotivo())
-                .registradoPor(movimiento.getRegistradoPor())
-                .registradoEn(movimiento.getRegistradoEn())
-                .build();
+    private Producto getProductoByCodigo(String codigoProducto) {
+        return productoRepository.findByCodigoProducto(codigoProducto)
+                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado con codigo: " + codigoProducto));
+    }
+
+    private void validarCantidad(Integer cantidad) {
+        if (cantidad == 0) {
+            throw new IllegalArgumentException("La cantidad del movimiento no puede ser cero");
+        }
+    }
+
+    private void aplicarMovimientoStock(Producto producto, Integer cantidad) {
+        Integer nuevoStock = producto.getStockActual() + cantidad;
+        if (nuevoStock < 0) {
+            throw new IllegalArgumentException("El movimiento deja el stock negativo para el producto: " + producto.getCodigoProducto());
+        }
+        producto.setStockActual(nuevoStock);
+    }
+
+    private void revertirMovimientoStock(Producto producto, Integer cantidad) {
+        producto.setStockActual(producto.getStockActual() - cantidad);
     }
 }
