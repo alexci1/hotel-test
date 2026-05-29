@@ -58,7 +58,8 @@ public class LlaveService {
         llave.setActiva(request.getActiva() != null ? request.getActiva() : Boolean.TRUE);
         llave.setEmitidaEn(LocalDate.now());
 
-        return llaveMapper.toResponse(llaveRepository.save(llave));
+        Llave saved = llaveRepository.save(llave);
+        return llaveMapper.toResponse(saved);
     }
 
     public LlaveResponse update(Long id, LlaveRequest request) {
@@ -74,14 +75,16 @@ public class LlaveService {
         llaveMapper.updateEntity(request, reserva, llave);
         llave.setActiva(request.getActiva() != null ? request.getActiva() : Boolean.TRUE);
 
-        return llaveMapper.toResponse(llaveRepository.save(llave));
+        Llave saved = llaveRepository.save(llave);
+        return llaveMapper.toResponse(saved);
     }
 
     public LlaveResponse updateEstado(Long id, Boolean activa) {
         Llave llave = getLlave(id);
         llave.setActiva(activa);
 
-        return llaveMapper.toResponse(llaveRepository.save(llave));
+        Llave saved = llaveRepository.save(llave);
+        return llaveMapper.toResponse(saved);
     }
 
     public void deleteById(Long id) {
