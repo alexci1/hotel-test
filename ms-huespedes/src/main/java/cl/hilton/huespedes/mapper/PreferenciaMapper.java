@@ -1,41 +1,29 @@
 package cl.hilton.huespedes.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.huespedes.dto.PreferenciaRequest;
 import cl.hilton.huespedes.dto.PreferenciaResponse;
-import cl.hilton.huespedes.model.Huesped;
 import cl.hilton.huespedes.model.Preferencia;
-import org.springframework.stereotype.Component;
 
-@Component
-public class PreferenciaMapper {
+@Mapper(componentModel = "spring")
+public interface PreferenciaMapper {
 
-    public Preferencia toEntity(PreferenciaRequest request, Huesped huesped) {
-        return Preferencia.builder()
-                .huesped(huesped)
-                .pisoPreferido(request.getPisoPreferido())
-                .tipoCama(request.getTipoCama())
-                .alergias(request.getAlergias())
-                .observaciones(request.getObservaciones())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "huesped", ignore = true)
+    Preferencia toEntity(PreferenciaRequest request);
 
-    public PreferenciaResponse toResponse(Preferencia preferencia) {
-        return PreferenciaResponse.builder()
-                .id(preferencia.getId())
-                .emailHuesped(preferencia.getHuesped().getEmail())
-                .nombreHuesped(preferencia.getHuesped().getNombreCompleto())
-                .pisoPreferido(preferencia.getPisoPreferido())
-                .tipoCama(preferencia.getTipoCama())
-                .alergias(preferencia.getAlergias())
-                .observaciones(preferencia.getObservaciones())
-                .build();
-    }
+    @Mapping(target = "emailHuesped", source = "huesped.email")
+    @Mapping(target = "nombreHuesped", source = "huesped.nombreCompleto")
+    PreferenciaResponse toResponse(Preferencia preferencia);
 
-    public void updateEntity(Preferencia preferencia, PreferenciaRequest request, Huesped huesped) {
-        preferencia.setHuesped(huesped);
-        preferencia.setPisoPreferido(request.getPisoPreferido());
-        preferencia.setTipoCama(request.getTipoCama());
-        preferencia.setAlergias(request.getAlergias());
-        preferencia.setObservaciones(request.getObservaciones());
-    }
+    List<PreferenciaResponse> toResponseList(List<Preferencia> preferencias);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "huesped", ignore = true)
+    void updateEntity(PreferenciaRequest request, @MappingTarget Preferencia preferencia);
 }
