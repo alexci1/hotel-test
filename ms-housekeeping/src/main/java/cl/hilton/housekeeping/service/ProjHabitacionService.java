@@ -1,6 +1,7 @@
 package cl.hilton.housekeeping.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,7 @@ public class ProjHabitacionService {
         }
 
         ProjHabitacion habitacion = habitacionMapper.toEntity(request);
-        ProjHabitacion saved = habitacionRepository.save(habitacion);
+        ProjHabitacion saved = habitacionRepository.save(Objects.requireNonNull(habitacion));
         return habitacionMapper.toResponse(saved);
     }
 
@@ -50,13 +51,13 @@ public class ProjHabitacionService {
         ProjHabitacion habitacion = getHabitacion(numeroHabitacion);
         habitacionMapper.updateEntity(habitacion, request);
 
-        ProjHabitacion saved = habitacionRepository.save(habitacion);
+        ProjHabitacion saved = habitacionRepository.save(Objects.requireNonNull(habitacion));
         return habitacionMapper.toResponse(saved);
     }
 
     public void deleteByNumeroHabitacion(String numeroHabitacion) {
         ProjHabitacion habitacion = getHabitacion(numeroHabitacion);
-        habitacionRepository.delete(habitacion);
+        habitacionRepository.delete(Objects.requireNonNull(habitacion));
     }
 
     private ProjHabitacion getHabitacion(String numeroHabitacion) {
