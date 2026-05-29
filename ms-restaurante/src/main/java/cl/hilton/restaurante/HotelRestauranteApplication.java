@@ -2,13 +2,13 @@ package cl.hilton.restaurante;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
-@org.springframework.cloud.openfeign.EnableFeignClients
+@EnableFeignClients
 public class HotelRestauranteApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(HotelRestauranteApplication.class, args);
 	}
-
 }
