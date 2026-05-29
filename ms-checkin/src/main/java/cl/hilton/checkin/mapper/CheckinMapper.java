@@ -23,9 +23,9 @@ public class CheckinMapper {
     public CheckinResponse toResponse(Checkin checkin) {
         return CheckinResponse.builder()
                 .id(checkin.getId())
-                .codigoReserva(checkin.getReserva().getCodigoReserva())
-                .emailHuesped(checkin.getHuesped().getEmail())
-                .nombreHuesped(checkin.getHuesped().getNombreCompleto())
+                .codigoReserva(checkin.getReserva() != null ? checkin.getReserva().getCodigoReserva() : null)
+                .emailHuesped(checkin.getHuesped() != null ? checkin.getHuesped().getEmail() : null)
+                .nombreHuesped(checkin.getHuesped() != null ? checkin.getHuesped().getNombreCompleto() : null)
                 .numeroHabitacion(checkin.getNumeroHabitacion())
                 .fechaHora(checkin.getFechaHora())
                 .realizadoPor(checkin.getRealizadoPor())
