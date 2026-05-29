@@ -9,7 +9,7 @@ public class ProjTipoHabitacionResponse {
 
     private String descripcion;
 
-    private Short capacidadMax;
+    private Integer capacidadMax;
 
     private Boolean activo;
 }
