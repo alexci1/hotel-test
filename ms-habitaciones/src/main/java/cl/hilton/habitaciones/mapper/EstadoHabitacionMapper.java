@@ -1,29 +1,30 @@
 package cl.hilton.habitaciones.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.habitaciones.dto.EstadoHabitacionRequest;
 import cl.hilton.habitaciones.dto.EstadoHabitacionResponse;
 import cl.hilton.habitaciones.model.EstadoHabitacion;
-import cl.hilton.habitaciones.model.Habitacion;
 
-public class EstadoHabitacionMapper {
+@Mapper(componentModel = "spring")
+public interface EstadoHabitacionMapper {
 
-    public static EstadoHabitacion toEntity(EstadoHabitacionRequest request, Habitacion habitacion) {
-        return EstadoHabitacion.builder()
-                .habitacion(habitacion)
-                .estado(request.getEstado())
-                .observacion(request.getObservacion())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "habitacion", ignore = true)
+    @Mapping(target = "actualizadoEn", ignore = true)
+    EstadoHabitacion toEntity(EstadoHabitacionRequest request);
 
-    public static EstadoHabitacionResponse toResponse(EstadoHabitacion estadoHabitacion) {
-        EstadoHabitacionResponse response = new EstadoHabitacionResponse();
+    @Mapping(target = "numeroHabitacion", source = "habitacion.numeroHabitacion")
+    EstadoHabitacionResponse toResponse(EstadoHabitacion estadoHabitacion);
 
-        response.setId(estadoHabitacion.getId());
-        response.setNumeroHabitacion(estadoHabitacion.getHabitacion().getNumeroHabitacion());
-        response.setEstado(estadoHabitacion.getEstado());
-        response.setObservacion(estadoHabitacion.getObservacion());
-        response.setActualizadoEn(estadoHabitacion.getActualizadoEn());
+    List<EstadoHabitacionResponse> toResponseList(List<EstadoHabitacion> estadosHabitacion);
 
-        return response;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "habitacion", ignore = true)
+    @Mapping(target = "actualizadoEn", ignore = true)
+    void updateEntity(EstadoHabitacionRequest request, @MappingTarget EstadoHabitacion estadoHabitacion);
 }
