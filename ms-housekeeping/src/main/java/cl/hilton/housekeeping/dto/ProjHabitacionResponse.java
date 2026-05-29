@@ -13,6 +13,6 @@ public class ProjHabitacionResponse {
 
     private String numeroHabitacion;
     private String tipo;
-    private Long piso;
+    private Integer piso;
     private LocalDate actualizadoEn;
 }
