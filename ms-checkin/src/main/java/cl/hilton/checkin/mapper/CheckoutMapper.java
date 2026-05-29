@@ -1,37 +1,29 @@
 package cl.hilton.checkin.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.checkin.dto.CheckoutRequest;
 import cl.hilton.checkin.dto.CheckoutResponse;
 import cl.hilton.checkin.model.Checkout;
 import cl.hilton.checkin.model.ProjReserva;
-import org.springframework.stereotype.Component;
 
-@Component
-public class CheckoutMapper {
+@Mapper(componentModel = "spring")
+public interface CheckoutMapper {
 
-    public Checkout toEntity(CheckoutRequest request, ProjReserva reserva) {
-        return Checkout.builder()
-                .reserva(reserva)
-                .fechaHora(request.getFechaHora())
-                .realizadoPor(request.getRealizadoPor())
-                .observaciones(request.getObservaciones())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reserva", source = "reserva")
+    Checkout toEntity(CheckoutRequest request, ProjReserva reserva);
 
-    public CheckoutResponse toResponse(Checkout checkout) {
-        return CheckoutResponse.builder()
-                .id(checkout.getId())
-                .codigoReserva(checkout.getReserva().getCodigoReserva())
-                .fechaHora(checkout.getFechaHora())
-                .realizadoPor(checkout.getRealizadoPor())
-                .observaciones(checkout.getObservaciones())
-                .build();
-    }
+    @Mapping(target = "codigoReserva", source = "reserva.codigoReserva")
+    CheckoutResponse toResponse(Checkout checkout);
 
-    public void updateEntity(Checkout checkout, CheckoutRequest request, ProjReserva reserva) {
-        checkout.setReserva(reserva);
-        checkout.setFechaHora(request.getFechaHora());
-        checkout.setRealizadoPor(request.getRealizadoPor());
-        checkout.setObservaciones(request.getObservaciones());
-    }
+    List<CheckoutResponse> toResponseList(List<Checkout> checkouts);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reserva", source = "reserva")
+    void updateEntity(CheckoutRequest request, ProjReserva reserva, @MappingTarget Checkout checkout);
 }
