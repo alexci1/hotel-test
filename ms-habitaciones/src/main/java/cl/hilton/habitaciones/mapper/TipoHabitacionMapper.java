@@ -1,29 +1,27 @@
 package cl.hilton.habitaciones.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.habitaciones.dto.TipoHabitacionRequest;
 import cl.hilton.habitaciones.dto.TipoHabitacionResponse;
 import cl.hilton.habitaciones.model.TipoHabitacion;
 
-public class TipoHabitacionMapper {
+@Mapper(componentModel = "spring")
+public interface TipoHabitacionMapper {
 
-    public static TipoHabitacion toEntity(TipoHabitacionRequest request) {
-        return TipoHabitacion.builder()
-                .codigo(request.getCodigo())
-                .descripcion(request.getDescripcion())
-                .capacidadMax(request.getCapacidadMax())
-                .activo(request.getActivo())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "habitaciones", ignore = true)
+    TipoHabitacion toEntity(TipoHabitacionRequest request);
 
-    public static TipoHabitacionResponse toResponse(TipoHabitacion tipoHabitacion) {
-        TipoHabitacionResponse response = new TipoHabitacionResponse();
+    TipoHabitacionResponse toResponse(TipoHabitacion tipoHabitacion);
 
-        response.setId(tipoHabitacion.getId());
-        response.setCodigo(tipoHabitacion.getCodigo());
-        response.setDescripcion(tipoHabitacion.getDescripcion());
-        response.setCapacidadMax(tipoHabitacion.getCapacidadMax());
-        response.setActivo(tipoHabitacion.getActivo());
+    List<TipoHabitacionResponse> toResponseList(List<TipoHabitacion> tiposHabitacion);
 
-        return response;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "habitaciones", ignore = true)
+    void updateEntity(TipoHabitacionRequest request, @MappingTarget TipoHabitacion tipoHabitacion);
 }
