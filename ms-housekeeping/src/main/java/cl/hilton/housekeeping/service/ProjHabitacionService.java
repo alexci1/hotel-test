@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class ProjHabitacionService {
 
     private final ProjHabitacionRepository habitacionRepository;
