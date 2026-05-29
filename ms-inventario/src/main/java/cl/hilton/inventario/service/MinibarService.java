@@ -1,17 +1,20 @@
 package cl.hilton.inventario.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import cl.hilton.inventario.dto.MiniBarRequest;
 import cl.hilton.inventario.dto.MiniBarResponse;
+import cl.hilton.inventario.mapper.MiniBarMapper;
 import cl.hilton.inventario.model.MiniBar;
 import cl.hilton.inventario.model.Producto;
 import cl.hilton.inventario.model.ProjHabitacion;
 import cl.hilton.inventario.repository.MiniBarRepository;
 import cl.hilton.inventario.repository.ProductoRepository;
 import cl.hilton.inventario.repository.ProjHabitacionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -20,103 +23,118 @@ public class MiniBarService {
     private final MiniBarRepository miniBarRepository;
     private final ProductoRepository productoRepository;
     private final ProjHabitacionRepository habitacionRepository;
+    private final MiniBarMapper miniBarMapper;
 
-    public List<MiniBarResponse> listar() {
-        return miniBarRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public List<MiniBarResponse> findAll() {
+        return miniBarMapper.toResponseList(miniBarRepository.findAll());
     }
 
-    public MiniBarResponse buscarPorId(Long id) {
-        return toResponse(obtenerMiniBar(id));
+    public MiniBarResponse findById(Long id) {
+        MiniBar miniBar = getMiniBarById(id);
+        return miniBarMapper.toResponse(miniBar);
     }
 
-    public List<MiniBarResponse> buscarPorHabitacion(String numeroHabitacion) {
-        return miniBarRepository.findByHabitacionNumeroHabitacion(numeroHabitacion).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<MiniBarResponse> findByNumeroHabitacion(String numeroHabitacion) {
+        return miniBarMapper.toResponseList(miniBarRepository.findByHabitacionNumeroHabitacion(numeroHabitacion));
     }
 
-    public List<MiniBarResponse> buscarPorProducto(String codigoProducto) {
-        return miniBarRepository.findByProductoCodigoProducto(codigoProducto).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<MiniBarResponse> findByCodigoProducto(String codigoProducto) {
+        return miniBarMapper.toResponseList(miniBarRepository.findByProductoCodigoProducto(codigoProducto));
     }
 
-    public MiniBarResponse buscarPorHabitacionYProducto(String numeroHabitacion, String codigoProducto) {
-        MiniBar miniBar = miniBarRepository
-                .findByHabitacionNumeroHabitacionAndProductoCodigoProducto(numeroHabitacion, codigoProducto)
-                .orElseThrow(() -> new RuntimeException("Registro de minibar no encontrado"));
+    public MiniBarResponse findByHabitacionAndProducto(String numeroHabitacion, String codigoProducto) {
+        MiniBar miniBar = miniBarRepository.findByHabitacionNumeroHabitacionAndProductoCodigoProducto(numeroHabitacion, codigoProducto)
+                .orElseThrow(() -> new EntityNotFoundException("Registro de minibar no encontrado para habitacion y producto indicados"));
 
-        return toResponse(miniBar);
+        return miniBarMapper.toResponse(miniBar);
     }
 
-    public MiniBarResponse crear(MiniBarRequest request) {
-        if (miniBarRepository.existsByHabitacionNumeroHabitacionAndProductoCodigoProducto(
-                request.getNumeroHabitacion(),
-                request.getCodigoProducto()
-        )) {
-            throw new RuntimeException("El producto ya existe en el minibar de esa habitación");
-        }
-
-        ProjHabitacion habitacion = habitacionRepository.findById(request.getNumeroHabitacion())
-                .orElseThrow(() -> new RuntimeException("Habitación no encontrada"));
-
-        Producto producto = productoRepository.findByCodigoProducto(request.getCodigoProducto())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-
-        MiniBar miniBar = MiniBar.builder()
-                .habitacion(habitacion)
-                .producto(producto)
-                .cantidad(request.getCantidad())
-                .precioUnitUsd(request.getPrecioUnitUsd())
-                .build();
-
-        return toResponse(miniBarRepository.save(miniBar));
+    public List<MiniBarResponse> findByCantidad(Integer cantidad) {
+        return miniBarMapper.toResponseList(miniBarRepository.findByCantidad(cantidad));
     }
 
-    public MiniBarResponse actualizar(Long id, MiniBarRequest request) {
-        MiniBar miniBar = obtenerMiniBar(id);
+    public List<MiniBarResponse> findByCantidadGreaterThan(Integer cantidad) {
+        return miniBarMapper.toResponseList(miniBarRepository.findByCantidadGreaterThan(cantidad));
+    }
 
-        ProjHabitacion habitacion = habitacionRepository.findById(request.getNumeroHabitacion())
-                .orElseThrow(() -> new RuntimeException("Habitación no encontrada"));
+    public List<MiniBarResponse> findByPrecioUnitUsdGreaterThan(Integer precioUnitUsd) {
+        return miniBarMapper.toResponseList(miniBarRepository.findByPrecioUnitUsdGreaterThan(precioUnitUsd));
+    }
 
-        Producto producto = productoRepository.findByCodigoProducto(request.getCodigoProducto())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+    public MiniBarResponse create(MiniBarRequest request) {
+        validarRegistroUnico(request.getNumeroHabitacion(), request.getCodigoProducto());
 
+        ProjHabitacion habitacion = getHabitacionByNumero(request.getNumeroHabitacion());
+        Producto producto = getProductoByCodigo(request.getCodigoProducto());
+
+        MiniBar miniBar = miniBarMapper.toEntity(request);
         miniBar.setHabitacion(habitacion);
         miniBar.setProducto(producto);
-        miniBar.setCantidad(request.getCantidad());
-        miniBar.setPrecioUnitUsd(request.getPrecioUnitUsd());
+        miniBar.setCantidad(request.getCantidad() != null ? request.getCantidad() : 0);
 
-        return toResponse(miniBarRepository.save(miniBar));
+        MiniBar miniBarGuardado = miniBarRepository.save(miniBar);
+
+        return miniBarMapper.toResponse(miniBarGuardado);
+    }
+
+    public MiniBarResponse update(Long id, MiniBarRequest request) {
+        MiniBar miniBar = getMiniBarById(id);
+        Integer cantidadActual = miniBar.getCantidad();
+
+        if (!miniBar.getHabitacion().getNumeroHabitacion().equalsIgnoreCase(request.getNumeroHabitacion())
+                || !miniBar.getProducto().getCodigoProducto().equalsIgnoreCase(request.getCodigoProducto())) {
+            validarRegistroUnico(request.getNumeroHabitacion(), request.getCodigoProducto());
+        }
+
+        ProjHabitacion habitacion = getHabitacionByNumero(request.getNumeroHabitacion());
+        Producto producto = getProductoByCodigo(request.getCodigoProducto());
+
+        miniBarMapper.updateEntity(request, miniBar);
+        miniBar.setHabitacion(habitacion);
+        miniBar.setProducto(producto);
+        miniBar.setCantidad(request.getCantidad() != null ? request.getCantidad() : cantidadActual);
+
+        MiniBar miniBarActualizado = miniBarRepository.save(miniBar);
+
+        return miniBarMapper.toResponse(miniBarActualizado);
     }
 
     public MiniBarResponse actualizarCantidad(Long id, Integer cantidad) {
-        MiniBar miniBar = obtenerMiniBar(id);
+        if (cantidad < 0) {
+            throw new IllegalArgumentException("La cantidad no puede ser negativa");
+        }
+
+        MiniBar miniBar = getMiniBarById(id);
         miniBar.setCantidad(cantidad);
 
-        return toResponse(miniBarRepository.save(miniBar));
+        MiniBar miniBarActualizado = miniBarRepository.save(miniBar);
+
+        return miniBarMapper.toResponse(miniBarActualizado);
     }
 
-    public void eliminar(Long id) {
-        MiniBar miniBar = obtenerMiniBar(id);
+    public void deleteById(Long id) {
+        MiniBar miniBar = getMiniBarById(id);
         miniBarRepository.delete(miniBar);
     }
 
-    private MiniBar obtenerMiniBar(Long id) {
+    private MiniBar getMiniBarById(Long id) {
         return miniBarRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Minibar no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Minibar no encontrado con id: " + id));
     }
 
-    private MiniBarResponse toResponse(MiniBar miniBar) {
-        return MiniBarResponse.builder()
-                .id(miniBar.getId())
-                .numeroHabitacion(miniBar.getHabitacion().getNumeroHabitacion())
-                .codigoProducto(miniBar.getProducto().getCodigoProducto())
-                .nombreProducto(miniBar.getProducto().getNombre())
-                .cantidad(miniBar.getCantidad())
-                .precioUnitUsd(miniBar.getPrecioUnitUsd())
-                .build();
+    private ProjHabitacion getHabitacionByNumero(String numeroHabitacion) {
+        return habitacionRepository.findByNumeroHabitacion(numeroHabitacion)
+                .orElseThrow(() -> new EntityNotFoundException("Habitacion proyectada no encontrada con numero: " + numeroHabitacion));
+    }
+
+    private Producto getProductoByCodigo(String codigoProducto) {
+        return productoRepository.findByCodigoProducto(codigoProducto)
+                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado con codigo: " + codigoProducto));
+    }
+
+    private void validarRegistroUnico(String numeroHabitacion, String codigoProducto) {
+        if (miniBarRepository.existsByHabitacionNumeroHabitacionAndProductoCodigoProducto(numeroHabitacion, codigoProducto)) {
+            throw new IllegalArgumentException("Ya existe ese producto en el minibar de la habitacion indicada");
+        }
     }
 }
