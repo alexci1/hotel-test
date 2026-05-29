@@ -1,15 +1,13 @@
 package cl.hilton.habitaciones.dto;
 
-import lombok.Data;
+import java.time.LocalDate;
 
-import java.math.BigDecimal;
+import lombok.Data;
 
 @Data
 public class ProjTarifaResponse {
 
     private String tipoHabitacion;
-
-    private BigDecimal precioBaseUsd;
-
-    private Boolean activa;
+    private Integer precioBaseUsd;
+    private LocalDate actualizadoEn;
 }
