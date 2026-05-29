@@ -1,11 +1,12 @@
 package cl.hilton.housekeeping.repository;
 
-import cl.hilton.housekeeping.model.Asignacion;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.List;
+import cl.hilton.housekeeping.model.Asignacion;
 
 @Repository
 public interface AsignacionRepository extends JpaRepository<Asignacion, Long> {
@@ -20,5 +21,5 @@ public interface AsignacionRepository extends JpaRepository<Asignacion, Long> {
 
     List<Asignacion> findByEstado(String estado);
 
-    List<Asignacion> findByPrioridad(Long prioridad);
+    List<Asignacion> findByPrioridad(Integer prioridad);
 }
