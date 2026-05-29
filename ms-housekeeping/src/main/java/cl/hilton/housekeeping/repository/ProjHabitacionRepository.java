@@ -11,5 +11,5 @@ public interface ProjHabitacionRepository extends JpaRepository<ProjHabitacion, 
 
     List<ProjHabitacion> findByTipo(String tipo);
 
-    List<ProjHabitacion> findByPiso(Long piso);
+    List<ProjHabitacion> findByPiso(Integer piso);
 }
