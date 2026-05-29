@@ -1,9 +1,12 @@
 package cl.hilton.housekeeping.dto;
 
-import jakarta.validation.constraints.*;
-import lombok.*;
-
-import java.time.LocalDate;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -15,17 +18,11 @@ public class ReporteRequest {
     @NotNull
     private Long asignacionId;
 
-    @NotNull
     private Boolean aprobado;
 
     @Size(max = 255)
     private String observaciones;
 
-    @NotBlank
-    @Email
     @Size(max = 120)
     private String inspector;
-
-    @NotNull
-    private LocalDate inspeccionadoEn;
 }
