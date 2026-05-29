@@ -34,9 +34,7 @@ public class CheckinService {
     }
 
     public List<CheckinResponse> listar() {
-        return checkinRepository.findAll().stream()
-                .map(checkinMapper::toResponse)
-                .toList();
+        return checkinMapper.toResponseList(checkinRepository.findAll());
     }
 
     public CheckinResponse buscarPorId(Long id) {
@@ -51,9 +49,7 @@ public class CheckinService {
     }
 
     public List<CheckinResponse> buscarPorHuesped(String emailHuesped) {
-        return checkinRepository.findByHuespedEmail(emailHuesped).stream()
-                .map(checkinMapper::toResponse)
-                .toList();
+        return checkinMapper.toResponseList(checkinRepository.findByHuespedEmail(emailHuesped));
     }
 
     public CheckinResponse crear(CheckinRequest request) {
@@ -74,7 +70,7 @@ public class CheckinService {
         ProjReserva reserva = obtenerReserva(request.getCodigoReserva());
         ProjHuesped huesped = obtenerHuesped(request.getEmailHuesped());
 
-        checkinMapper.updateEntity(checkin, request, reserva, huesped);
+        checkinMapper.updateEntity(request, reserva, huesped, checkin);
 
         return checkinMapper.toResponse(checkinRepository.save(checkin));
     }
