@@ -1,66 +1,86 @@
 package cl.hilton.reportes.controller;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import cl.hilton.reportes.dto.KpiRequest;
 import cl.hilton.reportes.dto.KpiResponse;
 import cl.hilton.reportes.service.KpiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
-@RequestMapping("/api/kpis")
+@RequestMapping("/api/v1/reportes/kpis")
 @RequiredArgsConstructor
 public class KpiController {
 
     private final KpiService kpiService;
 
     @GetMapping
-    public List<KpiResponse> listar() {
-        return kpiService.listar();
+    public List<KpiResponse> findAll() {
+        return kpiService.findAll();
     }
 
     @GetMapping("/{id}")
-    public KpiResponse buscarPorId(@PathVariable Long id) {
-        return kpiService.buscarPorId(id);
+    public KpiResponse findById(@PathVariable Long id) {
+        return kpiService.findById(id);
     }
 
-    @GetMapping("/nombre-exacto/{nombre}")
-    public KpiResponse buscarPorNombreExacto(@PathVariable String nombre) {
-        return kpiService.buscarPorNombreExacto(nombre);
+    @GetMapping("/nombre/{nombre}")
+    public KpiResponse findByNombre(@PathVariable String nombre) {
+        return kpiService.findByNombre(nombre);
     }
 
     @GetMapping("/buscar")
-    public List<KpiResponse> buscarPorNombre(@RequestParam String nombre) {
-        return kpiService.buscarPorNombre(nombre);
+    public List<KpiResponse> findByNombreContaining(@RequestParam String nombre) {
+        return kpiService.findByNombreContaining(nombre);
     }
 
     @GetMapping("/periodo/{periodo}")
-    public List<KpiResponse> buscarPorPeriodo(@PathVariable String periodo) {
-        return kpiService.buscarPorPeriodo(periodo);
+    public List<KpiResponse> findByPeriodo(@PathVariable String periodo) {
+        return kpiService.findByPeriodo(periodo);
     }
 
     @GetMapping("/unidad/{unidad}")
-    public List<KpiResponse> buscarPorUnidad(@PathVariable String unidad) {
-        return kpiService.buscarPorUnidad(unidad);
+    public List<KpiResponse> findByUnidad(@PathVariable String unidad) {
+        return kpiService.findByUnidad(unidad);
+    }
+
+    @GetMapping("/actualizado/{actualizadoEn}")
+    public List<KpiResponse> findByActualizadoEn(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate actualizadoEn) {
+        return kpiService.findByActualizadoEn(actualizadoEn);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public KpiResponse crear(@Valid @RequestBody KpiRequest request) {
-        return kpiService.crear(request);
+    public KpiResponse create(@Valid @RequestBody KpiRequest request) {
+        return kpiService.create(request);
     }
 
     @PutMapping("/{id}")
-    public KpiResponse actualizar(@PathVariable Long id, @Valid @RequestBody KpiRequest request) {
-        return kpiService.actualizar(id, request);
+    public KpiResponse update(
+            @PathVariable Long id,
+            @Valid @RequestBody KpiRequest request) {
+        return kpiService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable Long id) {
-        kpiService.eliminar(id);
+    public void deleteById(@PathVariable Long id) {
+        kpiService.deleteById(id);
     }
 }

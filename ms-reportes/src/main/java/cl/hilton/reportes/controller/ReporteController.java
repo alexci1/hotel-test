@@ -1,67 +1,83 @@
 package cl.hilton.reportes.controller;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import cl.hilton.reportes.dto.ReporteRequest;
 import cl.hilton.reportes.dto.ReporteResponse;
 import cl.hilton.reportes.service.ReporteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
-@RequestMapping("/api/reportes")
+@RequestMapping("/api/v1/reportes/reportes")
 @RequiredArgsConstructor
 public class ReporteController {
 
     private final ReporteService reporteService;
 
     @GetMapping
-    public List<ReporteResponse> listar() {
-        return reporteService.listar();
+    public List<ReporteResponse> findAll() {
+        return reporteService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ReporteResponse buscarPorId(@PathVariable Integer id) {
-        return reporteService.buscarPorId(id);
+    public ReporteResponse findById(@PathVariable Long id) {
+        return reporteService.findById(id);
     }
 
     @GetMapping("/codigo/{codigo}")
-    public ReporteResponse buscarPorCodigo(@PathVariable String codigo) {
-        return reporteService.buscarPorCodigo(codigo);
+    public ReporteResponse findByCodigo(@PathVariable String codigo) {
+        return reporteService.findByCodigo(codigo);
     }
 
     @GetMapping("/tipo/{tipo}")
-    public List<ReporteResponse> buscarPorTipo(@PathVariable String tipo) {
-        return reporteService.buscarPorTipo(tipo);
+    public List<ReporteResponse> findByTipo(@PathVariable String tipo) {
+        return reporteService.findByTipo(tipo);
     }
 
     @GetMapping("/frecuencia/{frecuencia}")
-    public List<ReporteResponse> buscarPorFrecuencia(@PathVariable String frecuencia) {
-        return reporteService.buscarPorFrecuencia(frecuencia);
+    public List<ReporteResponse> findByFrecuencia(@PathVariable String frecuencia) {
+        return reporteService.findByFrecuencia(frecuencia);
     }
 
-    @GetMapping("/activo")
-    public List<ReporteResponse> buscarPorActivo(@RequestParam Boolean activo) {
-        return reporteService.buscarPorActivo(activo);
+    @GetMapping("/activo/{activo}")
+    public List<ReporteResponse> findByActivo(@PathVariable Boolean activo) {
+        return reporteService.findByActivo(activo);
+    }
+
+    @GetMapping("/buscar")
+    public List<ReporteResponse> findByNombre(@RequestParam String nombre) {
+        return reporteService.findByNombre(nombre);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ReporteResponse crear(@Valid @RequestBody ReporteRequest request) {
-        return reporteService.crear(request);
+    public ReporteResponse create(@Valid @RequestBody ReporteRequest request) {
+        return reporteService.create(request);
     }
 
     @PutMapping("/{id}")
-    public ReporteResponse actualizar(@PathVariable Integer id, @Valid @RequestBody ReporteRequest request) {
-        return reporteService.actualizar(id, request);
+    public ReporteResponse update(
+            @PathVariable Long id,
+            @Valid @RequestBody ReporteRequest request) {
+        return reporteService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable Integer id) {
-        reporteService.eliminar(id);
+    public void deleteById(@PathVariable Long id) {
+        reporteService.deleteById(id);
     }
 }
-

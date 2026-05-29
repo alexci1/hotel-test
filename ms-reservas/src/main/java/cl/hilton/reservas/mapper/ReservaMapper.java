@@ -1,42 +1,35 @@
 package cl.hilton.reservas.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.reservas.dto.ReservaRequest;
 import cl.hilton.reservas.dto.ReservaResponse;
-import cl.hilton.reservas.model.ProjHabitacion;
-import cl.hilton.reservas.model.ProjHuesped;
 import cl.hilton.reservas.model.Reserva;
 
-public class ReservaMapper {
+@Mapper(componentModel = "spring")
+public interface ReservaMapper {
 
-    public static Reserva toEntity(
-            ReservaRequest request,
-            ProjHuesped huesped,
-            ProjHabitacion habitacion
-    ) {
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "huesped", ignore = true)
+    @Mapping(target = "habitacion", ignore = true)
+    @Mapping(target = "creadoEn", ignore = true)
+    @Mapping(target = "cancelacion", ignore = true)
+    Reserva toEntity(ReservaRequest request);
 
-        return Reserva.builder()
-                .codigoReserva(request.getCodigoReserva())
-                .huesped(huesped)
-                .habitacion(habitacion)
-                .fechaEntrada(request.getFechaEntrada())
-                .fechaSalida(request.getFechaSalida())
-                .estado(request.getEstado())
-                .build();
-    }
+    @Mapping(target = "emailHuesped", source = "huesped.email")
+    @Mapping(target = "numeroHabitacion", source = "habitacion.numeroHabitacion")
+    ReservaResponse toResponse(Reserva reserva);
 
-    public static ReservaResponse toResponse(Reserva reserva) {
+    List<ReservaResponse> toResponseList(List<Reserva> reservas);
 
-        ReservaResponse response = new ReservaResponse();
-
-        response.setId(reserva.getId());
-        response.setCodigoReserva(reserva.getCodigoReserva());
-        response.setEmailHuesped(reserva.getHuesped().getEmail());
-        response.setNumeroHabitacion(reserva.getHabitacion().getNumeroHabitacion());
-        response.setFechaEntrada(reserva.getFechaEntrada());
-        response.setFechaSalida(reserva.getFechaSalida());
-        response.setEstado(reserva.getEstado());
-        response.setCreadoEn(reserva.getCreadoEn());
-
-        return response;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "huesped", ignore = true)
+    @Mapping(target = "habitacion", ignore = true)
+    @Mapping(target = "creadoEn", ignore = true)
+    @Mapping(target = "cancelacion", ignore = true)
+    void updateEntity(ReservaRequest request, @MappingTarget Reserva reserva);
 }
