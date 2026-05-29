@@ -16,6 +16,9 @@ public interface LlaveMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "reserva", source = "reserva")
+    @Mapping(target = "numeroHabitacion", source = "request.numeroHabitacion")
+    @Mapping(target = "codigoLlave", source = "request.codigoLlave")
+    @Mapping(target = "activa", source = "request.activa")
     Llave toEntity(LlaveRequest request, ProjReserva reserva);
 
     @Mapping(target = "codigoReserva", source = "reserva.codigoReserva")
@@ -25,5 +28,12 @@ public interface LlaveMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "reserva", source = "reserva")
-    void updateEntity(LlaveRequest request, ProjReserva reserva, @MappingTarget Llave llave);
+    @Mapping(target = "numeroHabitacion", source = "request.numeroHabitacion")
+    @Mapping(target = "codigoLlave", source = "request.codigoLlave")
+    @Mapping(target = "activa", source = "request.activa")
+    void updateEntity(
+            LlaveRequest request,
+            ProjReserva reserva,
+            @MappingTarget Llave llave
+    );
 }
