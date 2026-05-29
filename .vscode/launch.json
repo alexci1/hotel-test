@@ -8,7 +8,8 @@
       "cwd": "${workspaceFolder}/eureka",
       "mainClass": "cl.hilton.eureka.HotelEurekaApplication",
       "projectName": "cl-hilton-eureka",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     },
     {
       "type": "java",
@@ -17,7 +18,8 @@
       "cwd": "${workspaceFolder}/ms-reservas",
       "mainClass": "cl.hilton.reservas.HotelReservasApplication",
       "projectName": "cl-hilton-reservas",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     },
     {
       "type": "java",
@@ -26,7 +28,8 @@
       "cwd": "${workspaceFolder}/ms-habitaciones",
       "mainClass": "cl.hilton.habitaciones.HotelHabitacionesApplication",
       "projectName": "cl-hilton-habitaciones",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     },
     {
       "type": "java",
@@ -35,7 +38,8 @@
       "cwd": "${workspaceFolder}/ms-huespedes",
       "mainClass": "cl.hilton.huespedes.HotelHuespedesApplication",
       "projectName": "cl-hilton-huespedes",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     },
     {
       "type": "java",
@@ -44,7 +48,8 @@
       "cwd": "${workspaceFolder}/ms-checkin",
       "mainClass": "cl.hilton.checkin.HotelCheckinApplication",
       "projectName": "cl-hilton-checkin",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     },
     {
       "type": "java",
@@ -53,7 +58,8 @@
       "cwd": "${workspaceFolder}/ms-pagos",
       "mainClass": "cl.hilton.pagos.HotelPagosApplication",
       "projectName": "cl-hilton-pagos",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     },
     {
       "type": "java",
@@ -62,7 +68,8 @@
       "cwd": "${workspaceFolder}/ms-housekeeping",
       "mainClass": "cl.hilton.housekeeping.HotelHousekeepingApplication",
       "projectName": "cl-hilton-housekeeping",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     },
     {
       "type": "java",
@@ -71,7 +78,8 @@
       "cwd": "${workspaceFolder}/ms-restaurante",
       "mainClass": "cl.hilton.restaurante.HotelRestauranteApplication",
       "projectName": "cl-hilton-restaurante",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     },
     {
       "type": "java",
@@ -80,7 +88,8 @@
       "cwd": "${workspaceFolder}/ms-inventario",
       "mainClass": "cl.hilton.inventario.HotelInventarioApplication",
       "projectName": "cl-hilton-inventario",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     },
     {
       "type": "java",
@@ -89,7 +98,8 @@
       "cwd": "${workspaceFolder}/ms-notificaciones",
       "mainClass": "cl.hilton.notificaciones.HotelNotificacionesApplication",
       "projectName": "cl-hilton-notificaciones",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     },
     {
       "type": "java",
@@ -98,7 +108,8 @@
       "cwd": "${workspaceFolder}/ms-tarifas",
       "mainClass": "cl.hilton.tarifas.HotelTarifasApplication",
       "projectName": "cl-hilton-tarifas",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     },
     {
       "type": "java",
@@ -107,7 +118,8 @@
       "cwd": "${workspaceFolder}/ms-reportes",
       "mainClass": "cl.hilton.reportes.HotelReportesApplication",
       "projectName": "cl-hilton-reportes",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     },
     {
       "type": "java",
@@ -116,7 +128,8 @@
       "cwd": "${workspaceFolder}/ms-autenticacion",
       "mainClass": "cl.hilton.autenticacion.HotelAutenticacionApplication",
       "projectName": "cl-hilton-autenticacion",
-      "envFile": "${workspaceFolder}/.env"
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dcom.sun.management.jmxremote=false"
     }
   ],
   "compounds": [
