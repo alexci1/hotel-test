@@ -1,11 +1,13 @@
 package cl.hilton.huespedes.repository;
 
-import cl.hilton.huespedes.model.Huesped;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import cl.hilton.huespedes.model.Huesped;
 
 @Repository
 public interface HuespedRepository extends JpaRepository<Huesped, Long> {
@@ -17,4 +19,8 @@ public interface HuespedRepository extends JpaRepository<Huesped, Long> {
     List<Huesped> findByActivo(Boolean activo);
 
     List<Huesped> findByNombreCompletoContainingIgnoreCase(String nombreCompleto);
+
+    List<Huesped> findByTelefono(String telefono);
+
+    List<Huesped> findByCreadoEn(LocalDate creadoEn);
 }
