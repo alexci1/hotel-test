@@ -14,14 +14,18 @@ import cl.hilton.reportes.model.Kpi;
 public interface KpiMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reporte", ignore = true)
     @Mapping(target = "actualizadoEn", ignore = true)
     Kpi toEntity(KpiRequest request);
 
+    @Mapping(target = "codigoReporte", source = "reporte.codigo")
+    @Mapping(target = "nombreReporte", source = "reporte.nombre")
     KpiResponse toResponse(Kpi kpi);
 
     List<KpiResponse> toResponseList(List<Kpi> kpis);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reporte", ignore = true)
     @Mapping(target = "actualizadoEn", ignore = true)
     void updateEntity(KpiRequest request, @MappingTarget Kpi kpi);
 }
