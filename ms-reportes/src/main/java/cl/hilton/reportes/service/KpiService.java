@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class KpiService {
 
     private final KpiRepository kpiRepository;
@@ -33,36 +34,44 @@ public class KpiService {
     }
 
     public KpiResponse findByNombre(String nombre) {
-        Kpi kpi = kpiRepository.findByNombre(nombre)
-                .orElseThrow(() -> new EntityNotFoundException("KPI no encontrado con nombre: " + nombre));
+        String nombreKpi = Objects.requireNonNull(nombre);
+        Kpi kpi = kpiRepository.findByNombre(nombreKpi)
+                .orElseThrow(() -> new EntityNotFoundException("KPI no encontrado con nombre: " + nombreKpi));
 
         return kpiMapper.toResponse(kpi);
     }
 
     public List<KpiResponse> findByReporte(String codigoReporte) {
-        return kpiMapper.toResponseList(kpiRepository.findByReporteCodigo(codigoReporte));
+        String codigo = Objects.requireNonNull(codigoReporte);
+        return kpiMapper.toResponseList(kpiRepository.findByReporteCodigo(codigo));
     }
 
     public List<KpiResponse> findByNombreContaining(String nombre) {
-        return kpiMapper.toResponseList(kpiRepository.findByNombreContainingIgnoreCase(nombre));
+        String nombreKpi = Objects.requireNonNull(nombre);
+        return kpiMapper.toResponseList(kpiRepository.findByNombreContainingIgnoreCase(nombreKpi));
     }
 
     public List<KpiResponse> findByPeriodo(String periodo) {
-        return kpiMapper.toResponseList(kpiRepository.findByPeriodo(periodo));
+        String periodoKpi = Objects.requireNonNull(periodo);
+        return kpiMapper.toResponseList(kpiRepository.findByPeriodo(periodoKpi));
     }
 
     public List<KpiResponse> findByUnidad(String unidad) {
-        return kpiMapper.toResponseList(kpiRepository.findByUnidad(unidad));
+        String unidadKpi = Objects.requireNonNull(unidad);
+        return kpiMapper.toResponseList(kpiRepository.findByUnidad(unidadKpi));
     }
 
     public List<KpiResponse> findByActualizadoEn(LocalDate actualizadoEn) {
-        return kpiMapper.toResponseList(kpiRepository.findByActualizadoEn(actualizadoEn));
+        LocalDate fecha = Objects.requireNonNull(actualizadoEn);
+        return kpiMapper.toResponseList(kpiRepository.findByActualizadoEn(fecha));
     }
 
     public KpiResponse create(KpiRequest request) {
-        validarNombreUnico(request.getNombre());
+        String nombre = Objects.requireNonNull(request.getNombre());
+        String codigoReporte = Objects.requireNonNull(request.getCodigoReporte());
+        validarNombreUnico(nombre);
 
-        Reporte reporte = getReporteByCodigo(request.getCodigoReporte());
+        Reporte reporte = getReporteByCodigo(codigoReporte);
         Kpi kpi = kpiMapper.toEntity(request);
         kpi.setReporte(reporte);
         kpi.setPeriodo(request.getPeriodo() != null ? request.getPeriodo() : "MENSUAL");
@@ -73,14 +82,18 @@ public class KpiService {
     }
 
     public KpiResponse update(Long id, KpiRequest request) {
-        Kpi kpi = getKpiById(id);
+        Long kpiId = Objects.requireNonNull(id);
+        String nombre = Objects.requireNonNull(request.getNombre());
+        String codigoReporte = Objects.requireNonNull(request.getCodigoReporte());
+
+        Kpi kpi = getKpiById(kpiId);
         String periodoActual = kpi.getPeriodo();
 
-        if (!kpi.getNombre().equalsIgnoreCase(request.getNombre())) {
-            validarNombreUnico(request.getNombre());
+        if (!kpi.getNombre().equalsIgnoreCase(nombre)) {
+            validarNombreUnico(nombre);
         }
 
-        Reporte reporte = getReporteByCodigo(request.getCodigoReporte());
+        Reporte reporte = getReporteByCodigo(codigoReporte);
         kpiMapper.updateEntity(request, kpi);
         kpi.setReporte(reporte);
         kpi.setPeriodo(request.getPeriodo() != null ? request.getPeriodo() : periodoActual);
@@ -96,18 +109,21 @@ public class KpiService {
     }
 
     private Kpi getKpiById(Long id) {
-        return kpiRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("KPI no encontrado con id: " + id));
+        Long kpiId = Objects.requireNonNull(id);
+        return kpiRepository.findById(kpiId)
+                .orElseThrow(() -> new EntityNotFoundException("KPI no encontrado con id: " + kpiId));
     }
 
     private Reporte getReporteByCodigo(String codigoReporte) {
-        return reporteRepository.findByCodigo(codigoReporte)
-                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado con codigo: " + codigoReporte));
+        String codigo = Objects.requireNonNull(codigoReporte);
+        return reporteRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado con codigo: " + codigo));
     }
 
     private void validarNombreUnico(String nombre) {
-        if (kpiRepository.existsByNombre(nombre)) {
-            throw new IllegalArgumentException("Ya existe un KPI con nombre: " + nombre);
+        String nombreKpi = Objects.requireNonNull(nombre);
+        if (kpiRepository.existsByNombre(nombreKpi)) {
+            throw new IllegalArgumentException("Ya existe un KPI con nombre: " + nombreKpi);
         }
     }
 }
