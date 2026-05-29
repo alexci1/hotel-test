@@ -1,42 +1,70 @@
 package cl.hilton.reservas.controller;
 
-import cl.hilton.reservas.model.Cancelacion;
-import cl.hilton.reservas.service.CancelacionService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import cl.hilton.reservas.dto.CancelacionRequest;
+import cl.hilton.reservas.dto.CancelacionResponse;
+import cl.hilton.reservas.service.CancelacionService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/cancelaciones")
+@RequestMapping("/api/v1/reservas/cancelaciones")
 @RequiredArgsConstructor
 public class CancelacionController {
 
     private final CancelacionService cancelacionService;
 
     @GetMapping
-    public List<Cancelacion> obtenerCancelaciones() {
-        return cancelacionService.obtenerCancelaciones();
+    public List<CancelacionResponse> findAll() {
+        return cancelacionService.findAll();
     }
 
     @GetMapping("/{id}")
-    public Optional<Cancelacion> obtenerPorId(@PathVariable Long id) {
-        return cancelacionService.obtenerPorId(id);
+    public CancelacionResponse findById(@PathVariable Long id) {
+        return cancelacionService.findById(id);
     }
 
     @GetMapping("/reserva/{codigoReserva}")
-    public Optional<Cancelacion> obtenerPorCodigoReserva(@PathVariable String codigoReserva) {
-        return cancelacionService.obtenerPorCodigoReserva(codigoReserva);
+    public CancelacionResponse findByCodigoReserva(@PathVariable String codigoReserva) {
+        return cancelacionService.findByCodigoReserva(codigoReserva);
+    }
+
+    @GetMapping("/fecha/{canceladoEn}")
+    public List<CancelacionResponse> findByCanceladoEn(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate canceladoEn) {
+        return cancelacionService.findByCanceladoEn(canceladoEn);
     }
 
     @PostMapping
-    public Cancelacion guardarCancelacion(@RequestBody Cancelacion cancelacion) {
-        return cancelacionService.guardarCancelacion(cancelacion);
+    @ResponseStatus(HttpStatus.CREATED)
+    public CancelacionResponse create(@Valid @RequestBody CancelacionRequest request) {
+        return cancelacionService.create(request);
+    }
+
+    @PutMapping("/{id}")
+    public CancelacionResponse update(
+            @PathVariable Long id,
+            @Valid @RequestBody CancelacionRequest request) {
+        return cancelacionService.update(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public void eliminarCancelacion(@PathVariable Long id) {
-        cancelacionService.eliminarCancelacion(id);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteById(@PathVariable Long id) {
+        cancelacionService.deleteById(id);
     }
 }
