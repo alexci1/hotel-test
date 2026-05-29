@@ -9,16 +9,10 @@
 -- 1. ELIMINACIÓN EN JERARQUÍA INVERSA
 DROP TABLE IF EXISTS estados_habitacion CASCADE;
 DROP TABLE IF EXISTS habitaciones CASCADE;
-DROP TABLE IF EXISTS tipos_habitacion CASCADE;
 DROP TABLE IF EXISTS proj_tarifas CASCADE;
+DROP TABLE IF EXISTS tipos_habitacion CASCADE;
 
 -- 2. TABLAS MAESTRAS
-
-CREATE TABLE proj_tarifas (
-    tipo_habitacion VARCHAR(40) PRIMARY KEY,
-    precio_base_usd INTEGER NOT NULL CHECK (precio_base_usd > 0),
-    actualizado_en DATE NOT NULL DEFAULT CURRENT_DATE
-);
 
 CREATE TABLE tipos_habitacion (
     id SERIAL PRIMARY KEY,
@@ -26,6 +20,12 @@ CREATE TABLE tipos_habitacion (
     descripcion VARCHAR(200),
     capacidad_max INTEGER NOT NULL DEFAULT 2 CHECK (capacidad_max BETWEEN 1 AND 10),
     activo BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE proj_tarifas (
+    tipo_habitacion VARCHAR(40) PRIMARY KEY REFERENCES tipos_habitacion(codigo) ON UPDATE CASCADE,
+    precio_base_usd INTEGER NOT NULL CHECK (precio_base_usd > 0),
+    actualizado_en DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE habitaciones (
@@ -46,6 +46,7 @@ CREATE TABLE estados_habitacion (
 );
 
 CREATE INDEX idx_tipos_habitacion_activo ON tipos_habitacion(activo);
+CREATE INDEX idx_proj_tarifas_tipo_habitacion ON proj_tarifas(tipo_habitacion);
 CREATE INDEX idx_habitaciones_codigo_tipo ON habitaciones(codigo_tipo);
 CREATE INDEX idx_habitaciones_activa ON habitaciones(activa);
 CREATE INDEX idx_estados_habitacion_numero_habitacion ON estados_habitacion(numero_habitacion);
@@ -53,17 +54,17 @@ CREATE INDEX idx_estados_habitacion_estado ON estados_habitacion(estado);
 
 -- 3. DATOS DE PRUEBA
 
-INSERT INTO proj_tarifas (tipo_habitacion, precio_base_usd) VALUES
-('SIMPLE', 80),
-('DOBLE', 120),
-('SUITE', 250);
-
 INSERT INTO tipos_habitacion (codigo, descripcion, capacidad_max, activo) VALUES
 ('SIMPLE', 'Habitacion individual con cama matrimonial', 2, TRUE),
 ('DOBLE', 'Habitacion con dos camas individuales', 4, TRUE),
 ('SUITE', 'Suite ejecutiva con sala de estar y jacuzzi', 2, TRUE),
 ('FAMILIAR', 'Habitacion amplia con litera y cama matrimonial', 6, TRUE),
 ('BORDE', 'Tipo sin precio asignado prueba borde', 1, FALSE);
+
+INSERT INTO proj_tarifas (tipo_habitacion, precio_base_usd) VALUES
+('SIMPLE', 80),
+('DOBLE', 120),
+('SUITE', 250);
 
 INSERT INTO habitaciones (numero_habitacion, piso, codigo_tipo, activa) VALUES
 ('101', 1, 'SIMPLE', TRUE),

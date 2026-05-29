@@ -38,6 +38,7 @@ CREATE TABLE metricas (
 
 CREATE TABLE kpis (
     id SERIAL PRIMARY KEY,
+    codigo_reporte VARCHAR(50) NOT NULL REFERENCES reportes(codigo) ON UPDATE CASCADE,
     nombre VARCHAR(80) NOT NULL UNIQUE,
     descripcion VARCHAR(255),
     valor_actual INTEGER,
@@ -57,6 +58,7 @@ CREATE INDEX idx_metricas_codigo_reporte ON metricas(codigo_reporte);
 CREATE INDEX idx_metricas_periodo ON metricas(periodo);
 CREATE INDEX idx_metricas_nombre_metrica ON metricas(nombre_metrica);
 
+CREATE INDEX idx_kpis_codigo_reporte ON kpis(codigo_reporte);
 CREATE INDEX idx_kpis_nombre ON kpis(nombre);
 CREATE INDEX idx_kpis_periodo ON kpis(periodo);
 CREATE INDEX idx_kpis_actualizado_en ON kpis(actualizado_en);
@@ -84,10 +86,10 @@ INSERT INTO metricas (codigo_reporte, periodo, nombre_metrica, valor, unidad) VA
 ('OCUPACION_DIARIA', '2024-06-01', 'duracion_media_estancia', 4, 'NOCHES'),
 ('INGRESOS_DIARIOS', '2024-07-01', 'ingresos_total', 90, 'USD');
 
-INSERT INTO kpis (nombre, descripcion, valor_actual, valor_objetivo, unidad, periodo) VALUES
-('OCUPACION_PROMEDIO', 'Porcentaje promedio de ocupacion mensual', 57, 80, 'PORCENTAJE', 'MENSUAL'),
-('ADR', 'Average Daily Rate: ingreso promedio por noche', 95, 110, 'USD', 'MENSUAL'),
-('REVPAR', 'Revenue per Available Room', 54, 88, 'USD', 'MENSUAL'),
-('NPS', 'Net Promoter Score de huespedes', 72, 80, 'PUNTOS', 'MENSUAL'),
-('TASA_COMPLETITUD_HK', 'Tasa de completitud de tareas housekeeping', 60, 95, 'PORCENTAJE', 'DIARIO'),
-('KPI_SIN_OBJETIVO', 'KPI sin meta definida', 42, NULL, 'UNIDADES', 'ANUAL');
+INSERT INTO kpis (codigo_reporte, nombre, descripcion, valor_actual, valor_objetivo, unidad, periodo) VALUES
+('EJECUTIVO_MENSUAL', 'OCUPACION_PROMEDIO', 'Porcentaje promedio de ocupacion mensual', 57, 80, 'PORCENTAJE', 'MENSUAL'),
+('EJECUTIVO_MENSUAL', 'ADR', 'Average Daily Rate: ingreso promedio por noche', 95, 110, 'USD', 'MENSUAL'),
+('EJECUTIVO_MENSUAL', 'REVPAR', 'Revenue per Available Room', 54, 88, 'USD', 'MENSUAL'),
+('EJECUTIVO_MENSUAL', 'NPS', 'Net Promoter Score de huespedes', 72, 80, 'PUNTOS', 'MENSUAL'),
+('RENDIMIENTO_HK', 'TASA_COMPLETITUD_HK', 'Tasa de completitud de tareas housekeeping', 60, 95, 'PORCENTAJE', 'DIARIO'),
+('BORDE_TIEMPO_REAL', 'KPI_SIN_OBJETIVO', 'KPI sin meta definida', 42, NULL, 'UNIDADES', 'ANUAL');
