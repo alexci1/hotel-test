@@ -29,19 +29,14 @@ public class LlaveService {
     }
 
     public List<LlaveResponse> listar() {
-
-        return llaveRepository.findAll().stream()
-                .map(llaveMapper::toResponse)
-                .toList();
+        return llaveMapper.toResponseList(llaveRepository.findAll());
     }
 
     public LlaveResponse buscarPorId(Long id) {
-
         return llaveMapper.toResponse(obtenerLlave(id));
     }
 
     public LlaveResponse buscarPorCodigoLlave(String codigoLlave) {
-
         Llave llave = llaveRepository.findByCodigoLlave(codigoLlave)
                 .orElseThrow(() -> new RuntimeException("Llave no encontrada"));
 
@@ -49,69 +44,51 @@ public class LlaveService {
     }
 
     public List<LlaveResponse> buscarPorHabitacion(String numeroHabitacion) {
-
-        return llaveRepository.findByNumeroHabitacion(numeroHabitacion)
-                .stream()
-                .map(llaveMapper::toResponse)
-                .toList();
+        return llaveMapper.toResponseList(llaveRepository.findByNumeroHabitacion(numeroHabitacion));
     }
 
     public List<LlaveResponse> buscarPorActiva(Boolean activa) {
-
-        return llaveRepository.findByActiva(activa)
-                .stream()
-                .map(llaveMapper::toResponse)
-                .toList();
+        return llaveMapper.toResponseList(llaveRepository.findByActiva(activa));
     }
 
     public LlaveResponse crear(LlaveRequest request) {
-
         if (llaveRepository.existsByCodigoLlave(request.getCodigoLlave())) {
             throw new RuntimeException("Ya existe una llave con ese código");
         }
 
         ProjReserva reserva = obtenerReservaOpcional(request.getCodigoReserva());
-
         Llave llave = llaveMapper.toEntity(request, reserva);
 
         return llaveMapper.toResponse(llaveRepository.save(llave));
     }
 
     public LlaveResponse actualizar(Long id, LlaveRequest request) {
-
         Llave llave = obtenerLlave(id);
-
         ProjReserva reserva = obtenerReservaOpcional(request.getCodigoReserva());
 
-        llaveMapper.updateEntity(llave, request, reserva);
+        llaveMapper.updateEntity(request, reserva, llave);
 
         return llaveMapper.toResponse(llaveRepository.save(llave));
     }
 
     public LlaveResponse cambiarEstado(Long id, Boolean activa) {
-
         Llave llave = obtenerLlave(id);
-
         llave.setActiva(activa);
 
         return llaveMapper.toResponse(llaveRepository.save(llave));
     }
 
     public void eliminar(Long id) {
-
         Llave llave = obtenerLlave(id);
-
         llaveRepository.delete(llave);
     }
 
     private Llave obtenerLlave(Long id) {
-
         return llaveRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Llave no encontrada"));
     }
 
     private ProjReserva obtenerReservaOpcional(String codigoReserva) {
-
         if (codigoReserva == null || codigoReserva.isBlank()) {
             return null;
         }
