@@ -3,6 +3,8 @@ package cl.hilton.checkin.dto;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,4 +20,6 @@ public class ProjHuespedRequest {
     @NotBlank
     @Size(max = 100)
     private String nombreCompleto;
+
+    private LocalDate actualizadoEn;
 }
