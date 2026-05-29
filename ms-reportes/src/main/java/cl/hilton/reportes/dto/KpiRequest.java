@@ -3,10 +3,22 @@ package cl.hilton.reportes.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class KpiRequest {
+
+    @NotBlank(message = "El codigo del reporte es obligatorio")
+    @Size(max = 50, message = "El codigo del reporte no puede superar los 50 caracteres")
+    private String codigoReporte;
 
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 80, message = "El nombre no puede superar los 80 caracteres")
