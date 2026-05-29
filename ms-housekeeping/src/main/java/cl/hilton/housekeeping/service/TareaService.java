@@ -1,79 +1,81 @@
 package cl.hilton.housekeeping.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import cl.hilton.housekeeping.dto.TareaRequest;
 import cl.hilton.housekeeping.dto.TareaResponse;
 import cl.hilton.housekeeping.mapper.TareaMapper;
 import cl.hilton.housekeeping.model.Tarea;
 import cl.hilton.housekeeping.repository.TareaRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class TareaService {
 
     private final TareaRepository tareaRepository;
     private final TareaMapper tareaMapper;
 
-    public TareaService(TareaRepository tareaRepository, TareaMapper tareaMapper) {
-        this.tareaRepository = tareaRepository;
-        this.tareaMapper = tareaMapper;
+    public List<TareaResponse> findAll() {
+        return tareaMapper.toResponseList(tareaRepository.findAll());
     }
 
-    public List<TareaResponse> listar() {
-        return tareaRepository.findAll().stream()
-                .map(tareaMapper::toResponse)
-                .toList();
+    public TareaResponse findById(Long id) {
+        return tareaMapper.toResponse(getTarea(id));
     }
 
-    public TareaResponse buscarPorId(Long id) {
-        return tareaMapper.toResponse(obtenerTarea(id));
-    }
-
-    public TareaResponse buscarPorCodigo(String codigo) {
+    public TareaResponse findByCodigo(String codigo) {
         Tarea tarea = tareaRepository.findByCodigo(codigo)
-                .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
-
+                .orElseThrow(() -> new EntityNotFoundException("Tarea no encontrada: " + codigo));
         return tareaMapper.toResponse(tarea);
     }
 
-    public List<TareaResponse> buscarPorActiva(Boolean activa) {
-        return tareaRepository.findByActiva(activa).stream()
-                .map(tareaMapper::toResponse)
-                .toList();
+    public List<TareaResponse> findByActiva(Boolean activa) {
+        return tareaMapper.toResponseList(tareaRepository.findByActiva(activa));
     }
 
-    public List<TareaResponse> buscarPorDescripcion(String descripcion) {
-        return tareaRepository.findByDescripcionContainingIgnoreCase(descripcion).stream()
-                .map(tareaMapper::toResponse)
-                .toList();
+    public List<TareaResponse> findByDescripcion(String descripcion) {
+        return tareaMapper.toResponseList(tareaRepository.findByDescripcionContainingIgnoreCase(descripcion));
     }
 
-    public TareaResponse crear(TareaRequest request) {
+    public TareaResponse create(TareaRequest request) {
         if (tareaRepository.existsByCodigo(request.getCodigo())) {
-            throw new RuntimeException("Ya existe una tarea con ese código");
+            throw new IllegalArgumentException("Ya existe una tarea con codigo: " + request.getCodigo());
         }
 
         Tarea tarea = tareaMapper.toEntity(request);
+        tarea.setActiva(request.getActiva() != null ? request.getActiva() : Boolean.TRUE);
 
-        return tareaMapper.toResponse(tareaRepository.save(tarea));
+        Tarea saved = tareaRepository.save(tarea);
+        return tareaMapper.toResponse(saved);
     }
 
-    public TareaResponse actualizar(Long id, TareaRequest request) {
-        Tarea tarea = obtenerTarea(id);
+    public TareaResponse update(Long id, TareaRequest request) {
+        Tarea tarea = getTarea(id);
 
-        tareaMapper.updateEntity(tarea, request);
+        tareaRepository.findByCodigo(request.getCodigo())
+                .filter(existente -> !existente.getId().equals(id))
+                .ifPresent(existente -> {
+                    throw new IllegalArgumentException("Ya existe una tarea con codigo: " + request.getCodigo());
+                });
 
-        return tareaMapper.toResponse(tareaRepository.save(tarea));
+        tareaMapper.updateEntity(request, tarea);
+        tarea.setActiva(request.getActiva() != null ? request.getActiva() : Boolean.TRUE);
+
+        Tarea saved = tareaRepository.save(tarea);
+        return tareaMapper.toResponse(saved);
     }
 
-    public void eliminar(Long id) {
-        Tarea tarea = obtenerTarea(id);
+    public void deleteById(Long id) {
+        Tarea tarea = getTarea(id);
         tareaRepository.delete(tarea);
     }
 
-    private Tarea obtenerTarea(Long id) {
+    private Tarea getTarea(Long id) {
         return tareaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Tarea no encontrada: " + id));
     }
 }
