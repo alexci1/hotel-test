@@ -57,4 +57,8 @@ public class Reporte {
     @OneToMany(mappedBy = "reporte")
     @Builder.Default
     private List<Metrica> metricas = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reporte")
+    @Builder.Default
+    private List<Kpi> kpis = new ArrayList<>();
 }
