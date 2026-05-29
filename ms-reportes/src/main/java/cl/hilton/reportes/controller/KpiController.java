@@ -44,6 +44,11 @@ public class KpiController {
         return kpiService.findByNombre(nombre);
     }
 
+    @GetMapping("/reporte/{codigoReporte}")
+    public List<KpiResponse> findByReporte(@PathVariable String codigoReporte) {
+        return kpiService.findByReporte(codigoReporte);
+    }
+
     @GetMapping("/buscar")
     public List<KpiResponse> findByNombreContaining(@RequestParam String nombre) {
         return kpiService.findByNombreContaining(nombre);
