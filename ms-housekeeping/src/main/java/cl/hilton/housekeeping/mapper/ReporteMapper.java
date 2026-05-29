@@ -1,42 +1,39 @@
 package cl.hilton.housekeeping.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.housekeeping.dto.ReporteRequest;
 import cl.hilton.housekeeping.dto.ReporteResponse;
 import cl.hilton.housekeeping.model.Asignacion;
 import cl.hilton.housekeeping.model.Reporte;
-import org.springframework.stereotype.Component;
 
-@Component
-public class ReporteMapper {
+@Mapper(componentModel = "spring")
+public interface ReporteMapper {
 
-    public Reporte toEntity(ReporteRequest request, Asignacion asignacion) {
-        return Reporte.builder()
-                .asignacion(asignacion)
-                .aprobado(request.getAprobado())
-                .observaciones(request.getObservaciones())
-                .inspector(request.getInspector())
-                .inspeccionadoEn(request.getInspeccionadoEn())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "asignacion", source = "asignacion")
+    @Mapping(target = "aprobado", source = "request.aprobado")
+    @Mapping(target = "observaciones", source = "request.observaciones")
+    @Mapping(target = "inspector", source = "request.inspector")
+    @Mapping(target = "inspeccionadoEn", ignore = true)
+    Reporte toEntity(ReporteRequest request, Asignacion asignacion);
 
-    public ReporteResponse toResponse(Reporte reporte) {
-        return ReporteResponse.builder()
-                .id(reporte.getId())
-                .asignacionId(reporte.getAsignacion().getId())
-                .numeroHabitacion(reporte.getAsignacion().getHabitacion().getNumeroHabitacion())
-                .codigoTarea(reporte.getAsignacion().getTarea().getCodigo())
-                .aprobado(reporte.getAprobado())
-                .observaciones(reporte.getObservaciones())
-                .inspector(reporte.getInspector())
-                .inspeccionadoEn(reporte.getInspeccionadoEn())
-                .build();
-    }
+    @Mapping(target = "asignacionId", source = "asignacion.id")
+    @Mapping(target = "numeroHabitacion", source = "asignacion.habitacion.numeroHabitacion")
+    @Mapping(target = "codigoTarea", source = "asignacion.tarea.codigo")
+    ReporteResponse toResponse(Reporte reporte);
 
-    public void updateEntity(Reporte reporte, ReporteRequest request, Asignacion asignacion) {
-        reporte.setAsignacion(asignacion);
-        reporte.setAprobado(request.getAprobado());
-        reporte.setObservaciones(request.getObservaciones());
-        reporte.setInspector(request.getInspector());
-        reporte.setInspeccionadoEn(request.getInspeccionadoEn());
-    }
+    List<ReporteResponse> toResponseList(List<Reporte> reportes);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "asignacion", source = "asignacion")
+    @Mapping(target = "aprobado", source = "request.aprobado")
+    @Mapping(target = "observaciones", source = "request.observaciones")
+    @Mapping(target = "inspector", source = "request.inspector")
+    @Mapping(target = "inspeccionadoEn", ignore = true)
+    void updateEntity(ReporteRequest request, Asignacion asignacion, @MappingTarget Reporte reporte);
 }
