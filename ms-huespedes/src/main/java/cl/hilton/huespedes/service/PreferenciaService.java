@@ -1,5 +1,9 @@
 package cl.hilton.huespedes.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import cl.hilton.huespedes.dto.PreferenciaRequest;
 import cl.hilton.huespedes.dto.PreferenciaResponse;
 import cl.hilton.huespedes.mapper.PreferenciaMapper;
@@ -7,82 +11,88 @@ import cl.hilton.huespedes.model.Huesped;
 import cl.hilton.huespedes.model.Preferencia;
 import cl.hilton.huespedes.repository.HuespedRepository;
 import cl.hilton.huespedes.repository.PreferenciaRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class PreferenciaService {
 
     private final PreferenciaRepository preferenciaRepository;
     private final HuespedRepository huespedRepository;
     private final PreferenciaMapper preferenciaMapper;
 
-    public PreferenciaService(
-            PreferenciaRepository preferenciaRepository,
-            HuespedRepository huespedRepository,
-            PreferenciaMapper preferenciaMapper
-    ) {
-        this.preferenciaRepository = preferenciaRepository;
-        this.huespedRepository = huespedRepository;
-        this.preferenciaMapper = preferenciaMapper;
+    public List<PreferenciaResponse> findAll() {
+        return preferenciaMapper.toResponseList(preferenciaRepository.findAll());
     }
 
-    public List<PreferenciaResponse> listar() {
-        return preferenciaRepository.findAll().stream()
-                .map(preferenciaMapper::toResponse)
-                .toList();
+    public PreferenciaResponse findById(Long id) {
+        Preferencia preferencia = getPreferenciaById(id);
+        return preferenciaMapper.toResponse(preferencia);
     }
 
-    public PreferenciaResponse buscarPorId(Long id) {
-        return preferenciaMapper.toResponse(obtenerPreferencia(id));
-    }
-
-    public PreferenciaResponse buscarPorEmailHuesped(String emailHuesped) {
+    public PreferenciaResponse findByEmailHuesped(String emailHuesped) {
         Preferencia preferencia = preferenciaRepository.findByHuespedEmail(emailHuesped)
-                .orElseThrow(() -> new RuntimeException("Preferencia no encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Preferencia no encontrada para huesped: " + emailHuesped));
 
         return preferenciaMapper.toResponse(preferencia);
     }
 
-    public List<PreferenciaResponse> buscarPorTipoCama(String tipoCama) {
-        return preferenciaRepository.findByTipoCama(tipoCama).stream()
-                .map(preferenciaMapper::toResponse)
-                .toList();
+    public List<PreferenciaResponse> findByTipoCama(String tipoCama) {
+        return preferenciaMapper.toResponseList(preferenciaRepository.findByTipoCama(tipoCama));
     }
 
-    public PreferenciaResponse crear(PreferenciaRequest request) {
+    public List<PreferenciaResponse> findByPisoPreferido(Integer pisoPreferido) {
+        return preferenciaMapper.toResponseList(preferenciaRepository.findByPisoPreferido(pisoPreferido));
+    }
+
+    public PreferenciaResponse create(PreferenciaRequest request) {
         if (preferenciaRepository.existsByHuespedEmail(request.getEmailHuesped())) {
-            throw new RuntimeException("Ya existe una preferencia para ese huésped");
+            throw new IllegalArgumentException("Ya existe una preferencia para el huesped: " + request.getEmailHuesped());
         }
 
-        Huesped huesped = obtenerHuespedPorEmail(request.getEmailHuesped());
-        Preferencia preferencia = preferenciaMapper.toEntity(request, huesped);
+        Huesped huesped = getHuespedByEmail(request.getEmailHuesped());
 
-        return preferenciaMapper.toResponse(preferenciaRepository.save(preferencia));
+        Preferencia preferencia = preferenciaMapper.toEntity(request);
+        preferencia.setHuesped(huesped);
+
+        Preferencia preferenciaGuardada = preferenciaRepository.save(preferencia);
+
+        return preferenciaMapper.toResponse(preferenciaGuardada);
     }
 
-    public PreferenciaResponse actualizar(Long id, PreferenciaRequest request) {
-        Preferencia preferencia = obtenerPreferencia(id);
-        Huesped huesped = obtenerHuespedPorEmail(request.getEmailHuesped());
+    public PreferenciaResponse update(Long id, PreferenciaRequest request) {
+        Preferencia preferencia = getPreferenciaById(id);
 
-        preferenciaMapper.updateEntity(preferencia, request, huesped);
+        if (request.getEmailHuesped() != null
+                && !preferencia.getHuesped().getEmail().equalsIgnoreCase(request.getEmailHuesped())) {
+            if (preferenciaRepository.existsByHuespedEmail(request.getEmailHuesped())) {
+                throw new IllegalArgumentException("Ya existe una preferencia para el huesped: " + request.getEmailHuesped());
+            }
 
-        return preferenciaMapper.toResponse(preferenciaRepository.save(preferencia));
+            Huesped huesped = getHuespedByEmail(request.getEmailHuesped());
+            preferencia.setHuesped(huesped);
+        }
+
+        preferenciaMapper.updateEntity(request, preferencia);
+
+        Preferencia preferenciaActualizada = preferenciaRepository.save(preferencia);
+
+        return preferenciaMapper.toResponse(preferenciaActualizada);
     }
 
-    public void eliminar(Long id) {
-        Preferencia preferencia = obtenerPreferencia(id);
+    public void deleteById(Long id) {
+        Preferencia preferencia = getPreferenciaById(id);
         preferenciaRepository.delete(preferencia);
     }
 
-    private Preferencia obtenerPreferencia(Long id) {
+    private Preferencia getPreferenciaById(Long id) {
         return preferenciaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Preferencia no encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Preferencia no encontrada con id: " + id));
     }
 
-    private Huesped obtenerHuespedPorEmail(String email) {
+    private Huesped getHuespedByEmail(String email) {
         return huespedRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Huésped no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Huesped no encontrado con email: " + email));
     }
 }
