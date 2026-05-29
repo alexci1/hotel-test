@@ -1,41 +1,28 @@
 package cl.hilton.restaurante.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import cl.hilton.restaurante.dto.ItemPedidoRequest;
 import cl.hilton.restaurante.dto.ItemPedidoResponse;
 import cl.hilton.restaurante.model.ItemPedido;
-import cl.hilton.restaurante.model.Pedido;
-import org.springframework.stereotype.Component;
 
-@Component
-public class ItemPedidoMapper {
+@Mapper(componentModel = "spring")
+public interface ItemPedidoMapper {
 
-    public ItemPedido toEntity(ItemPedidoRequest request, Pedido pedido) {
-        return ItemPedido.builder()
-                .pedido(pedido)
-                .nombreProducto(request.getNombreProducto())
-                .cantidad(request.getCantidad())
-                .precioUnitUsd(request.getPrecioUnitUsd())
-                .observacion(request.getObservacion())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "pedido", ignore = true)
+    ItemPedido toEntity(ItemPedidoRequest request);
 
-    public ItemPedidoResponse toResponse(ItemPedido item) {
-        return ItemPedidoResponse.builder()
-                .id(item.getId())
-                .numeroPedido(item.getPedido().getNumeroPedido())
-                .nombreProducto(item.getNombreProducto())
-                .cantidad(item.getCantidad())
-                .precioUnitUsd(item.getPrecioUnitUsd())
-                .observacion(item.getObservacion())
-                .build();
-    }
+    @Mapping(target = "numeroPedido", source = "pedido.numeroPedido")
+    ItemPedidoResponse toResponse(ItemPedido item);
 
-    public void updateEntity(ItemPedido item, ItemPedidoRequest request, Pedido pedido) {
-        item.setPedido(pedido);
-        item.setNombreProducto(request.getNombreProducto());
-        item.setCantidad(request.getCantidad());
-        item.setPrecioUnitUsd(request.getPrecioUnitUsd());
-        item.setObservacion(request.getObservacion());
-    }
+    List<ItemPedidoResponse> toResponseList(List<ItemPedido> items);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "pedido", ignore = true)
+    void updateEntity(ItemPedidoRequest request, @MappingTarget ItemPedido item);
 }
