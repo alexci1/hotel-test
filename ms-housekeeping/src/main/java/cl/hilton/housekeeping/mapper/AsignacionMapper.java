@@ -1,52 +1,49 @@
 package cl.hilton.housekeeping.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.housekeeping.dto.AsignacionRequest;
 import cl.hilton.housekeeping.dto.AsignacionResponse;
 import cl.hilton.housekeeping.model.Asignacion;
 import cl.hilton.housekeeping.model.ProjHabitacion;
 import cl.hilton.housekeeping.model.Tarea;
-import org.springframework.stereotype.Component;
 
-@Component
-public class AsignacionMapper {
+@Mapper(componentModel = "spring")
+public interface AsignacionMapper {
 
-    public Asignacion toEntity(AsignacionRequest request, ProjHabitacion habitacion, Tarea tarea) {
-        return Asignacion.builder()
-                .habitacion(habitacion)
-                .tarea(tarea)
-                .emailCamarero(request.getEmailCamarero())
-                .fechaProgramada(request.getFechaProgramada())
-                .estado(request.getEstado())
-                .prioridad(request.getPrioridad())
-                .iniciadaEn(request.getIniciadaEn())
-                .completadaEn(request.getCompletadaEn())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "habitacion", source = "habitacion")
+    @Mapping(target = "tarea", source = "tarea")
+    @Mapping(target = "emailCamarero", source = "request.emailCamarero")
+    @Mapping(target = "fechaProgramada", source = "request.fechaProgramada")
+    @Mapping(target = "estado", source = "request.estado")
+    @Mapping(target = "prioridad", source = "request.prioridad")
+    @Mapping(target = "iniciadaEn", source = "request.iniciadaEn")
+    @Mapping(target = "completadaEn", source = "request.completadaEn")
+    @Mapping(target = "reporte", ignore = true)
+    Asignacion toEntity(AsignacionRequest request, ProjHabitacion habitacion, Tarea tarea);
 
-    public AsignacionResponse toResponse(Asignacion asignacion) {
-        return AsignacionResponse.builder()
-                .id(asignacion.getId())
-                .numeroHabitacion(asignacion.getHabitacion().getNumeroHabitacion())
-                .tipoHabitacion(asignacion.getHabitacion().getTipo())
-                .codigoTarea(asignacion.getTarea().getCodigo())
-                .descripcionTarea(asignacion.getTarea().getDescripcion())
-                .emailCamarero(asignacion.getEmailCamarero())
-                .fechaProgramada(asignacion.getFechaProgramada())
-                .estado(asignacion.getEstado())
-                .prioridad(asignacion.getPrioridad())
-                .iniciadaEn(asignacion.getIniciadaEn())
-                .completadaEn(asignacion.getCompletadaEn())
-                .build();
-    }
+    @Mapping(target = "numeroHabitacion", source = "habitacion.numeroHabitacion")
+    @Mapping(target = "tipoHabitacion", source = "habitacion.tipo")
+    @Mapping(target = "codigoTarea", source = "tarea.codigo")
+    @Mapping(target = "descripcionTarea", source = "tarea.descripcion")
+    AsignacionResponse toResponse(Asignacion asignacion);
 
-    public void updateEntity(Asignacion asignacion, AsignacionRequest request, ProjHabitacion habitacion, Tarea tarea) {
-        asignacion.setHabitacion(habitacion);
-        asignacion.setTarea(tarea);
-        asignacion.setEmailCamarero(request.getEmailCamarero());
-        asignacion.setFechaProgramada(request.getFechaProgramada());
-        asignacion.setEstado(request.getEstado());
-        asignacion.setPrioridad(request.getPrioridad());
-        asignacion.setIniciadaEn(request.getIniciadaEn());
-        asignacion.setCompletadaEn(request.getCompletadaEn());
-    }
+    List<AsignacionResponse> toResponseList(List<Asignacion> asignaciones);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "habitacion", source = "habitacion")
+    @Mapping(target = "tarea", source = "tarea")
+    @Mapping(target = "emailCamarero", source = "request.emailCamarero")
+    @Mapping(target = "fechaProgramada", source = "request.fechaProgramada")
+    @Mapping(target = "estado", source = "request.estado")
+    @Mapping(target = "prioridad", source = "request.prioridad")
+    @Mapping(target = "iniciadaEn", source = "request.iniciadaEn")
+    @Mapping(target = "completadaEn", source = "request.completadaEn")
+    @Mapping(target = "reporte", ignore = true)
+    void updateEntity(AsignacionRequest request, ProjHabitacion habitacion, Tarea tarea, @MappingTarget Asignacion asignacion);
 }
