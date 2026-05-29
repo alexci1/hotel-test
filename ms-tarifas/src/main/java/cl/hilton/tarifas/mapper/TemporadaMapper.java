@@ -1,31 +1,27 @@
 package cl.hilton.tarifas.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.tarifas.dto.TemporadaRequest;
 import cl.hilton.tarifas.dto.TemporadaResponse;
 import cl.hilton.tarifas.model.Temporada;
 
-public class TemporadaMapper {
+@Mapper(componentModel = "spring")
+public interface TemporadaMapper {
 
-    public static Temporada toEntity(TemporadaRequest request) {
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "tarifas", ignore = true)
+    Temporada toEntity(TemporadaRequest request);
 
-        return Temporada.builder()
-                .codigo(request.getCodigo())
-                .nombre(request.getNombre())
-                .fechaInicio(request.getFechaInicio())
-                .fechaFin(request.getFechaFin())
-                .build();
-    }
+    TemporadaResponse toResponse(Temporada temporada);
 
-    public static TemporadaResponse toResponse(Temporada temporada) {
+    List<TemporadaResponse> toResponseList(List<Temporada> temporadas);
 
-        TemporadaResponse response = new TemporadaResponse();
-
-        response.setId(temporada.getId());
-        response.setCodigo(temporada.getCodigo());
-        response.setNombre(temporada.getNombre());
-        response.setFechaInicio(temporada.getFechaInicio());
-        response.setFechaFin(temporada.getFechaFin());
-
-        return response;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "tarifas", ignore = true)
+    void updateEntity(TemporadaRequest request, @MappingTarget Temporada temporada);
 }
