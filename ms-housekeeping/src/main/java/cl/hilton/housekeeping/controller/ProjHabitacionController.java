@@ -4,55 +4,53 @@ import cl.hilton.housekeeping.dto.ProjHabitacionRequest;
 import cl.hilton.housekeeping.dto.ProjHabitacionResponse;
 import cl.hilton.housekeeping.service.ProjHabitacionService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/proj-habitaciones")
+@RequestMapping("/api/v1/housekeeping/proj-habitaciones")
+@RequiredArgsConstructor
 public class ProjHabitacionController {
 
     private final ProjHabitacionService habitacionService;
 
-    public ProjHabitacionController(ProjHabitacionService habitacionService) {
-        this.habitacionService = habitacionService;
-    }
-
     @GetMapping
-    public List<ProjHabitacionResponse> listar() {
-        return habitacionService.listar();
+    public List<ProjHabitacionResponse> findAll() {
+        return habitacionService.findAll();
     }
 
     @GetMapping("/{numeroHabitacion}")
-    public ProjHabitacionResponse buscarPorNumero(@PathVariable String numeroHabitacion) {
-        return habitacionService.buscarPorNumero(numeroHabitacion);
+    public ProjHabitacionResponse findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
+        return habitacionService.findByNumeroHabitacion(numeroHabitacion);
     }
 
     @GetMapping("/tipo/{tipo}")
-    public List<ProjHabitacionResponse> buscarPorTipo(@PathVariable String tipo) {
-        return habitacionService.buscarPorTipo(tipo);
+    public List<ProjHabitacionResponse> findByTipo(@PathVariable String tipo) {
+        return habitacionService.findByTipo(tipo);
     }
 
     @GetMapping("/piso/{piso}")
-    public List<ProjHabitacionResponse> buscarPorPiso(@PathVariable Long piso) {
-        return habitacionService.buscarPorPiso(piso);
+    public List<ProjHabitacionResponse> findByPiso(@PathVariable Integer piso) {
+        return habitacionService.findByPiso(piso);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjHabitacionResponse crear(@Valid @RequestBody ProjHabitacionRequest request) {
-        return habitacionService.crear(request);
+    public ProjHabitacionResponse create(@Valid @RequestBody ProjHabitacionRequest request) {
+        return habitacionService.create(request);
     }
 
     @PutMapping("/{numeroHabitacion}")
-    public ProjHabitacionResponse actualizar(@PathVariable String numeroHabitacion, @Valid @RequestBody ProjHabitacionRequest request) {
-        return habitacionService.actualizar(numeroHabitacion, request);
+    public ProjHabitacionResponse update(@PathVariable String numeroHabitacion, @Valid @RequestBody ProjHabitacionRequest request) {
+        return habitacionService.update(numeroHabitacion, request);
     }
 
     @DeleteMapping("/{numeroHabitacion}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void eliminar(@PathVariable String numeroHabitacion) {
-        habitacionService.eliminar(numeroHabitacion);
+    public void deleteByNumeroHabitacion(@PathVariable String numeroHabitacion) {
+        habitacionService.deleteByNumeroHabitacion(numeroHabitacion);
     }
 }
