@@ -16,6 +16,8 @@ public interface KpiRepository extends JpaRepository<Kpi, Long> {
 
     boolean existsByNombre(String nombre);
 
+    List<Kpi> findByReporteCodigo(String codigoReporte);
+
     List<Kpi> findByPeriodo(String periodo);
 
     List<Kpi> findByUnidad(String unidad);
