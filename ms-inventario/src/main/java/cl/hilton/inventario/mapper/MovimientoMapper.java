@@ -1,44 +1,31 @@
 package cl.hilton.inventario.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.inventario.dto.MovimientoRequest;
 import cl.hilton.inventario.dto.MovimientoResponse;
 import cl.hilton.inventario.model.Movimiento;
-import cl.hilton.inventario.model.Producto;
-import org.springframework.stereotype.Component;
 
-@Component
-public class MovimientoMapper {
+@Mapper(componentModel = "spring")
+public interface MovimientoMapper {
 
-    public Movimiento toEntity(MovimientoRequest request, Producto producto) {
-        return Movimiento.builder()
-                .producto(producto)
-                .tipo(request.getTipo())
-                .cantidad(request.getCantidad())
-                .motivo(request.getMotivo())
-                .registradoPor(request.getRegistradoPor())
-                .registradoEn(request.getRegistradoEn())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "producto", ignore = true)
+    @Mapping(target = "registradoEn", ignore = true)
+    Movimiento toEntity(MovimientoRequest request);
 
-    public MovimientoResponse toResponse(Movimiento movimiento) {
-        return MovimientoResponse.builder()
-                .id(movimiento.getId())
-                .codigoProducto(movimiento.getProducto().getCodigoProducto())
-                .nombreProducto(movimiento.getProducto().getNombre())
-                .tipo(movimiento.getTipo())
-                .cantidad(movimiento.getCantidad())
-                .motivo(movimiento.getMotivo())
-                .registradoPor(movimiento.getRegistradoPor())
-                .registradoEn(movimiento.getRegistradoEn())
-                .build();
-    }
+    @Mapping(target = "codigoProducto", source = "producto.codigoProducto")
+    @Mapping(target = "nombreProducto", source = "producto.nombre")
+    MovimientoResponse toResponse(Movimiento movimiento);
 
-    public void updateEntity(Movimiento movimiento, MovimientoRequest request, Producto producto) {
-        movimiento.setProducto(producto);
-        movimiento.setTipo(request.getTipo());
-        movimiento.setCantidad(request.getCantidad());
-        movimiento.setMotivo(request.getMotivo());
-        movimiento.setRegistradoPor(request.getRegistradoPor());
-        movimiento.setRegistradoEn(request.getRegistradoEn());
-    }
+    List<MovimientoResponse> toResponseList(List<Movimiento> movimientos);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "producto", ignore = true)
+    @Mapping(target = "registradoEn", ignore = true)
+    void updateEntity(MovimientoRequest request, @MappingTarget Movimiento movimiento);
 }
