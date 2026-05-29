@@ -48,7 +48,8 @@ public class CheckoutService {
         Checkout checkout = checkoutMapper.toEntity(request, reserva);
         checkout.setFechaHora(LocalDate.now());
 
-        return checkoutMapper.toResponse(checkoutRepository.save(checkout));
+        Checkout saved = checkoutRepository.save(checkout);
+        return checkoutMapper.toResponse(saved);
     }
 
     public CheckoutResponse update(Long id, CheckoutRequest request) {
@@ -63,7 +64,8 @@ public class CheckoutService {
 
         checkoutMapper.updateEntity(request, reserva, checkout);
 
-        return checkoutMapper.toResponse(checkoutRepository.save(checkout));
+        Checkout saved = checkoutRepository.save(checkout);
+        return checkoutMapper.toResponse(saved);
     }
 
     public void deleteById(Long id) {
