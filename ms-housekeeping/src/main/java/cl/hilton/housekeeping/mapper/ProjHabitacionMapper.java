@@ -1,9 +1,13 @@
 package cl.hilton.housekeeping.mapper;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
 import cl.hilton.housekeeping.dto.ProjHabitacionRequest;
 import cl.hilton.housekeeping.dto.ProjHabitacionResponse;
 import cl.hilton.housekeeping.model.ProjHabitacion;
-import org.springframework.stereotype.Component;
 
 @Component
 public class ProjHabitacionMapper {
@@ -13,7 +17,7 @@ public class ProjHabitacionMapper {
                 .numeroHabitacion(request.getNumeroHabitacion())
                 .tipo(request.getTipo())
                 .piso(request.getPiso())
-                .actualizadoEn(request.getActualizadoEn())
+                .actualizadoEn(LocalDate.now())
                 .build();
     }
 
@@ -26,9 +30,13 @@ public class ProjHabitacionMapper {
                 .build();
     }
 
+    public List<ProjHabitacionResponse> toResponseList(List<ProjHabitacion> habitaciones) {
+        return habitaciones.stream().map(this::toResponse).toList();
+    }
+
     public void updateEntity(ProjHabitacion habitacion, ProjHabitacionRequest request) {
         habitacion.setTipo(request.getTipo());
         habitacion.setPiso(request.getPiso());
-        habitacion.setActualizadoEn(request.getActualizadoEn());
+        habitacion.setActualizadoEn(LocalDate.now());
     }
 }
