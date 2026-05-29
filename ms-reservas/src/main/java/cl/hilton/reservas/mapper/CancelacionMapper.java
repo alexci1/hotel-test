@@ -1,38 +1,30 @@
 package cl.hilton.reservas.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.reservas.dto.CancelacionRequest;
 import cl.hilton.reservas.dto.CancelacionResponse;
 import cl.hilton.reservas.model.Cancelacion;
-import cl.hilton.reservas.model.Reserva;
 
-public class CancelacionMapper {
+@Mapper(componentModel = "spring")
+public interface CancelacionMapper {
 
-    public static Cancelacion toEntity(
-            CancelacionRequest request,
-            Reserva reserva
-    ) {
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reserva", ignore = true)
+    @Mapping(target = "canceladoEn", ignore = true)
+    Cancelacion toEntity(CancelacionRequest request);
 
-        return Cancelacion.builder()
-                .reserva(reserva)
-                .motivo(request.getMotivo())
-                .canceladoPor(request.getCanceladoPor())
-                .penalidadUsd(request.getPenalidadUsd())
-                .build();
-    }
+    @Mapping(target = "codigoReserva", source = "reserva.codigoReserva")
+    CancelacionResponse toResponse(Cancelacion cancelacion);
 
-    public static CancelacionResponse toResponse(Cancelacion cancelacion) {
+    List<CancelacionResponse> toResponseList(List<Cancelacion> cancelaciones);
 
-        CancelacionResponse response = new CancelacionResponse();
-
-        response.setId(cancelacion.getId());
-        response.setCodigoReserva(
-                cancelacion.getReserva().getCodigoReserva()
-        );
-        response.setMotivo(cancelacion.getMotivo());
-        response.setCanceladoPor(cancelacion.getCanceladoPor());
-        response.setCanceladoEn(cancelacion.getCanceladoEn());
-        response.setPenalidadUsd(cancelacion.getPenalidadUsd());
-
-        return response;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reserva", ignore = true)
+    @Mapping(target = "canceladoEn", ignore = true)
+    void updateEntity(CancelacionRequest request, @MappingTarget Cancelacion cancelacion);
 }
