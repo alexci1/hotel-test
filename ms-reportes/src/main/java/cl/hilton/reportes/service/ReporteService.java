@@ -1,96 +1,99 @@
 package cl.hilton.reportes.service;
 
-import cl.hilton.reportes.dto.ReporteRequest;
-import cl.hilton.reportes.dto.ReporteResponse;
-import cl.hilton.reportes.model.Reporte;
-import cl.hilton.reportes.repository.ReporteRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import cl.hilton.reportes.dto.ReporteRequest;
+import cl.hilton.reportes.dto.ReporteResponse;
+import cl.hilton.reportes.mapper.ReporteMapper;
+import cl.hilton.reportes.model.Reporte;
+import cl.hilton.reportes.repository.ReporteRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ReporteService {
 
     private final ReporteRepository reporteRepository;
+    private final ReporteMapper reporteMapper;
 
-    public List<ReporteResponse> listar() {
-        return reporteRepository.findAll().stream().map(this::toResponse).toList();
+    public List<ReporteResponse> findAll() {
+        return reporteMapper.toResponseList(reporteRepository.findAll());
     }
 
-    public ReporteResponse buscarPorId(Integer id) {
-        return toResponse(obtenerReporte(id));
+    public ReporteResponse findById(Long id) {
+        Reporte reporte = getReporteById(id);
+        return reporteMapper.toResponse(reporte);
     }
 
-    public ReporteResponse buscarPorCodigo(String codigo) {
+    public ReporteResponse findByCodigo(String codigo) {
         Reporte reporte = reporteRepository.findByCodigo(codigo)
-                .orElseThrow(() -> new RuntimeException("Reporte no encontrado"));
-        return toResponse(reporte);
+                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado con codigo: " + codigo));
+
+        return reporteMapper.toResponse(reporte);
     }
 
-    public List<ReporteResponse> buscarPorTipo(String tipo) {
-        return reporteRepository.findByTipo(tipo).stream().map(this::toResponse).toList();
+    public List<ReporteResponse> findByTipo(String tipo) {
+        return reporteMapper.toResponseList(reporteRepository.findByTipo(tipo));
     }
 
-    public List<ReporteResponse> buscarPorFrecuencia(String frecuencia) {
-        return reporteRepository.findByFrecuencia(frecuencia).stream().map(this::toResponse).toList();
+    public List<ReporteResponse> findByFrecuencia(String frecuencia) {
+        return reporteMapper.toResponseList(reporteRepository.findByFrecuencia(frecuencia));
     }
 
-    public List<ReporteResponse> buscarPorActivo(Boolean activo) {
-        return reporteRepository.findByActivo(activo).stream().map(this::toResponse).toList();
+    public List<ReporteResponse> findByActivo(Boolean activo) {
+        return reporteMapper.toResponseList(reporteRepository.findByActivo(activo));
     }
 
-    public ReporteResponse crear(ReporteRequest request) {
-        if (reporteRepository.existsByCodigo(request.getCodigo())) {
-            throw new RuntimeException("Ya existe un reporte con ese código");
+    public List<ReporteResponse> findByNombre(String nombre) {
+        return reporteMapper.toResponseList(reporteRepository.findByNombreContainingIgnoreCase(nombre));
+    }
+
+    public ReporteResponse create(ReporteRequest request) {
+        validarCodigoUnico(request.getCodigo());
+
+        Reporte reporte = reporteMapper.toEntity(request);
+        reporte.setFrecuencia(request.getFrecuencia() != null ? request.getFrecuencia() : "DIARIO");
+        reporte.setActivo(request.getActivo() != null ? request.getActivo() : true);
+
+        Reporte reporteGuardado = reporteRepository.save(reporte);
+
+        return reporteMapper.toResponse(reporteGuardado);
+    }
+
+    public ReporteResponse update(Long id, ReporteRequest request) {
+        Reporte reporte = getReporteById(id);
+        Boolean activoActual = reporte.getActivo();
+        String frecuenciaActual = reporte.getFrecuencia();
+
+        if (!reporte.getCodigo().equalsIgnoreCase(request.getCodigo())) {
+            validarCodigoUnico(request.getCodigo());
         }
 
-        Reporte reporte = Reporte.builder()
-                .codigo(request.getCodigo())
-                .nombre(request.getNombre())
-                .descripcion(request.getDescripcion())
-                .tipo(request.getTipo())
-                .frecuencia(request.getFrecuencia())
-                .activo(request.getActivo())
-                .build();
+        reporteMapper.updateEntity(request, reporte);
+        reporte.setFrecuencia(request.getFrecuencia() != null ? request.getFrecuencia() : frecuenciaActual);
+        reporte.setActivo(request.getActivo() != null ? request.getActivo() : activoActual);
 
-        return toResponse(reporteRepository.save(reporte));
+        Reporte reporteActualizado = reporteRepository.save(reporte);
+
+        return reporteMapper.toResponse(reporteActualizado);
     }
 
-    public ReporteResponse actualizar(Integer id, ReporteRequest request) {
-        Reporte reporte = obtenerReporte(id);
-
-        reporte.setCodigo(request.getCodigo());
-        reporte.setNombre(request.getNombre());
-        reporte.setDescripcion(request.getDescripcion());
-        reporte.setTipo(request.getTipo());
-        reporte.setFrecuencia(request.getFrecuencia());
-        reporte.setActivo(request.getActivo());
-
-        return toResponse(reporteRepository.save(reporte));
-    }
-
-    public void eliminar(Integer id) {
-        Reporte reporte = obtenerReporte(id);
+    public void deleteById(Long id) {
+        Reporte reporte = getReporteById(id);
         reporteRepository.delete(reporte);
     }
 
-    private Reporte obtenerReporte(Integer id) {
+    private Reporte getReporteById(Long id) {
         return reporteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Reporte no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado con id: " + id));
     }
 
-    private ReporteResponse toResponse(Reporte reporte) {
-        return ReporteResponse.builder()
-                .id(reporte.getId())
-                .codigo(reporte.getCodigo())
-                .nombre(reporte.getNombre())
-                .descripcion(reporte.getDescripcion())
-                .tipo(reporte.getTipo())
-                .frecuencia(reporte.getFrecuencia())
-                .activo(reporte.getActivo())
-                .build();
+    private void validarCodigoUnico(String codigo) {
+        if (reporteRepository.existsByCodigo(codigo)) {
+            throw new IllegalArgumentException("Ya existe un reporte con codigo: " + codigo);
+        }
     }
 }
-
