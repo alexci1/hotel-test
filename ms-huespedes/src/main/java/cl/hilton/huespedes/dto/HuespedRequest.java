@@ -1,32 +1,24 @@
 package cl.hilton.huespedes.dto;
 
-import jakarta.validation.constraints.*;
-import lombok.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
 
-import java.time.LocalDate;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Data
 public class HuespedRequest {
 
-    @NotBlank
-    @Email
-    @Size(max = 120)
+    @NotBlank(message = "El email es obligatorio")
+    @Email(message = "El email debe tener formato valido")
+    @Size(max = 120, message = "El email no puede superar los 120 caracteres")
     private String email;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "El nombre completo es obligatorio")
+    @Size(max = 100, message = "El nombre completo no puede superar los 100 caracteres")
     private String nombreCompleto;
 
-    @Size(max = 20)
+    @Size(max = 20, message = "El telefono no puede superar los 20 caracteres")
     private String telefono;
 
-    @NotNull
     private Boolean activo;
-
-    @NotNull
-    private LocalDate creadoEn;
 }
