@@ -1,36 +1,27 @@
 package cl.hilton.housekeeping.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.housekeeping.dto.TareaRequest;
 import cl.hilton.housekeeping.dto.TareaResponse;
 import cl.hilton.housekeeping.model.Tarea;
-import org.springframework.stereotype.Component;
 
-@Component
-public class TareaMapper {
+@Mapper(componentModel = "spring")
+public interface TareaMapper {
 
-    public Tarea toEntity(TareaRequest request) {
-        return Tarea.builder()
-                .codigo(request.getCodigo())
-                .descripcion(request.getDescripcion())
-                .duracionMin(request.getDuracionMin())
-                .activa(request.getActiva())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "asignaciones", ignore = true)
+    Tarea toEntity(TareaRequest request);
 
-    public TareaResponse toResponse(Tarea tarea) {
-        return TareaResponse.builder()
-                .id(tarea.getId())
-                .codigo(tarea.getCodigo())
-                .descripcion(tarea.getDescripcion())
-                .duracionMin(tarea.getDuracionMin())
-                .activa(tarea.getActiva())
-                .build();
-    }
+    TareaResponse toResponse(Tarea tarea);
 
-    public void updateEntity(Tarea tarea, TareaRequest request) {
-        tarea.setCodigo(request.getCodigo());
-        tarea.setDescripcion(request.getDescripcion());
-        tarea.setDuracionMin(request.getDuracionMin());
-        tarea.setActiva(request.getActiva());
-    }
+    List<TareaResponse> toResponseList(List<Tarea> tareas);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "asignaciones", ignore = true)
+    void updateEntity(TareaRequest request, @MappingTarget Tarea tarea);
 }
