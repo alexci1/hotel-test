@@ -1,35 +1,28 @@
 package cl.hilton.reservas.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.reservas.dto.DisponibilidadRequest;
 import cl.hilton.reservas.dto.DisponibilidadResponse;
 import cl.hilton.reservas.model.Disponibilidad;
-import cl.hilton.reservas.model.ProjHabitacion;
 
-public class DisponibilidadMapper {
+@Mapper(componentModel = "spring")
+public interface DisponibilidadMapper {
 
-    public static Disponibilidad toEntity(
-            DisponibilidadRequest request,
-            ProjHabitacion habitacion
-    ) {
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "habitacion", ignore = true)
+    Disponibilidad toEntity(DisponibilidadRequest request);
 
-        return Disponibilidad.builder()
-                .habitacion(habitacion)
-                .fecha(request.getFecha())
-                .disponible(request.getDisponible())
-                .build();
-    }
+    @Mapping(target = "numeroHabitacion", source = "habitacion.numeroHabitacion")
+    DisponibilidadResponse toResponse(Disponibilidad disponibilidad);
 
-    public static DisponibilidadResponse toResponse(Disponibilidad disponibilidad) {
+    List<DisponibilidadResponse> toResponseList(List<Disponibilidad> disponibilidades);
 
-        DisponibilidadResponse response = new DisponibilidadResponse();
-
-        response.setId(disponibilidad.getId());
-        response.setNumeroHabitacion(
-                disponibilidad.getHabitacion().getNumeroHabitacion()
-        );
-        response.setFecha(disponibilidad.getFecha());
-        response.setDisponible(disponibilidad.getDisponible());
-
-        return response;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "habitacion", ignore = true)
+    void updateEntity(DisponibilidadRequest request, @MappingTarget Disponibilidad disponibilidad);
 }
