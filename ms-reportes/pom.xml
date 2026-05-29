@@ -87,12 +87,6 @@
             <artifactId>mapstruct</artifactId>
         </dependency>
 
-        <!-- Procesador de anotaciones de MapStruct -->
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-        </dependency>
-
         <!-- Dependencias de testing con JUnit, MockMvc, etc. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
