@@ -1,42 +1,29 @@
 package cl.hilton.inventario.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.inventario.dto.ProductoRequest;
 import cl.hilton.inventario.dto.ProductoResponse;
 import cl.hilton.inventario.model.Producto;
-import org.springframework.stereotype.Component;
 
-@Component
-public class ProductoMapper {
+@Mapper(componentModel = "spring")
+public interface ProductoMapper {
 
-    public Producto toEntity(ProductoRequest request) {
-        return Producto.builder()
-                .codigoProducto(request.getCodigoProducto())
-                .nombre(request.getNombre())
-                .categoria(request.getCategoria())
-                .stockActual(request.getStockActual())
-                .stockMinimo(request.getStockMinimo())
-                .unidad(request.getUnidad())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "movimientos", ignore = true)
+    @Mapping(target = "minibares", ignore = true)
+    Producto toEntity(ProductoRequest request);
 
-    public ProductoResponse toResponse(Producto producto) {
-        return ProductoResponse.builder()
-                .id(producto.getId())
-                .codigoProducto(producto.getCodigoProducto())
-                .nombre(producto.getNombre())
-                .categoria(producto.getCategoria())
-                .stockActual(producto.getStockActual())
-                .stockMinimo(producto.getStockMinimo())
-                .unidad(producto.getUnidad())
-                .build();
-    }
+    ProductoResponse toResponse(Producto producto);
 
-    public void updateEntity(Producto producto, ProductoRequest request) {
-        producto.setCodigoProducto(request.getCodigoProducto());
-        producto.setNombre(request.getNombre());
-        producto.setCategoria(request.getCategoria());
-        producto.setStockActual(request.getStockActual());
-        producto.setStockMinimo(request.getStockMinimo());
-        producto.setUnidad(request.getUnidad());
-    }
+    List<ProductoResponse> toResponseList(List<Producto> productos);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "movimientos", ignore = true)
+    @Mapping(target = "minibares", ignore = true)
+    void updateEntity(ProductoRequest request, @MappingTarget Producto producto);
 }
