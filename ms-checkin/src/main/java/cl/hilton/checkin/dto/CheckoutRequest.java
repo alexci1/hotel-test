@@ -1,11 +1,12 @@
 package cl.hilton.checkin.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
-import java.time.LocalDate;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -17,9 +18,6 @@ public class CheckoutRequest {
     @NotBlank
     @Size(max = 20)
     private String codigoReserva;
-
-    @NotNull
-    private LocalDate fechaHora;
 
     @NotBlank
     @Size(max = 80)
