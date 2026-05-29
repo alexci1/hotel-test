@@ -34,4 +34,6 @@ public class ProjReservaRequest {
     @NotBlank
     @Size(max = 20)
     private String estado;
+
+    private LocalDate actualizadoEn;
 }
