@@ -150,9 +150,9 @@
             </dependency>
 
             <dependency>
-                <groupId>cl.triskeledu</groupId>
-                <artifactId>cl-triskeledu-common</artifactId>
-                <version>${cl-triskeledu-common.version}</version>
+                <groupId>cl.hilton</groupId>
+                <artifactId>cl-hilton-common</artifactId>
+                <version>${cl-hilton-common.version}</version>
             </dependency>
 
         </dependencies>
