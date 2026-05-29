@@ -6,7 +6,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @EnableDiscoveryClient
-@EnableFeignClients(basePackages ="cl.hilton.autenticacion")
+@EnableFeignClients(basePackages ="cl.hilton.autenticacion.client")
 @SpringBootApplication
 public class HotelAutenticacionApplication {
 
