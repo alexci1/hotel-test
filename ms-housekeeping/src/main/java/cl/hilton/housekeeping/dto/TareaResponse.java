@@ -12,6 +12,6 @@ public class TareaResponse {
     private Long id;
     private String codigo;
     private String descripcion;
-    private Long duracionMin;
+    private Integer duracionMin;
     private Boolean activa;
 }
