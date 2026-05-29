@@ -1,111 +1,124 @@
 package cl.hilton.inventario.service;
 
-import cl.hilton.inventario.dto.ProductoRequest;
-import cl.hilton.inventario.dto.ProductoResponse;
-import cl.hilton.inventario.model.Producto;
-import cl.hilton.inventario.repository.ProductoRepository;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import cl.hilton.inventario.dto.ProductoRequest;
+import cl.hilton.inventario.dto.ProductoResponse;
+import cl.hilton.inventario.mapper.ProductoMapper;
+import cl.hilton.inventario.model.Producto;
+import cl.hilton.inventario.repository.ProductoRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
+    private final ProductoMapper productoMapper;
 
-    public List<ProductoResponse> listar() {
-        return productoRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public List<ProductoResponse> findAll() {
+        return productoMapper.toResponseList(productoRepository.findAll());
     }
 
-    public ProductoResponse buscarPorId(Long id) {
-        return toResponse(obtenerProducto(id));
+    public ProductoResponse findById(Long id) {
+        Producto producto = getProductoById(id);
+        return productoMapper.toResponse(producto);
     }
 
-    public ProductoResponse buscarPorCodigo(String codigoProducto) {
+    public ProductoResponse findByCodigoProducto(String codigoProducto) {
         Producto producto = productoRepository.findByCodigoProducto(codigoProducto)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado con codigo: " + codigoProducto));
 
-        return toResponse(producto);
+        return productoMapper.toResponse(producto);
     }
 
-    public List<ProductoResponse> buscarPorCategoria(String categoria) {
-        return productoRepository.findByCategoria(categoria).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<ProductoResponse> findByCategoria(String categoria) {
+        return productoMapper.toResponseList(productoRepository.findByCategoria(categoria));
     }
 
-    public List<ProductoResponse> buscarPorNombre(String nombre) {
-        return productoRepository.findByNombreContainingIgnoreCase(nombre).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<ProductoResponse> findByUnidad(String unidad) {
+        return productoMapper.toResponseList(productoRepository.findByUnidad(unidad));
     }
 
-    public List<ProductoResponse> buscarStockMenorOIgual(Integer stock) {
-        return productoRepository.findByStockActualLessThanEqual(stock).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<ProductoResponse> findByNombre(String nombre) {
+        return productoMapper.toResponseList(productoRepository.findByNombreContainingIgnoreCase(nombre));
     }
 
-    public ProductoResponse crear(ProductoRequest request) {
-        if (productoRepository.existsByCodigoProducto(request.getCodigoProducto())) {
-            throw new RuntimeException("Ya existe un producto con ese código");
+    public List<ProductoResponse> findByStockActualLessThanEqual(Integer stockActual) {
+        return productoMapper.toResponseList(productoRepository.findByStockActualLessThanEqual(stockActual));
+    }
+
+    public List<ProductoResponse> findByStockActualLessThan(Integer stockActual) {
+        return productoMapper.toResponseList(productoRepository.findByStockActualLessThan(stockActual));
+    }
+
+    public List<ProductoResponse> findByStockActualGreaterThan(Integer stockActual) {
+        return productoMapper.toResponseList(productoRepository.findByStockActualGreaterThan(stockActual));
+    }
+
+    public ProductoResponse create(ProductoRequest request) {
+        validarCodigoUnico(request.getCodigoProducto());
+
+        Producto producto = productoMapper.toEntity(request);
+        producto.setStockActual(request.getStockActual() != null ? request.getStockActual() : 0);
+        producto.setStockMinimo(request.getStockMinimo() != null ? request.getStockMinimo() : 5);
+        producto.setUnidad(request.getUnidad() != null ? request.getUnidad() : "UNIDAD");
+
+        Producto productoGuardado = productoRepository.save(producto);
+
+        return productoMapper.toResponse(productoGuardado);
+    }
+
+    public ProductoResponse update(Long id, ProductoRequest request) {
+        Producto producto = getProductoById(id);
+        Integer stockActual = producto.getStockActual();
+        Integer stockMinimo = producto.getStockMinimo();
+        String unidadActual = producto.getUnidad();
+
+        if (!producto.getCodigoProducto().equalsIgnoreCase(request.getCodigoProducto())) {
+            validarCodigoUnico(request.getCodigoProducto());
         }
 
-        Producto producto = Producto.builder()
-                .codigoProducto(request.getCodigoProducto())
-                .nombre(request.getNombre())
-                .categoria(request.getCategoria())
-                .stockActual(request.getStockActual())
-                .stockMinimo(request.getStockMinimo())
-                .unidad(request.getUnidad())
-                .build();
+        productoMapper.updateEntity(request, producto);
+        producto.setStockActual(request.getStockActual() != null ? request.getStockActual() : stockActual);
+        producto.setStockMinimo(request.getStockMinimo() != null ? request.getStockMinimo() : stockMinimo);
+        producto.setUnidad(request.getUnidad() != null ? request.getUnidad() : unidadActual);
 
-        return toResponse(productoRepository.save(producto));
-    }
+        Producto productoActualizado = productoRepository.save(producto);
 
-    public ProductoResponse actualizar(Long id, ProductoRequest request) {
-        Producto producto = obtenerProducto(id);
-
-        producto.setCodigoProducto(request.getCodigoProducto());
-        producto.setNombre(request.getNombre());
-        producto.setCategoria(request.getCategoria());
-        producto.setStockActual(request.getStockActual());
-        producto.setStockMinimo(request.getStockMinimo());
-        producto.setUnidad(request.getUnidad());
-
-        return toResponse(productoRepository.save(producto));
+        return productoMapper.toResponse(productoActualizado);
     }
 
     public ProductoResponse ajustarStock(Long id, Integer cantidad) {
-        Producto producto = obtenerProducto(id);
-        producto.setStockActual(producto.getStockActual() + cantidad);
+        Producto producto = getProductoById(id);
+        Integer nuevoStock = producto.getStockActual() + cantidad;
 
-        return toResponse(productoRepository.save(producto));
+        if (nuevoStock < 0) {
+            throw new IllegalArgumentException("El stock no puede quedar negativo");
+        }
+
+        producto.setStockActual(nuevoStock);
+        Producto productoActualizado = productoRepository.save(producto);
+
+        return productoMapper.toResponse(productoActualizado);
     }
 
-    public void eliminar(Long id) {
-        Producto producto = obtenerProducto(id);
+    public void deleteById(Long id) {
+        Producto producto = getProductoById(id);
         productoRepository.delete(producto);
     }
 
-    private Producto obtenerProducto(Long id) {
+    private Producto getProductoById(Long id) {
         return productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado con id: " + id));
     }
 
-    private ProductoResponse toResponse(Producto producto) {
-        return ProductoResponse.builder()
-                .id(producto.getId())
-                .codigoProducto(producto.getCodigoProducto())
-                .nombre(producto.getNombre())
-                .categoria(producto.getCategoria())
-                .stockActual(producto.getStockActual())
-                .stockMinimo(producto.getStockMinimo())
-                .unidad(producto.getUnidad())
-                .build();
+    private void validarCodigoUnico(String codigoProducto) {
+        if (productoRepository.existsByCodigoProducto(codigoProducto)) {
+            throw new IllegalArgumentException("Ya existe un producto con codigo: " + codigoProducto);
+        }
     }
 }
