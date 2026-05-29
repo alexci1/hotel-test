@@ -1,15 +1,22 @@
 package cl.hilton.inventario.repository;
 
-import cl.hilton.inventario.model.ProjHabitacion;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import cl.hilton.inventario.model.ProjHabitacion;
 
 @Repository
 public interface ProjHabitacionRepository extends JpaRepository<ProjHabitacion, String> {
 
-    List<ProjHabitacion> findByTipo(String tipo);
+    Optional<ProjHabitacion> findByNumeroHabitacion(String numeroHabitacion);
 
     boolean existsByNumeroHabitacion(String numeroHabitacion);
+
+    List<ProjHabitacion> findByTipo(String tipo);
+
+    List<ProjHabitacion> findByActualizadoEn(LocalDate actualizadoEn);
 }
