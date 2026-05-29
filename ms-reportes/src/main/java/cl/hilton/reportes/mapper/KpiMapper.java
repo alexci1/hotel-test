@@ -1,46 +1,27 @@
 package cl.hilton.reportes.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import cl.hilton.reportes.dto.KpiRequest;
 import cl.hilton.reportes.dto.KpiResponse;
 import cl.hilton.reportes.model.Kpi;
-import org.springframework.stereotype.Component;
 
-@Component
-public class KpiMapper {
+@Mapper(componentModel = "spring")
+public interface KpiMapper {
 
-    public Kpi toEntity(KpiRequest request) {
-        return Kpi.builder()
-                .nombre(request.getNombre())
-                .descripcion(request.getDescripcion())
-                .valorActual(request.getValorActual())
-                .valorObjetivo(request.getValorObjetivo())
-                .unidad(request.getUnidad())
-                .periodo(request.getPeriodo())
-                .actualizadoEn(request.getActualizadoEn())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "actualizadoEn", ignore = true)
+    Kpi toEntity(KpiRequest request);
 
-    public KpiResponse toResponse(Kpi kpi) {
-        return KpiResponse.builder()
-                .id(kpi.getId())
-                .nombre(kpi.getNombre())
-                .descripcion(kpi.getDescripcion())
-                .valorActual(kpi.getValorActual())
-                .valorObjetivo(kpi.getValorObjetivo())
-                .unidad(kpi.getUnidad())
-                .periodo(kpi.getPeriodo())
-                .actualizadoEn(kpi.getActualizadoEn())
-                .build();
-    }
+    KpiResponse toResponse(Kpi kpi);
 
-    public void updateEntity(Kpi kpi, KpiRequest request) {
-        kpi.setNombre(request.getNombre());
-        kpi.setDescripcion(request.getDescripcion());
-        kpi.setValorActual(request.getValorActual());
-        kpi.setValorObjetivo(request.getValorObjetivo());
-        kpi.setUnidad(request.getUnidad());
-        kpi.setPeriodo(request.getPeriodo());
-        kpi.setActualizadoEn(request.getActualizadoEn());
-    }
+    List<KpiResponse> toResponseList(List<Kpi> kpis);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "actualizadoEn", ignore = true)
+    void updateEntity(KpiRequest request, @MappingTarget Kpi kpi);
 }
