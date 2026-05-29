@@ -1,42 +1,34 @@
 package cl.hilton.checkin.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.checkin.dto.CheckinRequest;
 import cl.hilton.checkin.dto.CheckinResponse;
 import cl.hilton.checkin.model.Checkin;
 import cl.hilton.checkin.model.ProjHuesped;
 import cl.hilton.checkin.model.ProjReserva;
-import org.springframework.stereotype.Component;
 
-@Component
-public class CheckinMapper {
+@Mapper(componentModel = "spring")
+public interface CheckinMapper {
 
-    public Checkin toEntity(CheckinRequest request, ProjReserva reserva, ProjHuesped huesped) {
-        return Checkin.builder()
-                .reserva(reserva)
-                .huesped(huesped)
-                .numeroHabitacion(request.getNumeroHabitacion())
-                .fechaHora(request.getFechaHora())
-                .realizadoPor(request.getRealizadoPor())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reserva", source = "reserva")
+    @Mapping(target = "huesped", source = "huesped")
+    Checkin toEntity(CheckinRequest request, ProjReserva reserva, ProjHuesped huesped);
 
-    public CheckinResponse toResponse(Checkin checkin) {
-        return CheckinResponse.builder()
-                .id(checkin.getId())
-                .codigoReserva(checkin.getReserva() != null ? checkin.getReserva().getCodigoReserva() : null)
-                .emailHuesped(checkin.getHuesped() != null ? checkin.getHuesped().getEmail() : null)
-                .nombreHuesped(checkin.getHuesped() != null ? checkin.getHuesped().getNombreCompleto() : null)
-                .numeroHabitacion(checkin.getNumeroHabitacion())
-                .fechaHora(checkin.getFechaHora())
-                .realizadoPor(checkin.getRealizadoPor())
-                .build();
-    }
+    @Mapping(target = "codigoReserva", source = "reserva.codigoReserva")
+    @Mapping(target = "emailHuesped", source = "huesped.email")
+    @Mapping(target = "nombreHuesped", source = "huesped.nombreCompleto")
+    CheckinResponse toResponse(Checkin checkin);
 
-    public void updateEntity(Checkin checkin, CheckinRequest request, ProjReserva reserva, ProjHuesped huesped) {
-        checkin.setReserva(reserva);
-        checkin.setHuesped(huesped);
-        checkin.setNumeroHabitacion(request.getNumeroHabitacion());
-        checkin.setFechaHora(request.getFechaHora());
-        checkin.setRealizadoPor(request.getRealizadoPor());
-    }
+    List<CheckinResponse> toResponseList(List<Checkin> checkins);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reserva", source = "reserva")
+    @Mapping(target = "huesped", source = "huesped")
+    void updateEntity(CheckinRequest request, ProjReserva reserva, ProjHuesped huesped, @MappingTarget Checkin checkin);
 }
