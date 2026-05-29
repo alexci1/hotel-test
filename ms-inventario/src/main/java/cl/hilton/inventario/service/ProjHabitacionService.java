@@ -1,71 +1,94 @@
 package cl.hilton.inventario.service;
 
-import cl.hilton.inventario.dto.ProjHabitacionRequest;
-import cl.hilton.inventario.dto.ProjHabitacionResponse;
-import cl.hilton.inventario.model.ProjHabitacion;
-import cl.hilton.inventario.repository.ProjHabitacionRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import cl.hilton.inventario.client.HabitacionClient;
+import cl.hilton.inventario.dto.HabitacionInventarioResponse;
+import cl.hilton.inventario.dto.ProjHabitacionRequest;
+import cl.hilton.inventario.dto.ProjHabitacionResponse;
+import cl.hilton.inventario.mapper.ProjHabitacionMapper;
+import cl.hilton.inventario.model.ProjHabitacion;
+import cl.hilton.inventario.repository.ProjHabitacionRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ProjHabitacionService {
 
     private final ProjHabitacionRepository habitacionRepository;
+    private final ProjHabitacionMapper habitacionMapper;
+    private final HabitacionClient habitacionClient;
 
-    public List<ProjHabitacionResponse> listar() {
-        return habitacionRepository.findAll().stream().map(this::toResponse).toList();
+    public List<ProjHabitacionResponse> findAll() {
+        return habitacionMapper.toResponseList(habitacionRepository.findAll());
     }
 
-    public ProjHabitacionResponse buscarPorNumeroHabitacion(String numeroHabitacion) {
-        return toResponse(obtenerHabitacion(numeroHabitacion));
+    public ProjHabitacionResponse findByNumeroHabitacion(String numeroHabitacion) {
+        ProjHabitacion habitacion = getHabitacionByNumero(numeroHabitacion);
+        return habitacionMapper.toResponse(habitacion);
     }
 
-    public List<ProjHabitacionResponse> buscarPorTipo(String tipo) {
-        return habitacionRepository.findByTipo(tipo).stream().map(this::toResponse).toList();
+    public List<ProjHabitacionResponse> findByTipo(String tipo) {
+        return habitacionMapper.toResponseList(habitacionRepository.findByTipo(tipo));
     }
 
-    public ProjHabitacionResponse crear(ProjHabitacionRequest request) {
-        if (habitacionRepository.existsByNumeroHabitacion(request.getNumeroHabitacion())) {
-            throw new RuntimeException("Ya existe una habitación con ese número");
-        }
-
-        ProjHabitacion habitacion = ProjHabitacion.builder()
-                .numeroHabitacion(request.getNumeroHabitacion())
-                .tipo(request.getTipo())
-                .actualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : LocalDate.now())
-                .build();
-
-        return toResponse(habitacionRepository.save(habitacion));
+    public List<ProjHabitacionResponse> findByActualizadoEn(LocalDate actualizadoEn) {
+        return habitacionMapper.toResponseList(habitacionRepository.findByActualizadoEn(actualizadoEn));
     }
 
-    public ProjHabitacionResponse actualizar(String numeroHabitacion, ProjHabitacionRequest request) {
-        ProjHabitacion habitacion = obtenerHabitacion(numeroHabitacion);
+    public ProjHabitacionResponse create(ProjHabitacionRequest request) {
+        validarNumeroUnico(request.getNumeroHabitacion());
 
-        habitacion.setTipo(request.getTipo());
-        habitacion.setActualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : LocalDate.now());
+        ProjHabitacion habitacion = habitacionMapper.toEntity(request);
+        habitacion.setActualizadoEn(LocalDate.now());
 
-        return toResponse(habitacionRepository.save(habitacion));
+        ProjHabitacion habitacionGuardada = habitacionRepository.save(habitacion);
+
+        return habitacionMapper.toResponse(habitacionGuardada);
     }
 
-    public void eliminar(String numeroHabitacion) {
-        ProjHabitacion habitacion = obtenerHabitacion(numeroHabitacion);
+    public ProjHabitacionResponse update(String numeroHabitacion, ProjHabitacionRequest request) {
+        ProjHabitacion habitacion = getHabitacionByNumero(numeroHabitacion);
+
+        habitacionMapper.updateEntity(request, habitacion);
+        habitacion.setActualizadoEn(LocalDate.now());
+
+        ProjHabitacion habitacionActualizada = habitacionRepository.save(habitacion);
+
+        return habitacionMapper.toResponse(habitacionActualizada);
+    }
+
+    public ProjHabitacionResponse sincronizarPorNumeroHabitacion(String numeroHabitacion) {
+        HabitacionInventarioResponse externa = habitacionClient.buscarPorNumeroHabitacion(numeroHabitacion);
+        ProjHabitacion habitacion = habitacionRepository.findByNumeroHabitacion(externa.getNumeroHabitacion())
+                .orElseGet(ProjHabitacion::new);
+
+        habitacion.setNumeroHabitacion(externa.getNumeroHabitacion());
+        habitacion.setTipo(externa.getCodigoTipo());
+        habitacion.setActualizadoEn(LocalDate.now());
+
+        ProjHabitacion habitacionGuardada = habitacionRepository.save(habitacion);
+
+        return habitacionMapper.toResponse(habitacionGuardada);
+    }
+
+    public void deleteByNumeroHabitacion(String numeroHabitacion) {
+        ProjHabitacion habitacion = getHabitacionByNumero(numeroHabitacion);
         habitacionRepository.delete(habitacion);
     }
 
-    private ProjHabitacion obtenerHabitacion(String numeroHabitacion) {
-        return habitacionRepository.findById(numeroHabitacion)
-                .orElseThrow(() -> new RuntimeException("Habitación no encontrada"));
+    private ProjHabitacion getHabitacionByNumero(String numeroHabitacion) {
+        return habitacionRepository.findByNumeroHabitacion(numeroHabitacion)
+                .orElseThrow(() -> new EntityNotFoundException("Habitacion proyectada no encontrada con numero: " + numeroHabitacion));
     }
 
-    private ProjHabitacionResponse toResponse(ProjHabitacion habitacion) {
-        return ProjHabitacionResponse.builder()
-                .numeroHabitacion(habitacion.getNumeroHabitacion())
-                .tipo(habitacion.getTipo())
-                .actualizadoEn(habitacion.getActualizadoEn())
-                .build();
+    private void validarNumeroUnico(String numeroHabitacion) {
+        if (habitacionRepository.existsByNumeroHabitacion(numeroHabitacion)) {
+            throw new IllegalArgumentException("Ya existe una habitacion proyectada con numero: " + numeroHabitacion);
+        }
     }
 }
