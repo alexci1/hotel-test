@@ -1,18 +1,22 @@
 package cl.hilton.tarifas.dto;
 
-import jakarta.validation.constraints.*;
-import lombok.Data;
-
 import java.time.LocalDate;
+
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 @Data
 public class DescuentoRequest {
 
-    @NotBlank(message = "El código de descuento es obligatorio")
-    @Size(max = 30, message = "El código no puede superar los 30 caracteres")
+    @NotBlank(message = "El codigo de descuento es obligatorio")
+    @Size(max = 30, message = "El codigo no puede superar los 30 caracteres")
     private String codigoDescuento;
 
-    @Size(max = 100, message = "La descripción no puede superar los 100 caracteres")
+    @Size(max = 100, message = "La descripcion no puede superar los 100 caracteres")
     private String descripcion;
 
     @NotNull(message = "El porcentaje es obligatorio")
@@ -29,6 +33,5 @@ public class DescuentoRequest {
     @NotNull(message = "La fecha de fin es obligatoria")
     private LocalDate validoHasta;
 
-    @NotNull(message = "El estado activo es obligatorio")
     private Boolean activo;
 }
