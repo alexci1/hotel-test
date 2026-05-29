@@ -1,18 +1,14 @@
 package cl.hilton.huespedes.dto;
 
-import lombok.*;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Data
 public class PreferenciaResponse {
 
     private Long id;
     private String emailHuesped;
     private String nombreHuesped;
-    private Long pisoPreferido;
+    private Integer pisoPreferido;
     private String tipoCama;
     private String alergias;
     private String observaciones;
