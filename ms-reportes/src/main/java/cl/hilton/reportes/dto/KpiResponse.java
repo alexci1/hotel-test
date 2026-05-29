@@ -1,8 +1,12 @@
 package cl.hilton.reportes.dto;
 
-import lombok.*;
-
 import java.time.LocalDate;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -12,6 +16,8 @@ import java.time.LocalDate;
 public class KpiResponse {
 
     private Long id;
+    private String codigoReporte;
+    private String nombreReporte;
     private String nombre;
     private String descripcion;
     private Integer valorActual;
