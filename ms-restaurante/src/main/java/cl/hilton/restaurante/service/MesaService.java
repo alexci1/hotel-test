@@ -1,96 +1,108 @@
 package cl.hilton.restaurante.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
 
 import cl.hilton.restaurante.dto.MesaRequest;
 import cl.hilton.restaurante.dto.MesaResponse;
+import cl.hilton.restaurante.mapper.MesaMapper;
 import cl.hilton.restaurante.model.Mesa;
 import cl.hilton.restaurante.repository.MesaRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MesaService {
 
     private final MesaRepository mesaRepository;
+    private final MesaMapper mesaMapper;
 
-    public List<MesaResponse> listar() {
-        return mesaRepository.findAll().stream().map(this::toResponse).toList();
+    public List<MesaResponse> findAll() {
+        return mesaMapper.toResponseList(mesaRepository.findAll());
     }
 
-    public MesaResponse buscarPorId(Integer id) {
-        return toResponse(obtenerMesa(id));
+    public MesaResponse findById(Long id) {
+        Mesa mesa = getMesaById(id);
+        return mesaMapper.toResponse(mesa);
     }
 
-    public MesaResponse buscarPorNumeroMesa(String numeroMesa) {
+    public MesaResponse findByNumeroMesa(String numeroMesa) {
         Mesa mesa = mesaRepository.findByNumeroMesa(numeroMesa)
-                .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
-        return toResponse(mesa);
+                .orElseThrow(() -> new EntityNotFoundException("Mesa no encontrada con numero: " + numeroMesa));
+
+        return mesaMapper.toResponse(mesa);
     }
 
-    public List<MesaResponse> buscarPorZona(String zona) {
-        return mesaRepository.findByZona(zona).stream().map(this::toResponse).toList();
+    public List<MesaResponse> findByZona(String zona) {
+        return mesaMapper.toResponseList(mesaRepository.findByZona(zona));
     }
 
-    public List<MesaResponse> buscarPorDisponibilidad(Boolean disponible) {
-        return mesaRepository.findByDisponible(disponible).stream().map(this::toResponse).toList();
+    public List<MesaResponse> findByDisponible(Boolean disponible) {
+        return mesaMapper.toResponseList(mesaRepository.findByDisponible(disponible));
     }
 
-    public List<MesaResponse> buscarPorCapacidadMinima(Short capacidad) {
-        return mesaRepository.findByCapacidadGreaterThanEqual(capacidad).stream().map(this::toResponse).toList();
+    public List<MesaResponse> findByCapacidadMinima(Integer capacidad) {
+        return mesaMapper.toResponseList(mesaRepository.findByCapacidadGreaterThanEqual(capacidad));
     }
 
-    public MesaResponse crear(MesaRequest request) {
-        if (mesaRepository.existsByNumeroMesa(request.getNumeroMesa())) {
-            throw new RuntimeException("Ya existe una mesa con ese número");
+    public List<MesaResponse> findByZonaAndDisponible(String zona, Boolean disponible) {
+        return mesaMapper.toResponseList(mesaRepository.findByZonaAndDisponible(zona, disponible));
+    }
+
+    public MesaResponse create(MesaRequest request) {
+        validarNumeroMesaUnico(request.getNumeroMesa());
+
+        Mesa mesa = mesaMapper.toEntity(request);
+        mesa.setZona(request.getZona() != null ? request.getZona() : "SALON");
+        mesa.setDisponible(request.getDisponible() != null ? request.getDisponible() : true);
+
+        Mesa mesaGuardada = mesaRepository.save(mesa);
+
+        return mesaMapper.toResponse(mesaGuardada);
+    }
+
+    public MesaResponse update(Long id, MesaRequest request) {
+        Mesa mesa = getMesaById(id);
+        String zonaActual = mesa.getZona();
+        Boolean disponibleActual = mesa.getDisponible();
+
+        if (!mesa.getNumeroMesa().equalsIgnoreCase(request.getNumeroMesa())) {
+            validarNumeroMesaUnico(request.getNumeroMesa());
         }
 
-        Mesa mesa = Mesa.builder()
-                .numeroMesa(request.getNumeroMesa())
-                .capacidad(request.getCapacidad())
-                .zona(request.getZona())
-                .disponible(request.getDisponible())
-                .build();
+        mesaMapper.updateEntity(request, mesa);
+        mesa.setZona(request.getZona() != null ? request.getZona() : zonaActual);
+        mesa.setDisponible(request.getDisponible() != null ? request.getDisponible() : disponibleActual);
 
-        return toResponse(mesaRepository.save(mesa));
+        Mesa mesaActualizada = mesaRepository.save(mesa);
+
+        return mesaMapper.toResponse(mesaActualizada);
     }
 
-    public MesaResponse actualizar(Integer id, MesaRequest request) {
-        Mesa mesa = obtenerMesa(id);
-
-        mesa.setNumeroMesa(request.getNumeroMesa());
-        mesa.setCapacidad(request.getCapacidad());
-        mesa.setZona(request.getZona());
-        mesa.setDisponible(request.getDisponible());
-
-        return toResponse(mesaRepository.save(mesa));
-    }
-
-    public MesaResponse cambiarDisponibilidad(Integer id, Boolean disponible) {
-        Mesa mesa = obtenerMesa(id);
+    public MesaResponse cambiarDisponibilidad(Long id, Boolean disponible) {
+        Mesa mesa = getMesaById(id);
         mesa.setDisponible(disponible);
-        return toResponse(mesaRepository.save(mesa));
+
+        Mesa mesaActualizada = mesaRepository.save(mesa);
+
+        return mesaMapper.toResponse(mesaActualizada);
     }
 
-    public void eliminar(Integer id) {
-        Mesa mesa = obtenerMesa(id);
+    public void deleteById(Long id) {
+        Mesa mesa = getMesaById(id);
         mesaRepository.delete(mesa);
     }
 
-    private Mesa obtenerMesa(Integer id) {
+    private Mesa getMesaById(Long id) {
         return mesaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Mesa no encontrada con id: " + id));
     }
 
-    private MesaResponse toResponse(Mesa mesa) {
-        return MesaResponse.builder()
-                .id(mesa.getId())
-                .numeroMesa(mesa.getNumeroMesa())
-                .capacidad(mesa.getCapacidad())
-                .zona(mesa.getZona())
-                .disponible(mesa.getDisponible())
-                .build();
+    private void validarNumeroMesaUnico(String numeroMesa) {
+        if (mesaRepository.existsByNumeroMesa(numeroMesa)) {
+            throw new IllegalArgumentException("Ya existe una mesa con numero: " + numeroMesa);
+        }
     }
 }

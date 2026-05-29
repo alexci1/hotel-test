@@ -1,84 +1,94 @@
 package cl.hilton.restaurante.service;
 
-import cl.hilton.restaurante.dto.ProjHuespedRequest;
-import cl.hilton.restaurante.dto.ProjHuespedResponse;
-import cl.hilton.restaurante.model.ProjHuesped;
-import cl.hilton.restaurante.repository.ProjHuespedRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import cl.hilton.restaurante.client.HuespedClient;
+import cl.hilton.restaurante.dto.ProjHuespedRequest;
+import cl.hilton.restaurante.dto.ProjHuespedResponse;
+import cl.hilton.restaurante.mapper.ProjHuespedMapper;
+import cl.hilton.restaurante.model.ProjHuesped;
+import cl.hilton.restaurante.repository.ProjHuespedRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ProjHuespedService {
 
     private final ProjHuespedRepository huespedRepository;
+    private final ProjHuespedMapper huespedMapper;
+    private final HuespedClient huespedClient;
 
-    public List<ProjHuespedResponse> listar() {
-        return huespedRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public List<ProjHuespedResponse> findAll() {
+        return huespedMapper.toResponseList(huespedRepository.findAll());
     }
 
-    public ProjHuespedResponse buscarPorEmail(String email) {
-        return toResponse(obtenerHuesped(email));
+    public ProjHuespedResponse findByEmail(String email) {
+        ProjHuesped huesped = getHuespedByEmail(email);
+        return huespedMapper.toResponse(huesped);
     }
 
-    public List<ProjHuespedResponse> buscarPorHabitacion(String numeroHabitacion) {
-        return huespedRepository.findByNumeroHabitacion(numeroHabitacion).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<ProjHuespedResponse> findByNumeroHabitacion(String numeroHabitacion) {
+        return huespedMapper.toResponseList(huespedRepository.findByNumeroHabitacion(numeroHabitacion));
     }
 
-    public List<ProjHuespedResponse> buscarPorNombre(String nombre) {
-        return huespedRepository.findByNombreCompletoContainingIgnoreCase(nombre).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<ProjHuespedResponse> findByNombreCompleto(String nombreCompleto) {
+        return huespedMapper.toResponseList(huespedRepository.findByNombreCompletoContainingIgnoreCase(nombreCompleto));
     }
 
-    public ProjHuespedResponse crear(ProjHuespedRequest request) {
-        if (huespedRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Ya existe un huésped con ese email");
-        }
+    public ProjHuespedResponse create(ProjHuespedRequest request) {
+        validarEmailUnico(request.getEmail());
 
-        ProjHuesped huesped = ProjHuesped.builder()
-                .email(request.getEmail())
-                .nombreCompleto(request.getNombreCompleto())
-                .numeroHabitacion(request.getNumeroHabitacion())
-                .actualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : LocalDate.now())
-                .build();
+        ProjHuesped huesped = huespedMapper.toEntity(request);
+        huesped.setActualizadoEn(LocalDate.now());
 
-        return toResponse(huespedRepository.save(huesped));
+        ProjHuesped huespedGuardado = huespedRepository.save(huesped);
+
+        return huespedMapper.toResponse(huespedGuardado);
     }
 
-    public ProjHuespedResponse actualizar(String email, ProjHuespedRequest request) {
-        ProjHuesped huesped = obtenerHuesped(email);
+    public ProjHuespedResponse update(String email, ProjHuespedRequest request) {
+        ProjHuesped huesped = getHuespedByEmail(email);
 
-        huesped.setNombreCompleto(request.getNombreCompleto());
-        huesped.setNumeroHabitacion(request.getNumeroHabitacion());
-        huesped.setActualizadoEn(request.getActualizadoEn() != null ? request.getActualizadoEn() : LocalDate.now());
+        huespedMapper.updateEntity(request, huesped);
+        huesped.setActualizadoEn(LocalDate.now());
 
-        return toResponse(huespedRepository.save(huesped));
+        ProjHuesped huespedActualizado = huespedRepository.save(huesped);
+
+        return huespedMapper.toResponse(huespedActualizado);
     }
 
-    public void eliminar(String email) {
-        ProjHuesped huesped = obtenerHuesped(email);
+    public ProjHuespedResponse sincronizarPorEmail(String email) {
+        ProjHuespedResponse externo = huespedClient.buscarPorEmail(email);
+        ProjHuesped huesped = huespedRepository.findByEmail(externo.getEmail())
+                .orElseGet(ProjHuesped::new);
+
+        huesped.setEmail(externo.getEmail());
+        huesped.setNombreCompleto(externo.getNombreCompleto());
+        huesped.setNumeroHabitacion(externo.getNumeroHabitacion());
+        huesped.setActualizadoEn(LocalDate.now());
+
+        ProjHuesped huespedGuardado = huespedRepository.save(huesped);
+
+        return huespedMapper.toResponse(huespedGuardado);
+    }
+
+    public void deleteByEmail(String email) {
+        ProjHuesped huesped = getHuespedByEmail(email);
         huespedRepository.delete(huesped);
     }
 
-    private ProjHuesped obtenerHuesped(String email) {
-        return huespedRepository.findById(email)
-                .orElseThrow(() -> new RuntimeException("Huésped no encontrado"));
+    private ProjHuesped getHuespedByEmail(String email) {
+        return huespedRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Huesped proyectado no encontrado con email: " + email));
     }
 
-    private ProjHuespedResponse toResponse(ProjHuesped huesped) {
-        return ProjHuespedResponse.builder()
-                .email(huesped.getEmail())
-                .nombreCompleto(huesped.getNombreCompleto())
-                .numeroHabitacion(huesped.getNumeroHabitacion())
-                .actualizadoEn(huesped.getActualizadoEn())
-                .build();
+    private void validarEmailUnico(String email) {
+        if (huespedRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Ya existe un huesped proyectado con email: " + email);
+        }
     }
 }

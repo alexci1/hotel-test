@@ -1,15 +1,18 @@
 package cl.hilton.restaurante.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import cl.hilton.restaurante.dto.ItemPedidoRequest;
 import cl.hilton.restaurante.dto.ItemPedidoResponse;
+import cl.hilton.restaurante.mapper.ItemPedidoMapper;
 import cl.hilton.restaurante.model.ItemPedido;
 import cl.hilton.restaurante.model.Pedido;
 import cl.hilton.restaurante.repository.ItemPedidoRepository;
 import cl.hilton.restaurante.repository.PedidoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -17,77 +20,64 @@ public class ItemPedidoService {
 
     private final ItemPedidoRepository itemPedidoRepository;
     private final PedidoRepository pedidoRepository;
+    private final ItemPedidoMapper itemPedidoMapper;
 
-    public List<ItemPedidoResponse> listar() {
-        return itemPedidoRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public List<ItemPedidoResponse> findAll() {
+        return itemPedidoMapper.toResponseList(itemPedidoRepository.findAll());
     }
 
-    public ItemPedidoResponse buscarPorId(Long id) {
-        return toResponse(obtenerItem(id));
+    public ItemPedidoResponse findById(Long id) {
+        ItemPedido item = getItemById(id);
+        return itemPedidoMapper.toResponse(item);
     }
 
-    public List<ItemPedidoResponse> buscarPorPedido(String numeroPedido) {
-        return itemPedidoRepository.findByPedidoNumeroPedido(numeroPedido).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<ItemPedidoResponse> findByNumeroPedido(String numeroPedido) {
+        return itemPedidoMapper.toResponseList(itemPedidoRepository.findByPedidoNumeroPedido(numeroPedido));
     }
 
-    public List<ItemPedidoResponse> buscarPorNombreProducto(String nombreProducto) {
-        return itemPedidoRepository.findByNombreProductoContainingIgnoreCase(nombreProducto).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<ItemPedidoResponse> findByNombreProducto(String nombreProducto) {
+        return itemPedidoMapper.toResponseList(itemPedidoRepository.findByNombreProductoContainingIgnoreCase(nombreProducto));
     }
 
-    public ItemPedidoResponse crear(ItemPedidoRequest request) {
+    public List<ItemPedidoResponse> findByCantidadMayorQue(Integer cantidad) {
+        return itemPedidoMapper.toResponseList(itemPedidoRepository.findByCantidadGreaterThan(cantidad));
+    }
+
+    public ItemPedidoResponse create(ItemPedidoRequest request) {
         Pedido pedido = pedidoRepository.findByNumeroPedido(request.getNumeroPedido())
-                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado con numero: " + request.getNumeroPedido()));
 
-        ItemPedido item = ItemPedido.builder()
-                .pedido(pedido)
-                .nombreProducto(request.getNombreProducto())
-                .cantidad(request.getCantidad())
-                .precioUnitUsd(request.getPrecioUnitUsd())
-                .observacion(request.getObservacion())
-                .build();
-
-        return toResponse(itemPedidoRepository.save(item));
-    }
-
-    public ItemPedidoResponse actualizar(Long id, ItemPedidoRequest request) {
-        ItemPedido item = obtenerItem(id);
-
-        Pedido pedido = pedidoRepository.findByNumeroPedido(request.getNumeroPedido())
-                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
-
+        ItemPedido item = itemPedidoMapper.toEntity(request);
         item.setPedido(pedido);
-        item.setNombreProducto(request.getNombreProducto());
-        item.setCantidad(request.getCantidad());
-        item.setPrecioUnitUsd(request.getPrecioUnitUsd());
-        item.setObservacion(request.getObservacion());
+        item.setCantidad(request.getCantidad() != null ? request.getCantidad() : 1);
 
-        return toResponse(itemPedidoRepository.save(item));
+        ItemPedido itemGuardado = itemPedidoRepository.save(item);
+
+        return itemPedidoMapper.toResponse(itemGuardado);
     }
 
-    public void eliminar(Long id) {
-        ItemPedido item = obtenerItem(id);
+    public ItemPedidoResponse update(Long id, ItemPedidoRequest request) {
+        ItemPedido item = getItemById(id);
+
+        Pedido pedido = pedidoRepository.findByNumeroPedido(request.getNumeroPedido())
+                .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado con numero: " + request.getNumeroPedido()));
+
+        itemPedidoMapper.updateEntity(request, item);
+        item.setPedido(pedido);
+        item.setCantidad(request.getCantidad() != null ? request.getCantidad() : item.getCantidad());
+
+        ItemPedido itemActualizado = itemPedidoRepository.save(item);
+
+        return itemPedidoMapper.toResponse(itemActualizado);
+    }
+
+    public void deleteById(Long id) {
+        ItemPedido item = getItemById(id);
         itemPedidoRepository.delete(item);
     }
 
-    private ItemPedido obtenerItem(Long id) {
+    private ItemPedido getItemById(Long id) {
         return itemPedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Item de pedido no encontrado"));
-    }
-
-    private ItemPedidoResponse toResponse(ItemPedido item) {
-        return ItemPedidoResponse.builder()
-                .id(item.getId())
-                .numeroPedido(item.getPedido().getNumeroPedido())
-                .nombreProducto(item.getNombreProducto())
-                .cantidad(item.getCantidad())
-                .precioUnitUsd(item.getPrecioUnitUsd())
-                .observacion(item.getObservacion())
-                .build();
+                .orElseThrow(() -> new EntityNotFoundException("Item de pedido no encontrado con id: " + id));
     }
 }

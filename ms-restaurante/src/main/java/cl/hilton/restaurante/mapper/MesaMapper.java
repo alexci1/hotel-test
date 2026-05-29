@@ -1,37 +1,27 @@
 package cl.hilton.restaurante.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import cl.hilton.restaurante.dto.MesaRequest;
 import cl.hilton.restaurante.dto.MesaResponse;
 import cl.hilton.restaurante.model.Mesa;
-import org.springframework.stereotype.Component;
 
-@Component
-public class MesaMapper {
+@Mapper(componentModel = "spring")
+public interface MesaMapper {
 
-    public Mesa toEntity(MesaRequest request) {
-        return Mesa.builder()
-                .numeroMesa(request.getNumeroMesa())
-                .capacidad(request.getCapacidad())
-                .zona(request.getZona())
-                .disponible(request.getDisponible())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "pedidos", ignore = true)
+    Mesa toEntity(MesaRequest request);
 
-    public MesaResponse toResponse(Mesa mesa) {
-        return MesaResponse.builder()
-                .id(mesa.getId())
-                .numeroMesa(mesa.getNumeroMesa())
-                .capacidad(mesa.getCapacidad())
-                .zona(mesa.getZona())
-                .disponible(mesa.getDisponible())
-                .build();
-    }
+    MesaResponse toResponse(Mesa mesa);
 
-    public void updateEntity(Mesa mesa, MesaRequest request) {
-        mesa.setNumeroMesa(request.getNumeroMesa());
-        mesa.setCapacidad(request.getCapacidad());
-        mesa.setZona(request.getZona());
-        mesa.setDisponible(request.getDisponible());
-    }
+    List<MesaResponse> toResponseList(List<Mesa> mesas);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "pedidos", ignore = true)
+    void updateEntity(MesaRequest request, @MappingTarget Mesa mesa);
 }

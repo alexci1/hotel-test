@@ -1,14 +1,17 @@
 package cl.hilton.restaurante.repository;
 
+import java.util.List;
+import java.util.Optional;
 
-import cl.hilton.restaurante.model.ProjHuesped;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import cl.hilton.restaurante.model.ProjHuesped;
 
 @Repository
 public interface ProjHuespedRepository extends JpaRepository<ProjHuesped, String> {
+
+    Optional<ProjHuesped> findByEmail(String email);
 
     boolean existsByEmail(String email);
 
