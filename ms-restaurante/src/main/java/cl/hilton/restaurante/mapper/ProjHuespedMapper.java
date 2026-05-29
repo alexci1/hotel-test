@@ -1,35 +1,28 @@
 package cl.hilton.restaurante.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import cl.hilton.restaurante.dto.ProjHuespedRequest;
 import cl.hilton.restaurante.dto.ProjHuespedResponse;
 import cl.hilton.restaurante.model.ProjHuesped;
-import org.springframework.stereotype.Component;
 
-@Component
-public class ProjHuespedMapper {
+@Mapper(componentModel = "spring")
+public interface ProjHuespedMapper {
 
-    public ProjHuesped toEntity(ProjHuespedRequest request) {
-        return ProjHuesped.builder()
-                .email(request.getEmail())
-                .nombreCompleto(request.getNombreCompleto())
-                .numeroHabitacion(request.getNumeroHabitacion())
-                .actualizadoEn(request.getActualizadoEn())
-                .build();
-    }
+    @Mapping(target = "actualizadoEn", ignore = true)
+    @Mapping(target = "pedidos", ignore = true)
+    ProjHuesped toEntity(ProjHuespedRequest request);
 
-    public ProjHuespedResponse toResponse(ProjHuesped huesped) {
-        return ProjHuespedResponse.builder()
-                .email(huesped.getEmail())
-                .nombreCompleto(huesped.getNombreCompleto())
-                .numeroHabitacion(huesped.getNumeroHabitacion())
-                .actualizadoEn(huesped.getActualizadoEn())
-                .build();
-    }
+    ProjHuespedResponse toResponse(ProjHuesped huesped);
 
-    public void updateEntity(ProjHuesped huesped, ProjHuespedRequest request) {
-        huesped.setNombreCompleto(request.getNombreCompleto());
-        huesped.setNumeroHabitacion(request.getNumeroHabitacion());
-        huesped.setActualizadoEn(request.getActualizadoEn());
-    }
+    List<ProjHuespedResponse> toResponseList(List<ProjHuesped> huespedes);
+
+    @Mapping(target = "email", ignore = true)
+    @Mapping(target = "actualizadoEn", ignore = true)
+    @Mapping(target = "pedidos", ignore = true)
+    void updateEntity(ProjHuespedRequest request, @MappingTarget ProjHuesped huesped);
 }
