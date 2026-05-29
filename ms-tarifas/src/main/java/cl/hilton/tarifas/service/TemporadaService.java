@@ -1,50 +1,97 @@
 package cl.hilton.tarifas.service;
 
-import cl.hilton.tarifas.model.Temporada;
-import cl.hilton.tarifas.repository.TemporadaRepository;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import cl.hilton.tarifas.dto.TemporadaRequest;
+import cl.hilton.tarifas.dto.TemporadaResponse;
+import cl.hilton.tarifas.mapper.TemporadaMapper;
+import cl.hilton.tarifas.model.Temporada;
+import cl.hilton.tarifas.repository.TemporadaRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class TemporadaService {
 
     private final TemporadaRepository temporadaRepository;
+    private final TemporadaMapper temporadaMapper;
 
-    public List<Temporada> obtenerTemporadas() {
-        return temporadaRepository.findAll();
+    public List<TemporadaResponse> findAll() {
+        return temporadaMapper.toResponseList(temporadaRepository.findAll());
     }
 
-    public Optional<Temporada> obtenerPorId(@NonNull Long id) {
-        return temporadaRepository.findById(id);
+    public TemporadaResponse findById(Long id) {
+        Temporada temporada = getTemporadaById(id);
+        return temporadaMapper.toResponse(temporada);
     }
 
-    public Optional<Temporada> obtenerPorCodigo(String codigo) {
-        return temporadaRepository.findByCodigo(codigo);
+    public TemporadaResponse findByCodigo(String codigo) {
+        Temporada temporada = temporadaRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new EntityNotFoundException("Temporada no encontrada con codigo: " + codigo));
+
+        return temporadaMapper.toResponse(temporada);
     }
 
-    public Temporada guardarTemporada(@NonNull Temporada temporada) {
-        return temporadaRepository.save(temporada);
+    public List<TemporadaResponse> findByNombre(String nombre) {
+        return temporadaMapper.toResponseList(temporadaRepository.findByNombreContainingIgnoreCase(nombre));
     }
 
-    public void eliminarTemporada(@NonNull Long id) {
-        temporadaRepository.deleteById(id);
+    public List<TemporadaResponse> findByFechaInicioBefore(LocalDate fechaInicio) {
+        return temporadaMapper.toResponseList(temporadaRepository.findByFechaInicioBefore(fechaInicio));
     }
 
-    public List<Temporada> buscarPorNombre(String nombre) {
-        return temporadaRepository.findByNombreContainingIgnoreCase(nombre);
+    public List<TemporadaResponse> findByFechaFinAfter(LocalDate fechaFin) {
+        return temporadaMapper.toResponseList(temporadaRepository.findByFechaFinAfter(fechaFin));
     }
 
-    public List<Temporada> obtenerAntesDe(LocalDate fecha) {
-        return temporadaRepository.findByFechaInicioBefore(fecha);
+    public TemporadaResponse create(TemporadaRequest request) {
+        validarCodigoUnico(request.getCodigo());
+        validarFechas(request.getFechaInicio(), request.getFechaFin());
+
+        Temporada temporada = temporadaMapper.toEntity(request);
+        Temporada temporadaGuardada = temporadaRepository.save(temporada);
+
+        return temporadaMapper.toResponse(temporadaGuardada);
     }
 
-    public List<Temporada> obtenerDespuesDe(LocalDate fecha) {
-        return temporadaRepository.findByFechaFinAfter(fecha);
+    public TemporadaResponse update(Long id, TemporadaRequest request) {
+        Temporada temporada = getTemporadaById(id);
+
+        if (!temporada.getCodigo().equalsIgnoreCase(request.getCodigo())) {
+            validarCodigoUnico(request.getCodigo());
+        }
+
+        validarFechas(request.getFechaInicio(), request.getFechaFin());
+
+        temporadaMapper.updateEntity(request, temporada);
+        Temporada temporadaActualizada = temporadaRepository.save(temporada);
+
+        return temporadaMapper.toResponse(temporadaActualizada);
+    }
+
+    public void deleteById(Long id) {
+        Temporada temporada = getTemporadaById(id);
+        temporadaRepository.delete(temporada);
+    }
+
+    private Temporada getTemporadaById(Long id) {
+        return temporadaRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Temporada no encontrada con id: " + id));
+    }
+
+    private void validarCodigoUnico(String codigo) {
+        if (temporadaRepository.existsByCodigo(codigo)) {
+            throw new IllegalArgumentException("Ya existe una temporada con codigo: " + codigo);
+        }
+    }
+
+    private void validarFechas(LocalDate fechaInicio, LocalDate fechaFin) {
+        if (fechaFin.isBefore(fechaInicio)) {
+            throw new IllegalArgumentException("La fecha de fin debe ser igual o posterior a la fecha de inicio");
+        }
     }
 }
