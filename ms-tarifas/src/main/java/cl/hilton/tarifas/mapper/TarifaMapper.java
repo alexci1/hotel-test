@@ -1,39 +1,31 @@
 package cl.hilton.tarifas.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.tarifas.dto.TarifaRequest;
 import cl.hilton.tarifas.dto.TarifaResponse;
-import cl.hilton.tarifas.model.ProjTipoHabitacion;
 import cl.hilton.tarifas.model.Tarifa;
-import cl.hilton.tarifas.model.Temporada;
 
-public class TarifaMapper {
+@Mapper(componentModel = "spring")
+public interface TarifaMapper {
 
-    public static Tarifa toEntity(
-            TarifaRequest request,
-            Temporada temporada,
-            ProjTipoHabitacion tipoHabitacion
-    ) {
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "temporada", ignore = true)
+    @Mapping(target = "tipoHabitacion", ignore = true)
+    Tarifa toEntity(TarifaRequest request);
 
-        return Tarifa.builder()
-                .temporada(temporada)
-                .tipoHabitacion(tipoHabitacion)
-                .precioNocheUsd(request.getPrecioNocheUsd())
-                .incluyeDesayuno(request.getIncluyeDesayuno())
-                .activa(request.getActiva())
-                .build();
-    }
+    @Mapping(target = "codigoTemporada", source = "temporada.codigo")
+    @Mapping(target = "codigoTipoHabitacion", source = "tipoHabitacion.codigo")
+    TarifaResponse toResponse(Tarifa tarifa);
 
-    public static TarifaResponse toResponse(Tarifa tarifa) {
+    List<TarifaResponse> toResponseList(List<Tarifa> tarifas);
 
-        TarifaResponse response = new TarifaResponse();
-
-        response.setId(tarifa.getId());
-        response.setCodigoTemporada(tarifa.getTemporada().getCodigo());
-        response.setCodigoTipoHabitacion(tarifa.getTipoHabitacion().getCodigo());
-        response.setPrecioNocheUsd(tarifa.getPrecioNocheUsd());
-        response.setIncluyeDesayuno(tarifa.getIncluyeDesayuno());
-        response.setActiva(tarifa.getActiva());
-
-        return response;
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "temporada", ignore = true)
+    @Mapping(target = "tipoHabitacion", ignore = true)
+    void updateEntity(TarifaRequest request, @MappingTarget Tarifa tarifa);
 }
