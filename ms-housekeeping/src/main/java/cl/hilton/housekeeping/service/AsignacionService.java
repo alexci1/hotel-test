@@ -1,5 +1,10 @@
 package cl.hilton.housekeeping.service;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import cl.hilton.housekeeping.dto.AsignacionRequest;
 import cl.hilton.housekeeping.dto.AsignacionResponse;
 import cl.hilton.housekeeping.mapper.AsignacionMapper;
@@ -9,12 +14,11 @@ import cl.hilton.housekeeping.model.Tarea;
 import cl.hilton.housekeeping.repository.AsignacionRepository;
 import cl.hilton.housekeeping.repository.ProjHabitacionRepository;
 import cl.hilton.housekeeping.repository.TareaRepository;
-import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.util.List;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class AsignacionService {
 
     private final AsignacionRepository asignacionRepository;
@@ -22,101 +26,88 @@ public class AsignacionService {
     private final TareaRepository tareaRepository;
     private final AsignacionMapper asignacionMapper;
 
-    public AsignacionService(
-            AsignacionRepository asignacionRepository,
-            ProjHabitacionRepository habitacionRepository,
-            TareaRepository tareaRepository,
-            AsignacionMapper asignacionMapper
-    ) {
-        this.asignacionRepository = asignacionRepository;
-        this.habitacionRepository = habitacionRepository;
-        this.tareaRepository = tareaRepository;
-        this.asignacionMapper = asignacionMapper;
+    public List<AsignacionResponse> findAll() {
+        return asignacionMapper.toResponseList(asignacionRepository.findAll());
     }
 
-    public List<AsignacionResponse> listar() {
-        return asignacionRepository.findAll().stream()
-                .map(asignacionMapper::toResponse)
-                .toList();
+    public AsignacionResponse findById(Long id) {
+        return asignacionMapper.toResponse(getAsignacion(id));
     }
 
-    public AsignacionResponse buscarPorId(Long id) {
-        return asignacionMapper.toResponse(obtenerAsignacion(id));
+    public List<AsignacionResponse> findByNumeroHabitacion(String numeroHabitacion) {
+        return asignacionMapper.toResponseList(asignacionRepository.findByHabitacionNumeroHabitacion(numeroHabitacion));
     }
 
-    public List<AsignacionResponse> buscarPorHabitacion(String numeroHabitacion) {
-        return asignacionRepository.findByHabitacionNumeroHabitacion(numeroHabitacion).stream()
-                .map(asignacionMapper::toResponse)
-                .toList();
+    public List<AsignacionResponse> findByCodigoTarea(String codigoTarea) {
+        return asignacionMapper.toResponseList(asignacionRepository.findByTareaCodigo(codigoTarea));
     }
 
-    public List<AsignacionResponse> buscarPorTarea(String codigoTarea) {
-        return asignacionRepository.findByTareaCodigo(codigoTarea).stream()
-                .map(asignacionMapper::toResponse)
-                .toList();
+    public List<AsignacionResponse> findByEmailCamarero(String emailCamarero) {
+        return asignacionMapper.toResponseList(asignacionRepository.findByEmailCamarero(emailCamarero));
     }
 
-    public List<AsignacionResponse> buscarPorCamarero(String emailCamarero) {
-        return asignacionRepository.findByEmailCamarero(emailCamarero).stream()
-                .map(asignacionMapper::toResponse)
-                .toList();
+    public List<AsignacionResponse> findByFechaProgramada(LocalDate fechaProgramada) {
+        return asignacionMapper.toResponseList(asignacionRepository.findByFechaProgramada(fechaProgramada));
     }
 
-    public List<AsignacionResponse> buscarPorFecha(LocalDate fechaProgramada) {
-        return asignacionRepository.findByFechaProgramada(fechaProgramada).stream()
-                .map(asignacionMapper::toResponse)
-                .toList();
+    public List<AsignacionResponse> findByEstado(String estado) {
+        return asignacionMapper.toResponseList(asignacionRepository.findByEstado(estado));
     }
 
-    public List<AsignacionResponse> buscarPorEstado(String estado) {
-        return asignacionRepository.findByEstado(estado).stream()
-                .map(asignacionMapper::toResponse)
-                .toList();
+    public List<AsignacionResponse> findByPrioridad(Integer prioridad) {
+        return asignacionMapper.toResponseList(asignacionRepository.findByPrioridad(prioridad));
     }
 
-    public AsignacionResponse crear(AsignacionRequest request) {
-        ProjHabitacion habitacion = obtenerHabitacion(request.getNumeroHabitacion());
-        Tarea tarea = obtenerTarea(request.getCodigoTarea());
+    public AsignacionResponse create(AsignacionRequest request) {
+        ProjHabitacion habitacion = getHabitacion(request.getNumeroHabitacion());
+        Tarea tarea = getTarea(request.getCodigoTarea());
 
         Asignacion asignacion = asignacionMapper.toEntity(request, habitacion, tarea);
+        asignacion.setEstado(request.getEstado() != null ? request.getEstado() : "PENDIENTE");
+        asignacion.setPrioridad(request.getPrioridad() != null ? request.getPrioridad() : 1);
 
-        return asignacionMapper.toResponse(asignacionRepository.save(asignacion));
+        Asignacion saved = asignacionRepository.save(asignacion);
+        return asignacionMapper.toResponse(saved);
     }
 
-    public AsignacionResponse actualizar(Long id, AsignacionRequest request) {
-        Asignacion asignacion = obtenerAsignacion(id);
-        ProjHabitacion habitacion = obtenerHabitacion(request.getNumeroHabitacion());
-        Tarea tarea = obtenerTarea(request.getCodigoTarea());
+    public AsignacionResponse update(Long id, AsignacionRequest request) {
+        Asignacion asignacion = getAsignacion(id);
+        ProjHabitacion habitacion = getHabitacion(request.getNumeroHabitacion());
+        Tarea tarea = getTarea(request.getCodigoTarea());
 
-        asignacionMapper.updateEntity(asignacion, request, habitacion, tarea);
+        asignacionMapper.updateEntity(request, habitacion, tarea, asignacion);
+        asignacion.setEstado(request.getEstado() != null ? request.getEstado() : "PENDIENTE");
+        asignacion.setPrioridad(request.getPrioridad() != null ? request.getPrioridad() : 1);
 
-        return asignacionMapper.toResponse(asignacionRepository.save(asignacion));
+        Asignacion saved = asignacionRepository.save(asignacion);
+        return asignacionMapper.toResponse(saved);
     }
 
-    public AsignacionResponse cambiarEstado(Long id, String estado) {
-        Asignacion asignacion = obtenerAsignacion(id);
+    public AsignacionResponse updateEstado(Long id, String estado) {
+        Asignacion asignacion = getAsignacion(id);
         asignacion.setEstado(estado);
 
-        return asignacionMapper.toResponse(asignacionRepository.save(asignacion));
+        Asignacion saved = asignacionRepository.save(asignacion);
+        return asignacionMapper.toResponse(saved);
     }
 
-    public void eliminar(Long id) {
-        Asignacion asignacion = obtenerAsignacion(id);
+    public void deleteById(Long id) {
+        Asignacion asignacion = getAsignacion(id);
         asignacionRepository.delete(asignacion);
     }
 
-    private Asignacion obtenerAsignacion(Long id) {
+    private Asignacion getAsignacion(Long id) {
         return asignacionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Asignación no encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Asignacion no encontrada: " + id));
     }
 
-    private ProjHabitacion obtenerHabitacion(String numeroHabitacion) {
+    private ProjHabitacion getHabitacion(String numeroHabitacion) {
         return habitacionRepository.findById(numeroHabitacion)
-                .orElseThrow(() -> new RuntimeException("Habitación no encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada: " + numeroHabitacion));
     }
 
-    private Tarea obtenerTarea(String codigoTarea) {
+    private Tarea getTarea(String codigoTarea) {
         return tareaRepository.findByCodigo(codigoTarea)
-                .orElseThrow(() -> new RuntimeException("Tarea no encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Tarea no encontrada: " + codigoTarea));
     }
 }
