@@ -1,19 +1,22 @@
 package cl.hilton.restaurante.service;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
 import cl.hilton.restaurante.dto.PedidoRequest;
 import cl.hilton.restaurante.dto.PedidoResponse;
+import cl.hilton.restaurante.mapper.PedidoMapper;
 import cl.hilton.restaurante.model.Mesa;
 import cl.hilton.restaurante.model.Pedido;
 import cl.hilton.restaurante.model.ProjHuesped;
 import cl.hilton.restaurante.repository.MesaRepository;
 import cl.hilton.restaurante.repository.PedidoRepository;
 import cl.hilton.restaurante.repository.ProjHuespedRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,131 +25,137 @@ public class PedidoService {
     private final PedidoRepository pedidoRepository;
     private final MesaRepository mesaRepository;
     private final ProjHuespedRepository huespedRepository;
+    private final PedidoMapper pedidoMapper;
 
-    public List<PedidoResponse> listar() {
-        return pedidoRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public List<PedidoResponse> findAll() {
+        return pedidoMapper.toResponseList(pedidoRepository.findAll());
     }
 
-    public PedidoResponse buscarPorId(Long id) {
-        return toResponse(obtenerPedido(id));
+    public PedidoResponse findById(Long id) {
+        Pedido pedido = getPedidoById(id);
+        return pedidoMapper.toResponse(pedido);
     }
 
-    public PedidoResponse buscarPorNumeroPedido(String numeroPedido) {
+    public PedidoResponse findByNumeroPedido(String numeroPedido) {
         Pedido pedido = pedidoRepository.findByNumeroPedido(numeroPedido)
-                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado con numero: " + numeroPedido));
 
-        return toResponse(pedido);
+        return pedidoMapper.toResponse(pedido);
     }
 
-    public List<PedidoResponse> buscarPorEstado(String estado) {
-        return pedidoRepository.findByEstado(estado).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<PedidoResponse> findByEstado(String estado) {
+        return pedidoMapper.toResponseList(pedidoRepository.findByEstado(estado));
     }
 
-    public List<PedidoResponse> buscarPorMesa(String numeroMesa) {
-        return pedidoRepository.findByMesaNumeroMesa(numeroMesa).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<PedidoResponse> findByNumeroMesa(String numeroMesa) {
+        return pedidoMapper.toResponseList(pedidoRepository.findByMesaNumeroMesa(numeroMesa));
     }
 
-    public List<PedidoResponse> buscarPorHuesped(String email) {
-        return pedidoRepository.findByHuespedEmail(email).stream()
-                .map(this::toResponse)
-                .toList();
+    public List<PedidoResponse> findByEmailHuesped(String emailHuesped) {
+        return pedidoMapper.toResponseList(pedidoRepository.findByHuespedEmail(emailHuesped));
     }
 
-    public PedidoResponse crear(PedidoRequest request) {
-        if (pedidoRepository.existsByNumeroPedido(request.getNumeroPedido())) {
-            throw new RuntimeException("Ya existe un pedido con ese número");
-        }
-
-        Mesa mesa = obtenerMesaOpcional(request.getNumeroMesa());
-        ProjHuesped huesped = obtenerHuespedOpcional(request.getEmailHuesped());
-
-        if (mesa == null && huesped == null) {
-            throw new RuntimeException("El pedido debe tener mesa o huésped");
-        }
-
-        Pedido pedido = Pedido.builder()
-                .numeroPedido(request.getNumeroPedido())
-                .mesa(mesa)
-                .huesped(huesped)
-                .estado(request.getEstado())
-                .totalUsd(request.getTotalUsd())
-                .creadoEn(request.getCreadoEn() != null ? request.getCreadoEn() : LocalDate.now())
-                .build();
-
-        return toResponse(pedidoRepository.save(pedido));
+    public List<PedidoResponse> findByRangoCreadoEn(LocalDate desde, LocalDate hasta) {
+        return pedidoMapper.toResponseList(pedidoRepository.findByCreadoEnBetween(desde, hasta));
     }
 
-    public PedidoResponse actualizar(Long id, PedidoRequest request) {
-        Pedido pedido = obtenerPedido(id);
+    public List<PedidoResponse> findByNumeroMesaAndEstado(String numeroMesa, String estado) {
+        return pedidoMapper.toResponseList(pedidoRepository.findByMesaNumeroMesaAndEstado(numeroMesa, estado));
+    }
 
-        Mesa mesa = obtenerMesaOpcional(request.getNumeroMesa());
-        ProjHuesped huesped = obtenerHuespedOpcional(request.getEmailHuesped());
+    public List<PedidoResponse> findByEmailHuespedAndEstado(String emailHuesped, String estado) {
+        return pedidoMapper.toResponseList(pedidoRepository.findByHuespedEmailAndEstado(emailHuesped, estado));
+    }
 
-        if (mesa == null && huesped == null) {
-            throw new RuntimeException("El pedido debe tener mesa o huésped");
-        }
+    public PedidoResponse create(PedidoRequest request) {
+        validarNumeroPedidoUnico(request.getNumeroPedido());
 
-        pedido.setNumeroPedido(request.getNumeroPedido());
+        Mesa mesa = getMesaOpcional(request.getNumeroMesa());
+        ProjHuesped huesped = getHuespedOpcional(request.getEmailHuesped());
+        validarOrigen(mesa, huesped);
+
+        Pedido pedido = pedidoMapper.toEntity(request);
         pedido.setMesa(mesa);
         pedido.setHuesped(huesped);
-        pedido.setEstado(request.getEstado());
-        pedido.setTotalUsd(request.getTotalUsd());
-        pedido.setCreadoEn(request.getCreadoEn() != null ? request.getCreadoEn() : pedido.getCreadoEn());
+        pedido.setEstado(request.getEstado() != null ? request.getEstado() : "ABIERTO");
+        pedido.setTotalUsd(request.getTotalUsd() != null ? request.getTotalUsd() : 0);
+        pedido.setCreadoEn(LocalDate.now());
 
-        return toResponse(pedidoRepository.save(pedido));
+        Pedido pedidoGuardado = pedidoRepository.save(pedido);
+
+        return pedidoMapper.toResponse(pedidoGuardado);
+    }
+
+    public PedidoResponse update(Long id, PedidoRequest request) {
+        Pedido pedido = getPedidoById(id);
+        String estadoActual = pedido.getEstado();
+        Integer totalActual = pedido.getTotalUsd();
+
+        if (!pedido.getNumeroPedido().equalsIgnoreCase(request.getNumeroPedido())) {
+            validarNumeroPedidoUnico(request.getNumeroPedido());
+        }
+
+        Mesa mesa = getMesaOpcional(request.getNumeroMesa());
+        ProjHuesped huesped = getHuespedOpcional(request.getEmailHuesped());
+        validarOrigen(mesa, huesped);
+
+        pedidoMapper.updateEntity(request, pedido);
+        pedido.setMesa(mesa);
+        pedido.setHuesped(huesped);
+        pedido.setEstado(request.getEstado() != null ? request.getEstado() : estadoActual);
+        pedido.setTotalUsd(request.getTotalUsd() != null ? request.getTotalUsd() : totalActual);
+
+        Pedido pedidoActualizado = pedidoRepository.save(pedido);
+
+        return pedidoMapper.toResponse(pedidoActualizado);
     }
 
     public PedidoResponse cambiarEstado(Long id, String estado) {
-        Pedido pedido = obtenerPedido(id);
+        Pedido pedido = getPedidoById(id);
         pedido.setEstado(estado);
 
-        return toResponse(pedidoRepository.save(pedido));
+        Pedido pedidoActualizado = pedidoRepository.save(pedido);
+
+        return pedidoMapper.toResponse(pedidoActualizado);
     }
 
-    public void eliminar(Long id) {
-        Pedido pedido = obtenerPedido(id);
+    public void deleteById(Long id) {
+        Pedido pedido = getPedidoById(id);
         pedidoRepository.delete(pedido);
     }
 
-    private Mesa obtenerMesaOpcional(String numeroMesa) {
+    private Pedido getPedidoById(Long id) {
+        return pedidoRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado con id: " + id));
+    }
+
+    private Mesa getMesaOpcional(String numeroMesa) {
         if (!StringUtils.hasText(numeroMesa)) {
             return null;
         }
 
         return mesaRepository.findByNumeroMesa(numeroMesa)
-                .orElseThrow(() -> new RuntimeException("Mesa no encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Mesa no encontrada con numero: " + numeroMesa));
     }
 
-    private ProjHuesped obtenerHuespedOpcional(String email) {
+    private ProjHuesped getHuespedOpcional(String email) {
         if (!StringUtils.hasText(email)) {
             return null;
         }
 
-        return huespedRepository.findById(email)
-                .orElseThrow(() -> new RuntimeException("Huésped no encontrado"));
+        return huespedRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Huesped proyectado no encontrado con email: " + email));
     }
 
-    private Pedido obtenerPedido(Long id) {
-        return pedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+    private void validarOrigen(Mesa mesa, ProjHuesped huesped) {
+        if (mesa == null && huesped == null) {
+            throw new IllegalArgumentException("El pedido debe tener mesa o huesped");
+        }
     }
 
-    private PedidoResponse toResponse(Pedido pedido) {
-        return PedidoResponse.builder()
-                .id(pedido.getId())
-                .numeroPedido(pedido.getNumeroPedido())
-                .numeroMesa(pedido.getMesa() != null ? pedido.getMesa().getNumeroMesa() : null)
-                .emailHuesped(pedido.getHuesped() != null ? pedido.getHuesped().getEmail() : null)
-                .nombreHuesped(pedido.getHuesped() != null ? pedido.getHuesped().getNombreCompleto() : null)
-                .estado(pedido.getEstado())
-                .totalUsd(pedido.getTotalUsd())
-                .creadoEn(pedido.getCreadoEn())
-                .build();
+    private void validarNumeroPedidoUnico(String numeroPedido) {
+        if (pedidoRepository.existsByNumeroPedido(numeroPedido)) {
+            throw new IllegalArgumentException("Ya existe un pedido con numero: " + numeroPedido);
+        }
     }
 }
