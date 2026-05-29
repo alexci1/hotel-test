@@ -18,6 +18,8 @@ public interface CheckinMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "reserva", source = "reserva")
     @Mapping(target = "huesped", source = "huesped")
+    @Mapping(target = "numeroHabitacion", source = "request.numeroHabitacion")
+    @Mapping(target = "fechaHora", ignore = true)
     Checkin toEntity(CheckinRequest request, ProjReserva reserva, ProjHuesped huesped);
 
     @Mapping(target = "codigoReserva", source = "reserva.codigoReserva")
@@ -30,5 +32,7 @@ public interface CheckinMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "reserva", source = "reserva")
     @Mapping(target = "huesped", source = "huesped")
+    @Mapping(target = "numeroHabitacion", source = "request.numeroHabitacion")
+    @Mapping(target = "fechaHora", ignore = true)
     void updateEntity(CheckinRequest request, ProjReserva reserva, ProjHuesped huesped, @MappingTarget Checkin checkin);
 }
