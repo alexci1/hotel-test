@@ -60,7 +60,8 @@ public class CheckinService {
         Checkin checkin = checkinMapper.toEntity(request, reserva, huesped);
         checkin.setFechaHora(LocalDate.now());
 
-        return checkinMapper.toResponse(checkinRepository.save(checkin));
+        Checkin saved = checkinRepository.save(checkin);
+        return checkinMapper.toResponse(saved);
     }
 
     public CheckinResponse update(Long id, CheckinRequest request) {
@@ -76,7 +77,8 @@ public class CheckinService {
 
         checkinMapper.updateEntity(request, reserva, huesped, checkin);
 
-        return checkinMapper.toResponse(checkinRepository.save(checkin));
+        Checkin saved = checkinRepository.save(checkin);
+        return checkinMapper.toResponse(saved);
     }
 
     public void deleteById(Long id) {
