@@ -2,8 +2,10 @@ package cl.hilton.autenticacion.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.autenticacion.dto.UsuarioRequest;
 import cl.hilton.autenticacion.dto.UsuarioResponse;
@@ -83,8 +85,9 @@ public class UsuarioService {
         return usuarioMapper.toResponse(usuarioActualizado);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Usuario usuario = getUsuarioById(id);
+        Usuario usuario = Objects.requireNonNull(getUsuarioById(id), "el usuario no puede ser nulo");
         usuarioRepository.delete(usuario);
     }
 
