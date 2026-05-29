@@ -1,31 +1,26 @@
 package cl.hilton.checkin.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.checkin.dto.ProjHuespedRequest;
 import cl.hilton.checkin.dto.ProjHuespedResponse;
 import cl.hilton.checkin.model.ProjHuesped;
-import org.springframework.stereotype.Component;
 
-@Component
-public class ProjHuespedMapper {
+@Mapper(componentModel = "spring")
+public interface ProjHuespedMapper {
 
-    public ProjHuesped toEntity(ProjHuespedRequest request) {
-        return ProjHuesped.builder()
-                .email(request.getEmail())
-                .nombreCompleto(request.getNombreCompleto())
-                .actualizadoEn(request.getActualizadoEn())
-                .build();
-    }
+    @Mapping(target = "checkins", ignore = true)
+    ProjHuesped toEntity(ProjHuespedRequest request);
 
-    public ProjHuespedResponse toResponse(ProjHuesped huesped) {
-        return ProjHuespedResponse.builder()
-                .email(huesped.getEmail())
-                .nombreCompleto(huesped.getNombreCompleto())
-                .actualizadoEn(huesped.getActualizadoEn())
-                .build();
-    }
+    ProjHuespedResponse toResponse(ProjHuesped huesped);
 
-    public void updateEntity(ProjHuesped huesped, ProjHuespedRequest request) {
-        huesped.setNombreCompleto(request.getNombreCompleto());
-        huesped.setActualizadoEn(request.getActualizadoEn());
-    }
+    List<ProjHuespedResponse> toResponseList(List<ProjHuesped> huespedes);
+
+    @Mapping(target = "email", ignore = true)
+    @Mapping(target = "checkins", ignore = true)
+    void updateEntity(ProjHuespedRequest request, @MappingTarget ProjHuesped huesped);
 }
