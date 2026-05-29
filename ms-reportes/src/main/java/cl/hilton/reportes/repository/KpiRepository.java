@@ -1,11 +1,13 @@
 package cl.hilton.reportes.repository;
 
-import cl.hilton.reportes.model.Kpi;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import cl.hilton.reportes.model.Kpi;
 
 @Repository
 public interface KpiRepository extends JpaRepository<Kpi, Long> {
@@ -17,6 +19,8 @@ public interface KpiRepository extends JpaRepository<Kpi, Long> {
     List<Kpi> findByPeriodo(String periodo);
 
     List<Kpi> findByUnidad(String unidad);
+
+    List<Kpi> findByActualizadoEn(LocalDate actualizadoEn);
 
     List<Kpi> findByNombreContainingIgnoreCase(String nombre);
 }
