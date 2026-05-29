@@ -1,43 +1,27 @@
 package cl.hilton.reportes.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import cl.hilton.reportes.dto.ReporteRequest;
 import cl.hilton.reportes.dto.ReporteResponse;
 import cl.hilton.reportes.model.Reporte;
-import org.springframework.stereotype.Component;
 
-@Component
-public class ReporteMapper {
+@Mapper(componentModel = "spring")
+public interface ReporteMapper {
 
-    public Reporte toEntity(ReporteRequest request) {
-        return Reporte.builder()
-                .codigo(request.getCodigo())
-                .nombre(request.getNombre())
-                .descripcion(request.getDescripcion())
-                .tipo(request.getTipo())
-                .frecuencia(request.getFrecuencia())
-                .activo(request.getActivo())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "metricas", ignore = true)
+    Reporte toEntity(ReporteRequest request);
 
-    public ReporteResponse toResponse(Reporte reporte) {
-        return ReporteResponse.builder()
-                .id(reporte.getId())
-                .codigo(reporte.getCodigo())
-                .nombre(reporte.getNombre())
-                .descripcion(reporte.getDescripcion())
-                .tipo(reporte.getTipo())
-                .frecuencia(reporte.getFrecuencia())
-                .activo(reporte.getActivo())
-                .build();
-    }
+    ReporteResponse toResponse(Reporte reporte);
 
-    public void updateEntity(Reporte reporte, ReporteRequest request) {
-        reporte.setCodigo(request.getCodigo());
-        reporte.setNombre(request.getNombre());
-        reporte.setDescripcion(request.getDescripcion());
-        reporte.setTipo(request.getTipo());
-        reporte.setFrecuencia(request.getFrecuencia());
-        reporte.setActivo(request.getActivo());
-    }
+    List<ReporteResponse> toResponseList(List<Reporte> reportes);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "metricas", ignore = true)
+    void updateEntity(ReporteRequest request, @MappingTarget Reporte reporte);
 }
