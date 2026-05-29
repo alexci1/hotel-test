@@ -1,45 +1,31 @@
 package cl.hilton.reportes.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import cl.hilton.reportes.dto.MetricaRequest;
 import cl.hilton.reportes.dto.MetricaResponse;
 import cl.hilton.reportes.model.Metrica;
-import cl.hilton.reportes.model.Reporte;
-import org.springframework.stereotype.Component;
 
-@Component
-public class MetricaMapper {
+@Mapper(componentModel = "spring")
+public interface MetricaMapper {
 
-    public Metrica toEntity(MetricaRequest request, Reporte reporte) {
-        return Metrica.builder()
-                .reporte(reporte)
-                .periodo(request.getPeriodo())
-                .nombreMetrica(request.getNombreMetrica())
-                .valor(request.getValor())
-                .unidad(request.getUnidad())
-                .calculadoEn(request.getCalculadoEn())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reporte", ignore = true)
+    @Mapping(target = "calculadoEn", ignore = true)
+    Metrica toEntity(MetricaRequest request);
 
-    public MetricaResponse toResponse(Metrica metrica) {
-        return MetricaResponse.builder()
-                .id(metrica.getId())
-                .codigoReporte(metrica.getReporte().getCodigo())
-                .nombreReporte(metrica.getReporte().getNombre())
-                .periodo(metrica.getPeriodo())
-                .nombreMetrica(metrica.getNombreMetrica())
-                .valor(metrica.getValor())
-                .unidad(metrica.getUnidad())
-                .calculadoEn(metrica.getCalculadoEn())
-                .build();
-    }
+    @Mapping(target = "codigoReporte", source = "reporte.codigo")
+    @Mapping(target = "nombreReporte", source = "reporte.nombre")
+    MetricaResponse toResponse(Metrica metrica);
 
-    public void updateEntity(Metrica metrica, MetricaRequest request, Reporte reporte) {
-        metrica.setReporte(reporte);
-        metrica.setPeriodo(request.getPeriodo());
-        metrica.setNombreMetrica(request.getNombreMetrica());
-        metrica.setValor(request.getValor());
-        metrica.setUnidad(request.getUnidad());
-        metrica.setCalculadoEn(request.getCalculadoEn());
-    }
+    List<MetricaResponse> toResponseList(List<Metrica> metricas);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reporte", ignore = true)
+    @Mapping(target = "calculadoEn", ignore = true)
+    void updateEntity(MetricaRequest request, @MappingTarget Metrica metrica);
 }
