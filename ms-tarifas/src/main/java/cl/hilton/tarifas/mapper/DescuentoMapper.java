@@ -1,37 +1,25 @@
 package cl.hilton.tarifas.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.tarifas.dto.DescuentoRequest;
 import cl.hilton.tarifas.dto.DescuentoResponse;
 import cl.hilton.tarifas.model.Descuento;
 
-public class DescuentoMapper {
+@Mapper(componentModel = "spring")
+public interface DescuentoMapper {
 
-    public static Descuento toEntity(DescuentoRequest request) {
+    @Mapping(target = "id", ignore = true)
+    Descuento toEntity(DescuentoRequest request);
 
-        return Descuento.builder()
-                .codigoDescuento(request.getCodigoDescuento())
-                .descripcion(request.getDescripcion())
-                .porcentaje(request.getPorcentaje())
-                .aplicaA(request.getAplicaA())
-                .validoDesde(request.getValidoDesde())
-                .validoHasta(request.getValidoHasta())
-                .activo(request.getActivo())
-                .build();
-    }
+    DescuentoResponse toResponse(Descuento descuento);
 
-    public static DescuentoResponse toResponse(Descuento descuento) {
+    List<DescuentoResponse> toResponseList(List<Descuento> descuentos);
 
-        DescuentoResponse response = new DescuentoResponse();
-
-        response.setId(descuento.getId());
-        response.setCodigoDescuento(descuento.getCodigoDescuento());
-        response.setDescripcion(descuento.getDescripcion());
-        response.setPorcentaje(descuento.getPorcentaje());
-        response.setAplicaA(descuento.getAplicaA());
-        response.setValidoDesde(descuento.getValidoDesde());
-        response.setValidoHasta(descuento.getValidoHasta());
-        response.setActivo(descuento.getActivo());
-
-        return response;
-    }
+    @Mapping(target = "id", ignore = true)
+    void updateEntity(DescuentoRequest request, @MappingTarget Descuento descuento);
 }
