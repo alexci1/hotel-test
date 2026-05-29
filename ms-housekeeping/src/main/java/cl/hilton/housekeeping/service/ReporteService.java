@@ -2,6 +2,7 @@ package cl.hilton.housekeeping.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
@@ -32,64 +33,74 @@ public class ReporteService {
     }
 
     public ReporteResponse findByAsignacionId(Long asignacionId) {
-        Reporte reporte = reporteRepository.findByAsignacionId(asignacionId)
-                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado para asignacion: " + asignacionId));
+        Long idAsignacion = Objects.requireNonNull(asignacionId);
+        Reporte reporte = reporteRepository.findByAsignacionId(idAsignacion)
+                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado para asignacion: " + idAsignacion));
 
         return reporteMapper.toResponse(reporte);
     }
 
     public List<ReporteResponse> findByAprobado(Boolean aprobado) {
-        return reporteMapper.toResponseList(reporteRepository.findByAprobado(aprobado));
+        Boolean estado = Objects.requireNonNull(aprobado);
+        return reporteMapper.toResponseList(reporteRepository.findByAprobado(estado));
     }
 
     public List<ReporteResponse> findByInspector(String inspector) {
-        return reporteMapper.toResponseList(reporteRepository.findByInspector(inspector));
+        String inspectorReporte = Objects.requireNonNull(inspector);
+        return reporteMapper.toResponseList(reporteRepository.findByInspector(inspectorReporte));
     }
 
     public ReporteResponse create(ReporteRequest request) {
-        if (reporteRepository.existsByAsignacionId(request.getAsignacionId())) {
-            throw new IllegalArgumentException("Ya existe un reporte para la asignacion: " + request.getAsignacionId());
+        Long asignacionId = Objects.requireNonNull(request.getAsignacionId());
+
+        if (reporteRepository.existsByAsignacionId(asignacionId)) {
+            throw new IllegalArgumentException("Ya existe un reporte para la asignacion: " + asignacionId);
         }
 
-        Asignacion asignacion = getAsignacion(request.getAsignacionId());
+        Asignacion asignacion = getAsignacion(asignacionId);
         Reporte reporte = reporteMapper.toEntity(request, asignacion);
         reporte.setAprobado(request.getAprobado() != null ? request.getAprobado() : Boolean.FALSE);
         reporte.setInspeccionadoEn(LocalDate.now());
 
-        Reporte saved = reporteRepository.save(reporte);
+        Reporte saved = reporteRepository.save(Objects.requireNonNull(reporte));
         return reporteMapper.toResponse(saved);
     }
 
     public ReporteResponse update(Long id, ReporteRequest request) {
-        Reporte reporte = getReporte(id);
-        Asignacion asignacion = getAsignacion(request.getAsignacionId());
+        Long reporteId = Objects.requireNonNull(id);
+        Long asignacionId = Objects.requireNonNull(request.getAsignacionId());
 
-        reporteRepository.findByAsignacionId(request.getAsignacionId())
-                .filter(existente -> !existente.getId().equals(id))
+        Reporte reporte = getReporte(reporteId);
+        Asignacion asignacion = getAsignacion(asignacionId);
+
+        reporteRepository.findByAsignacionId(asignacionId)
+                .filter(existente -> !existente.getId().equals(reporteId))
                 .ifPresent(existente -> {
-                    throw new IllegalArgumentException("Ya existe un reporte para la asignacion: " + request.getAsignacionId());
+                    throw new IllegalArgumentException("Ya existe un reporte para la asignacion: " + asignacionId);
                 });
 
         reporteMapper.updateEntity(request, asignacion, reporte);
         reporte.setAprobado(request.getAprobado() != null ? request.getAprobado() : Boolean.FALSE);
         reporte.setInspeccionadoEn(LocalDate.now());
 
-        Reporte saved = reporteRepository.save(reporte);
+        Reporte saved = reporteRepository.save(Objects.requireNonNull(reporte));
         return reporteMapper.toResponse(saved);
     }
 
     public void deleteById(Long id) {
         Reporte reporte = getReporte(id);
-        reporteRepository.delete(reporte);
+        reporteRepository.delete(Objects.requireNonNull(reporte));
     }
 
     private Reporte getReporte(Long id) {
-        return reporteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado: " + id));
+        Long reporteId = Objects.requireNonNull(id);
+        return reporteRepository.findById(reporteId)
+                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado: " + reporteId));
     }
 
     private Asignacion getAsignacion(Long asignacionId) {
-        return asignacionRepository.findById(asignacionId)
-                .orElseThrow(() -> new EntityNotFoundException("Asignacion no encontrada: " + asignacionId));
+        Long idAsignacion = Objects.requireNonNull(asignacionId);
+        return asignacionRepository.findById(idAsignacion)
+                .orElseThrow(() -> new EntityNotFoundException("Asignacion no encontrada: " + idAsignacion));
     }
 }
