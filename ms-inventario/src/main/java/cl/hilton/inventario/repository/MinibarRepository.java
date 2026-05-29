@@ -1,12 +1,11 @@
 package cl.hilton.inventario.repository;
 
-import java.util.List;
-import java.util.Optional;
-
+import cl.hilton.inventario.model.MiniBar;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import cl.hilton.inventario.model.MiniBar;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MiniBarRepository extends JpaRepository<MiniBar, Long> {
