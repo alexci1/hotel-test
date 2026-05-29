@@ -1,5 +1,10 @@
 package cl.hilton.checkin.service;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import cl.hilton.checkin.dto.CheckinRequest;
 import cl.hilton.checkin.dto.CheckinResponse;
 import cl.hilton.checkin.mapper.CheckinMapper;
@@ -9,11 +14,11 @@ import cl.hilton.checkin.model.ProjReserva;
 import cl.hilton.checkin.repository.CheckinRepository;
 import cl.hilton.checkin.repository.ProjHuespedRepository;
 import cl.hilton.checkin.repository.ProjReservaRepository;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class CheckinService {
 
     private final CheckinRepository checkinRepository;
@@ -21,77 +26,76 @@ public class CheckinService {
     private final ProjHuespedRepository huespedRepository;
     private final CheckinMapper checkinMapper;
 
-    public CheckinService(
-            CheckinRepository checkinRepository,
-            ProjReservaRepository reservaRepository,
-            ProjHuespedRepository huespedRepository,
-            CheckinMapper checkinMapper
-    ) {
-        this.checkinRepository = checkinRepository;
-        this.reservaRepository = reservaRepository;
-        this.huespedRepository = huespedRepository;
-        this.checkinMapper = checkinMapper;
-    }
-
-    public List<CheckinResponse> listar() {
+    public List<CheckinResponse> findAll() {
         return checkinMapper.toResponseList(checkinRepository.findAll());
     }
 
-    public CheckinResponse buscarPorId(Long id) {
-        return checkinMapper.toResponse(obtenerCheckin(id));
+    public CheckinResponse findById(Long id) {
+        return checkinMapper.toResponse(getCheckin(id));
     }
 
-    public CheckinResponse buscarPorReserva(String codigoReserva) {
+    public CheckinResponse findByCodigoReserva(String codigoReserva) {
         Checkin checkin = checkinRepository.findByReservaCodigoReserva(codigoReserva)
-                .orElseThrow(() -> new RuntimeException("Check-in no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Check-in no encontrado para reserva: " + codigoReserva));
 
         return checkinMapper.toResponse(checkin);
     }
 
-    public List<CheckinResponse> buscarPorHuesped(String emailHuesped) {
+    public List<CheckinResponse> findByEmailHuesped(String emailHuesped) {
         return checkinMapper.toResponseList(checkinRepository.findByHuespedEmail(emailHuesped));
     }
 
-    public CheckinResponse crear(CheckinRequest request) {
+    public List<CheckinResponse> findByNumeroHabitacion(String numeroHabitacion) {
+        return checkinMapper.toResponseList(checkinRepository.findByNumeroHabitacion(numeroHabitacion));
+    }
+
+    public CheckinResponse create(CheckinRequest request) {
         if (checkinRepository.findByReservaCodigoReserva(request.getCodigoReserva()).isPresent()) {
-            throw new RuntimeException("Ya existe un check-in para esa reserva");
+            throw new IllegalArgumentException("Ya existe un check-in para la reserva: " + request.getCodigoReserva());
         }
 
-        ProjReserva reserva = obtenerReserva(request.getCodigoReserva());
-        ProjHuesped huesped = obtenerHuesped(request.getEmailHuesped());
+        ProjReserva reserva = getReserva(request.getCodigoReserva());
+        ProjHuesped huesped = getHuesped(request.getEmailHuesped());
 
         Checkin checkin = checkinMapper.toEntity(request, reserva, huesped);
+        checkin.setFechaHora(LocalDate.now());
 
         return checkinMapper.toResponse(checkinRepository.save(checkin));
     }
 
-    public CheckinResponse actualizar(Long id, CheckinRequest request) {
-        Checkin checkin = obtenerCheckin(id);
-        ProjReserva reserva = obtenerReserva(request.getCodigoReserva());
-        ProjHuesped huesped = obtenerHuesped(request.getEmailHuesped());
+    public CheckinResponse update(Long id, CheckinRequest request) {
+        Checkin checkin = getCheckin(id);
+        ProjReserva reserva = getReserva(request.getCodigoReserva());
+        ProjHuesped huesped = getHuesped(request.getEmailHuesped());
+
+        checkinRepository.findByReservaCodigoReserva(request.getCodigoReserva())
+                .filter(existente -> !existente.getId().equals(id))
+                .ifPresent(existente -> {
+                    throw new IllegalArgumentException("Ya existe un check-in para la reserva: " + request.getCodigoReserva());
+                });
 
         checkinMapper.updateEntity(request, reserva, huesped, checkin);
 
         return checkinMapper.toResponse(checkinRepository.save(checkin));
     }
 
-    public void eliminar(Long id) {
-        Checkin checkin = obtenerCheckin(id);
+    public void deleteById(Long id) {
+        Checkin checkin = getCheckin(id);
         checkinRepository.delete(checkin);
     }
 
-    private Checkin obtenerCheckin(Long id) {
+    private Checkin getCheckin(Long id) {
         return checkinRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Check-in no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Check-in no encontrado: " + id));
     }
 
-    private ProjReserva obtenerReserva(String codigoReserva) {
+    private ProjReserva getReserva(String codigoReserva) {
         return reservaRepository.findById(codigoReserva)
-                .orElseThrow(() -> new RuntimeException("Reserva no encontrada"));
+                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada: " + codigoReserva));
     }
 
-    private ProjHuesped obtenerHuesped(String email) {
+    private ProjHuesped getHuesped(String email) {
         return huespedRepository.findById(email)
-                .orElseThrow(() -> new RuntimeException("Huésped no encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Huesped no encontrado: " + email));
     }
 }
