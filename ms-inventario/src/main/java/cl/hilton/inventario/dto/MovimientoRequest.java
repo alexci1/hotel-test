@@ -1,15 +1,12 @@
 package cl.hilton.inventario.dto;
 
-import jakarta.validation.constraints.*;
-import lombok.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
 
-import java.time.LocalDate;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Data
 public class MovimientoRequest {
 
     @NotBlank
@@ -17,7 +14,7 @@ public class MovimientoRequest {
     private String codigoProducto;
 
     @NotBlank
-    @Size(max = 20)
+    @Pattern(regexp = "ENTRADA|SALIDA|AJUSTE|DEVOLUCION")
     private String tipo;
 
     @NotNull
@@ -29,6 +26,4 @@ public class MovimientoRequest {
     @NotBlank
     @Size(max = 120)
     private String registradoPor;
-
-    private LocalDate registradoEn;
 }
