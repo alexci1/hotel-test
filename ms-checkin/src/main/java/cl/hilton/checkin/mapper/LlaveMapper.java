@@ -1,40 +1,29 @@
 package cl.hilton.checkin.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.checkin.dto.LlaveRequest;
 import cl.hilton.checkin.dto.LlaveResponse;
 import cl.hilton.checkin.model.Llave;
 import cl.hilton.checkin.model.ProjReserva;
-import org.springframework.stereotype.Component;
 
-@Component
-public class LlaveMapper {
+@Mapper(componentModel = "spring")
+public interface LlaveMapper {
 
-    public Llave toEntity(LlaveRequest request, ProjReserva reserva) {
-        return Llave.builder()
-                .numeroHabitacion(request.getNumeroHabitacion())
-                .codigoLlave(request.getCodigoLlave())
-                .activa(request.getActiva())
-                .reserva(reserva)
-                .emitidaEn(request.getEmitidaEn())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reserva", source = "reserva")
+    Llave toEntity(LlaveRequest request, ProjReserva reserva);
 
-    public LlaveResponse toResponse(Llave llave) {
-        return LlaveResponse.builder()
-                .id(llave.getId())
-                .numeroHabitacion(llave.getNumeroHabitacion())
-                .codigoLlave(llave.getCodigoLlave())
-                .activa(llave.getActiva())
-                .codigoReserva(llave.getReserva() != null ? llave.getReserva().getCodigoReserva() : null)
-                .emitidaEn(llave.getEmitidaEn())
-                .build();
-    }
+    @Mapping(target = "codigoReserva", source = "reserva.codigoReserva")
+    LlaveResponse toResponse(Llave llave);
 
-    public void updateEntity(Llave llave, LlaveRequest request, ProjReserva reserva) {
-        llave.setNumeroHabitacion(request.getNumeroHabitacion());
-        llave.setCodigoLlave(request.getCodigoLlave());
-        llave.setActiva(request.getActiva());
-        llave.setReserva(reserva);
-        llave.setEmitidaEn(request.getEmitidaEn());
-    }
+    List<LlaveResponse> toResponseList(List<Llave> llaves);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reserva", source = "reserva")
+    void updateEntity(LlaveRequest request, ProjReserva reserva, @MappingTarget Llave llave);
 }
