@@ -1,24 +1,17 @@
 package cl.hilton.inventario.dto;
 
-import jakarta.validation.constraints.*;
-import lombok.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
 
-import java.time.LocalDate;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Data
 public class ProjHabitacionRequest {
 
-    @NotBlank
-    @Size(max = 10)
+    @NotBlank(message = "El numero de habitacion es obligatorio")
+    @Size(max = 10, message = "El numero de habitacion no puede superar los 10 caracteres")
     private String numeroHabitacion;
 
-    @NotBlank
-    @Size(max = 40)
+    @NotBlank(message = "El tipo es obligatorio")
+    @Size(max = 40, message = "El tipo no puede superar los 40 caracteres")
     private String tipo;
-
-    private LocalDate actualizadoEn;
 }
