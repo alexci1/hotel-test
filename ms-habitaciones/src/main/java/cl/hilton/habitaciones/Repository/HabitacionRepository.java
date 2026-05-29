@@ -1,11 +1,12 @@
 package cl.hilton.habitaciones.repository;
 
-import cl.hilton.habitaciones.model.Habitacion;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import cl.hilton.habitaciones.model.Habitacion;
 
 @Repository
 public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
@@ -17,4 +18,8 @@ public interface HabitacionRepository extends JpaRepository<Habitacion, Long> {
     List<Habitacion> findByPiso(Integer piso);
 
     List<Habitacion> findByActiva(Boolean activa);
+
+    List<Habitacion> findByTipoHabitacionCodigo(String codigoTipo);
+
+    List<Habitacion> findByTipoHabitacionCodigoAndActiva(String codigoTipo, Boolean activa);
 }
