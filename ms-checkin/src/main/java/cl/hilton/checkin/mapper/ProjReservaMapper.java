@@ -1,43 +1,30 @@
 package cl.hilton.checkin.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.checkin.dto.ProjReservaRequest;
 import cl.hilton.checkin.dto.ProjReservaResponse;
 import cl.hilton.checkin.model.ProjReserva;
-import org.springframework.stereotype.Component;
 
-@Component
-public class ProjReservaMapper {
+@Mapper(componentModel = "spring")
+public interface ProjReservaMapper {
 
-    public ProjReserva toEntity(ProjReservaRequest request) {
-        return ProjReserva.builder()
-                .codigoReserva(request.getCodigoReserva())
-                .emailHuesped(request.getEmailHuesped())
-                .numeroHabitacion(request.getNumeroHabitacion())
-                .fechaEntrada(request.getFechaEntrada())
-                .fechaSalida(request.getFechaSalida())
-                .estado(request.getEstado())
-                .actualizadoEn(request.getActualizadoEn())
-                .build();
-    }
+    @Mapping(target = "checkin", ignore = true)
+    @Mapping(target = "checkout", ignore = true)
+    @Mapping(target = "llaves", ignore = true)
+    ProjReserva toEntity(ProjReservaRequest request);
 
-    public ProjReservaResponse toResponse(ProjReserva reserva) {
-        return ProjReservaResponse.builder()
-                .codigoReserva(reserva.getCodigoReserva())
-                .emailHuesped(reserva.getEmailHuesped())
-                .numeroHabitacion(reserva.getNumeroHabitacion())
-                .fechaEntrada(reserva.getFechaEntrada())
-                .fechaSalida(reserva.getFechaSalida())
-                .estado(reserva.getEstado())
-                .actualizadoEn(reserva.getActualizadoEn())
-                .build();
-    }
+    ProjReservaResponse toResponse(ProjReserva reserva);
 
-    public void updateEntity(ProjReserva reserva, ProjReservaRequest request) {
-        reserva.setEmailHuesped(request.getEmailHuesped());
-        reserva.setNumeroHabitacion(request.getNumeroHabitacion());
-        reserva.setFechaEntrada(request.getFechaEntrada());
-        reserva.setFechaSalida(request.getFechaSalida());
-        reserva.setEstado(request.getEstado());
-        reserva.setActualizadoEn(request.getActualizadoEn());
-    }
+    List<ProjReservaResponse> toResponseList(List<ProjReserva> reservas);
+
+    @Mapping(target = "codigoReserva", ignore = true)
+    @Mapping(target = "checkin", ignore = true)
+    @Mapping(target = "checkout", ignore = true)
+    @Mapping(target = "llaves", ignore = true)
+    void updateEntity(ProjReservaRequest request, @MappingTarget ProjReserva reserva);
 }
