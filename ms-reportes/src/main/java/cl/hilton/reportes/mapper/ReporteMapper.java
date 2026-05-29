@@ -15,6 +15,7 @@ public interface ReporteMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "metricas", ignore = true)
+    @Mapping(target = "kpis", ignore = true)
     Reporte toEntity(ReporteRequest request);
 
     ReporteResponse toResponse(Reporte reporte);
@@ -23,5 +24,6 @@ public interface ReporteMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "metricas", ignore = true)
+    @Mapping(target = "kpis", ignore = true)
     void updateEntity(ReporteRequest request, @MappingTarget Reporte reporte);
 }
