@@ -13,6 +13,7 @@ import cl.hilton.checkin.model.ProjReserva;
 @Mapper(componentModel = "spring")
 public interface ProjReservaMapper {
 
+    @Mapping(target = "actualizadoEn", ignore = true)
     @Mapping(target = "checkin", ignore = true)
     @Mapping(target = "checkout", ignore = true)
     @Mapping(target = "llaves", ignore = true)
@@ -23,6 +24,7 @@ public interface ProjReservaMapper {
     List<ProjReservaResponse> toResponseList(List<ProjReserva> reservas);
 
     @Mapping(target = "codigoReserva", ignore = true)
+    @Mapping(target = "actualizadoEn", ignore = true)
     @Mapping(target = "checkin", ignore = true)
     @Mapping(target = "checkout", ignore = true)
     @Mapping(target = "llaves", ignore = true)
