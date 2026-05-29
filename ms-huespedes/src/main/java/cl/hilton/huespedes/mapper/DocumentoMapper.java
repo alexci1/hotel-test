@@ -1,41 +1,29 @@
 package cl.hilton.huespedes.mapper;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+
 import cl.hilton.huespedes.dto.DocumentoRequest;
 import cl.hilton.huespedes.dto.DocumentoResponse;
 import cl.hilton.huespedes.model.Documento;
-import cl.hilton.huespedes.model.Huesped;
-import org.springframework.stereotype.Component;
 
-@Component
-public class DocumentoMapper {
+@Mapper(componentModel = "spring")
+public interface DocumentoMapper {
 
-    public Documento toEntity(DocumentoRequest request, Huesped huesped) {
-        return Documento.builder()
-                .huesped(huesped)
-                .tipo(request.getTipo())
-                .numero(request.getNumero())
-                .paisEmisor(request.getPaisEmisor())
-                .vencimiento(request.getVencimiento())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "huesped", ignore = true)
+    Documento toEntity(DocumentoRequest request);
 
-    public DocumentoResponse toResponse(Documento documento) {
-        return DocumentoResponse.builder()
-                .id(documento.getId())
-                .emailHuesped(documento.getHuesped().getEmail())
-                .nombreHuesped(documento.getHuesped().getNombreCompleto())
-                .tipo(documento.getTipo())
-                .numero(documento.getNumero())
-                .paisEmisor(documento.getPaisEmisor())
-                .vencimiento(documento.getVencimiento())
-                .build();
-    }
+    @Mapping(target = "emailHuesped", source = "huesped.email")
+    @Mapping(target = "nombreHuesped", source = "huesped.nombreCompleto")
+    DocumentoResponse toResponse(Documento documento);
 
-    public void updateEntity(Documento documento, DocumentoRequest request, Huesped huesped) {
-        documento.setHuesped(huesped);
-        documento.setTipo(request.getTipo());
-        documento.setNumero(request.getNumero());
-        documento.setPaisEmisor(request.getPaisEmisor());
-        documento.setVencimiento(request.getVencimiento());
-    }
+    List<DocumentoResponse> toResponseList(List<Documento> documentos);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "huesped", ignore = true)
+    void updateEntity(DocumentoRequest request, @MappingTarget Documento documento);
 }
