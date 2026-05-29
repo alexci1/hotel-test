@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/llaves")
+@RequestMapping("/api/v1/llaves")
 public class LlaveController {
 
     private final LlaveService llaveService;
