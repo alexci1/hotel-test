@@ -1,11 +1,12 @@
 package cl.hilton.inventario.repository;
 
-import cl.hilton.inventario.model.MiniBar;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import cl.hilton.inventario.model.MiniBar;
 
 @Repository
 public interface MiniBarRepository extends JpaRepository<MiniBar, Long> {
@@ -24,7 +25,9 @@ public interface MiniBarRepository extends JpaRepository<MiniBar, Long> {
             String codigoProducto
     );
 
+    List<MiniBar> findByCantidad(Integer cantidad);
+
     List<MiniBar> findByCantidadGreaterThan(Integer cantidad);
 
-    List<MiniBar> findByCantidadEquals(Integer cantidad);
+    List<MiniBar> findByPrecioUnitUsdGreaterThan(Integer precioUnitUsd);
 }
