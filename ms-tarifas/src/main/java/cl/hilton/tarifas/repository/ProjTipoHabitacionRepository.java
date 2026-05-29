@@ -1,11 +1,13 @@
 package cl.hilton.tarifas.repository;
 
-import cl.hilton.tarifas.model.ProjTipoHabitacion;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import cl.hilton.tarifas.model.ProjTipoHabitacion;
 
 @Repository
 public interface ProjTipoHabitacionRepository extends JpaRepository<ProjTipoHabitacion, String> {
@@ -14,8 +16,11 @@ public interface ProjTipoHabitacionRepository extends JpaRepository<ProjTipoHabi
 
     boolean existsByCodigo(String codigo);
 
-    List<ProjTipoHabitacion> findByCapacidadMax(Short capacidadMax);
+    List<ProjTipoHabitacion> findByCapacidadMax(Integer capacidadMax);
+
+    List<ProjTipoHabitacion> findByCapacidadMaxGreaterThanEqual(Integer capacidadMax);
 
     List<ProjTipoHabitacion> findByDescripcionContainingIgnoreCase(String descripcion);
 
+    List<ProjTipoHabitacion> findByActualizadoEn(LocalDate actualizadoEn);
 }
