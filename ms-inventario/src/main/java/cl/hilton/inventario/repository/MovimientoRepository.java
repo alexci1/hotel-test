@@ -1,11 +1,12 @@
 package cl.hilton.inventario.repository;
 
-import cl.hilton.inventario.model.Movimiento;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.List;
+import cl.hilton.inventario.model.Movimiento;
 
 @Repository
 public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
@@ -15,6 +16,8 @@ public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
     List<Movimiento> findByTipo(String tipo);
 
     List<Movimiento> findByRegistradoPor(String registradoPor);
+
+    List<Movimiento> findByRegistradoEn(LocalDate registradoEn);
 
     List<Movimiento> findByRegistradoEnBetween(LocalDate desde, LocalDate hasta);
 
