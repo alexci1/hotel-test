@@ -15,6 +15,7 @@ import cl.hilton.notificaciones.repository.NotificacionRepository;
 import cl.hilton.notificaciones.repository.PlantillaRepository;
 import cl.hilton.notificaciones.repository.ProjHuespedRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -50,7 +51,7 @@ public class NotificacionService {
     public List<NotificacionResponse> findByCreadoEn(LocalDate creadoEn) {
         return notificacionMapper.toResponseList(notificacionRepository.findByCreadoEn(creadoEn));
     }
-
+    @Transactional
     public NotificacionResponse create(NotificacionRequest request) {
         Plantilla plantilla = plantillaRepository.findByCodigo(request.getCodigoPlantilla())
                 .orElseThrow(() -> new EntityNotFoundException("Plantilla no encontrada con codigo: " + request.getCodigoPlantilla()));
@@ -67,7 +68,7 @@ public class NotificacionService {
 
         return notificacionMapper.toResponse(notificacionGuardada);
     }
-
+    @Transactional
     public NotificacionResponse update(Long id, NotificacionRequest request) {
         Notificacion notificacion = getNotificacionById(id);
 
@@ -85,7 +86,7 @@ public class NotificacionService {
 
         return notificacionMapper.toResponse(notificacionActualizada);
     }
-
+    @Transactional
     public void deleteById(Long id) {
         Notificacion notificacion = getNotificacionById(id);
         notificacionRepository.delete(notificacion);

@@ -13,6 +13,7 @@ import cl.hilton.notificaciones.model.Notificacion;
 import cl.hilton.notificaciones.repository.EnvioRepository;
 import cl.hilton.notificaciones.repository.NotificacionRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -46,7 +47,7 @@ public class EnvioService {
     public List<EnvioResponse> findByEnviadoEn(LocalDate enviadoEn) {
         return envioMapper.toResponseList(envioRepository.findByEnviadoEn(enviadoEn));
     }
-
+    @Transactional
     public EnvioResponse create(EnvioRequest request) {
         if (envioRepository.existsByNotificacionId(request.getNotificacionId())) {
             throw new IllegalArgumentException("Ya existe un envio para la notificacion: " + request.getNotificacionId());
@@ -65,7 +66,7 @@ public class EnvioService {
 
         return envioMapper.toResponse(envioGuardado);
     }
-
+    @Transactional
     public EnvioResponse update(Long id, EnvioRequest request) {
         Envio envio = getEnvioById(id);
 
@@ -90,7 +91,7 @@ public class EnvioService {
 
         return envioMapper.toResponse(envioActualizado);
     }
-
+    @Transactional
     public void deleteById(Long id) {
         Envio envio = getEnvioById(id);
         envioRepository.delete(envio);

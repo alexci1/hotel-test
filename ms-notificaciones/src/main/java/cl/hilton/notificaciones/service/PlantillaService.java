@@ -10,6 +10,7 @@ import cl.hilton.notificaciones.mapper.PlantillaMapper;
 import cl.hilton.notificaciones.model.Plantilla;
 import cl.hilton.notificaciones.repository.PlantillaRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -42,7 +43,7 @@ public class PlantillaService {
     public List<PlantillaResponse> findByActiva(Boolean activa) {
         return plantillaMapper.toResponseList(plantillaRepository.findByActiva(activa));
     }
-
+    @Transactional
     public PlantillaResponse create(PlantillaRequest request) {
         validarCodigoUnico(request.getCodigo());
 
@@ -53,7 +54,7 @@ public class PlantillaService {
 
         return plantillaMapper.toResponse(plantillaGuardada);
     }
-
+    @Transactional
     public PlantillaResponse update(Long id, PlantillaRequest request) {
         Plantilla plantilla = getPlantillaById(id);
         Boolean activaActual = plantilla.getActiva();
@@ -69,7 +70,7 @@ public class PlantillaService {
 
         return plantillaMapper.toResponse(plantillaActualizada);
     }
-
+    @Transactional
     public void deleteById(Long id) {
         Plantilla plantilla = getPlantillaById(id);
         plantillaRepository.delete(plantilla);

@@ -13,6 +13,7 @@ import cl.hilton.pagos.model.Factura;
 import cl.hilton.pagos.repository.CargoRepository;
 import cl.hilton.pagos.repository.FacturaRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -43,7 +44,7 @@ public class CargoService {
     public List<CargoResponse> findByRegistradoEn(LocalDate registradoEn) {
         return cargoMapper.toResponseList(cargoRepository.findByRegistradoEn(registradoEn));
     }
-
+    @Transactional
     public CargoResponse create(CargoRequest request) {
         Factura factura = facturaRepository.findByNumeroFactura(request.getNumeroFactura())
                 .orElseThrow(() -> new EntityNotFoundException("Factura no encontrada con numero: " + request.getNumeroFactura()));
@@ -56,7 +57,7 @@ public class CargoService {
 
         return cargoMapper.toResponse(cargoGuardado);
     }
-
+    @Transactional
     public CargoResponse update(Long id, CargoRequest request) {
         Cargo cargo = getCargoById(id);
 
@@ -70,7 +71,7 @@ public class CargoService {
 
         return cargoMapper.toResponse(cargoActualizado);
     }
-
+    @Transactional
     public void deleteById(Long id) {
         Cargo cargo = getCargoById(id);
         cargoRepository.delete(cargo);

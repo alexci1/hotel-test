@@ -13,6 +13,7 @@ import cl.hilton.autenticacion.model.Usuario;
 import cl.hilton.autenticacion.repository.SesionRepository;
 import cl.hilton.autenticacion.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -53,7 +54,7 @@ public class SesionService {
     public List<SesionResponse> findActivas() {
         return sesionMapper.toResponseList(sesionRepository.findByInvalidadaFalse());
     }
-
+    @Transactional
     public SesionResponse create(SesionRequest request) {
         validarTokenHashUnico(request.getTokenHash());
 
@@ -73,7 +74,7 @@ public class SesionService {
 
         return sesionMapper.toResponse(sesionGuardada);
     }
-
+    @Transactional
     public SesionResponse update(Long id, SesionRequest request) {
         Sesion sesion = getSesionById(id);
         Boolean invalidadaActual = sesion.getInvalidada();
@@ -107,7 +108,7 @@ public class SesionService {
 
         return sesionMapper.toResponse(sesionActualizada);
     }
-
+    @Transactional
     public void deleteById(Long id) {
         Sesion sesion = getSesionById(id);
         sesionRepository.delete(sesion);

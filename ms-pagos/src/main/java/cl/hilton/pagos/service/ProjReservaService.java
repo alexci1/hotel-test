@@ -12,6 +12,7 @@ import cl.hilton.pagos.mapper.ProjReservaMapper;
 import cl.hilton.pagos.model.ProjReserva;
 import cl.hilton.pagos.repository.ProjReservaRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -46,7 +47,7 @@ public class ProjReservaService {
     public List<ProjReservaResponse> findByFechaSalida(LocalDate fechaSalida) {
         return reservaMapper.toResponseList(reservaRepository.findByFechaSalida(fechaSalida));
     }
-
+    @Transactional
     public ProjReservaResponse create(ProjReservaRequest request) {
         validarCodigoReservaUnico(request.getCodigoReserva());
 
@@ -57,7 +58,7 @@ public class ProjReservaService {
 
         return reservaMapper.toResponse(reservaGuardada);
     }
-
+    @Transactional
     public ProjReservaResponse update(String codigoReserva, ProjReservaRequest request) {
         ProjReserva reserva = getReservaByCodigo(codigoReserva);
 
@@ -85,7 +86,7 @@ public class ProjReservaService {
 
         return reservaMapper.toResponse(reservaGuardada);
     }
-
+    @Transactional
     public void deleteByCodigoReserva(String codigoReserva) {
         ProjReserva reserva = getReservaByCodigo(codigoReserva);
         reservaRepository.delete(reserva);

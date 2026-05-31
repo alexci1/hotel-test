@@ -12,6 +12,7 @@ import cl.hilton.notificaciones.mapper.ProjHuespedMapper;
 import cl.hilton.notificaciones.model.ProjHuesped;
 import cl.hilton.notificaciones.repository.ProjHuespedRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,7 +35,7 @@ public class ProjHuespedService {
     public List<ProjHuespedResponse> findByNombreCompleto(String nombreCompleto) {
         return huespedMapper.toResponseList(huespedRepository.findByNombreCompletoContainingIgnoreCase(nombreCompleto));
     }
-
+    @Transactional
     public ProjHuespedResponse create(ProjHuespedRequest request) {
         validarEmailUnico(request.getEmail());
 
@@ -45,7 +46,7 @@ public class ProjHuespedService {
 
         return huespedMapper.toResponse(huespedGuardado);
     }
-
+    @Transactional
     public ProjHuespedResponse update(String email, ProjHuespedRequest request) {
         ProjHuesped huesped = getHuespedByEmail(email);
 
@@ -70,7 +71,7 @@ public class ProjHuespedService {
 
         return huespedMapper.toResponse(huespedGuardado);
     }
-
+    @Transactional
     public void deleteByEmail(String email) {
         ProjHuesped huesped = getHuespedByEmail(email);
         huespedRepository.delete(huesped);

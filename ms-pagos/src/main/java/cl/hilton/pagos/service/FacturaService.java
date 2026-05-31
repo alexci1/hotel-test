@@ -15,6 +15,7 @@ import cl.hilton.pagos.repository.FacturaRepository;
 import cl.hilton.pagos.repository.ProjHuespedRepository;
 import cl.hilton.pagos.repository.ProjReservaRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -60,7 +61,7 @@ public class FacturaService {
     public List<FacturaResponse> findByEmitidaEn(LocalDate emitidaEn) {
         return facturaMapper.toResponseList(facturaRepository.findByEmitidaEn(emitidaEn));
     }
-
+    @Transactional
     public FacturaResponse create(FacturaRequest request) {
         validarNumeroFacturaUnico(request.getNumeroFactura());
 
@@ -83,7 +84,7 @@ public class FacturaService {
 
         return facturaMapper.toResponse(facturaGuardada);
     }
-
+    @Transactional
     public FacturaResponse update(Long id, FacturaRequest request) {
         Factura factura = getFacturaById(id);
 
@@ -110,7 +111,7 @@ public class FacturaService {
 
         return facturaMapper.toResponse(facturaActualizada);
     }
-
+    @Transactional
     public void deleteById(Long id) {
         Factura factura = getFacturaById(id);
         facturaRepository.delete(factura);
