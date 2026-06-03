@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.housekeeping.dto.AsignacionRequest;
 import cl.hilton.housekeeping.dto.AsignacionResponse;
@@ -32,83 +33,140 @@ public class AsignacionService {
     }
 
     public AsignacionResponse findById(Long id) {
-        return asignacionMapper.toResponse(getAsignacion(id));
+        Asignacion asignacion = getAsignacionById(id);
+        return asignacionMapper.toResponse(asignacion);
     }
 
     public List<AsignacionResponse> findByNumeroHabitacion(String numeroHabitacion) {
-        return asignacionMapper.toResponseList(asignacionRepository.findByHabitacionNumeroHabitacion(numeroHabitacion));
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
+        return asignacionMapper.toResponseList(asignacionRepository.findByHabitacionNumeroHabitacion(numero));
     }
 
     public List<AsignacionResponse> findByCodigoTarea(String codigoTarea) {
-        return asignacionMapper.toResponseList(asignacionRepository.findByTareaCodigo(codigoTarea));
+        String codigo = validarTexto(codigoTarea, "codigoTarea");
+        return asignacionMapper.toResponseList(asignacionRepository.findByTareaCodigo(codigo));
     }
 
     public List<AsignacionResponse> findByEmailCamarero(String emailCamarero) {
-        return asignacionMapper.toResponseList(asignacionRepository.findByEmailCamarero(emailCamarero));
+        String email = validarTexto(emailCamarero, "emailCamarero");
+        return asignacionMapper.toResponseList(asignacionRepository.findByEmailCamarero(email));
     }
 
     public List<AsignacionResponse> findByFechaProgramada(LocalDate fechaProgramada) {
-        return asignacionMapper.toResponseList(asignacionRepository.findByFechaProgramada(fechaProgramada));
+        LocalDate fecha = validarFecha(fechaProgramada, "fechaProgramada");
+        return asignacionMapper.toResponseList(asignacionRepository.findByFechaProgramada(fecha));
     }
 
     public List<AsignacionResponse> findByEstado(String estado) {
-        return asignacionMapper.toResponseList(asignacionRepository.findByEstado(estado));
+        String estadoValido = validarTexto(estado, "estado");
+        return asignacionMapper.toResponseList(asignacionRepository.findByEstado(estadoValido));
     }
 
     public List<AsignacionResponse> findByPrioridad(Integer prioridad) {
-        return asignacionMapper.toResponseList(asignacionRepository.findByPrioridad(prioridad));
+        Integer prioridadValida = validarInteger(prioridad, "prioridad");
+        return asignacionMapper.toResponseList(asignacionRepository.findByPrioridad(prioridadValida));
     }
 
+    @Transactional
     public AsignacionResponse create(AsignacionRequest request) {
-        ProjHabitacion habitacion = getHabitacion(request.getNumeroHabitacion());
-        Tarea tarea = getTarea(request.getCodigoTarea());
+        ProjHabitacion habitacion = getHabitacionByNumero(request.getNumeroHabitacion());
+        Tarea tarea = getTareaByCodigo(request.getCodigoTarea());
 
         Asignacion asignacion = asignacionMapper.toEntity(request, habitacion, tarea);
         asignacion.setEstado(request.getEstado() != null ? request.getEstado() : "PENDIENTE");
         asignacion.setPrioridad(request.getPrioridad() != null ? request.getPrioridad() : 1);
 
-        Asignacion saved = asignacionRepository.save(asignacion);
-        return asignacionMapper.toResponse(saved);
+        Asignacion asignacionGuardada = asignacionRepository.save(asignacion);
+
+        return asignacionMapper.toResponse(asignacionGuardada);
     }
 
+    @Transactional
     public AsignacionResponse update(Long id, AsignacionRequest request) {
-        Asignacion asignacion = getAsignacion(id);
-        ProjHabitacion habitacion = getHabitacion(request.getNumeroHabitacion());
-        Tarea tarea = getTarea(request.getCodigoTarea());
+        Long asignacionId = validarId(id);
+
+        Asignacion asignacion = getAsignacionById(asignacionId);
+        ProjHabitacion habitacion = getHabitacionByNumero(request.getNumeroHabitacion());
+        Tarea tarea = getTareaByCodigo(request.getCodigoTarea());
+
+        String estadoActual = asignacion.getEstado();
+        Integer prioridadActual = asignacion.getPrioridad();
 
         asignacionMapper.updateEntity(request, habitacion, tarea, asignacion);
-        asignacion.setEstado(request.getEstado() != null ? request.getEstado() : "PENDIENTE");
-        asignacion.setPrioridad(request.getPrioridad() != null ? request.getPrioridad() : 1);
+        asignacion.setEstado(request.getEstado() != null ? request.getEstado() : estadoActual);
+        asignacion.setPrioridad(request.getPrioridad() != null ? request.getPrioridad() : prioridadActual);
 
-        Asignacion saved = asignacionRepository.save(asignacion);
-        return asignacionMapper.toResponse(saved);
+        Asignacion asignacionActualizada = asignacionRepository.save(asignacion);
+
+        return asignacionMapper.toResponse(asignacionActualizada);
     }
 
+    @Transactional
     public AsignacionResponse updateEstado(Long id, String estado) {
-        Asignacion asignacion = getAsignacion(id);
-        asignacion.setEstado(estado);
+        Long asignacionId = validarId(id);
+        String estadoValido = validarTexto(estado, "estado");
 
-        Asignacion saved = asignacionRepository.save(asignacion);
-        return asignacionMapper.toResponse(saved);
+        Asignacion asignacion = getAsignacionById(asignacionId);
+        asignacion.setEstado(estadoValido);
+
+        Asignacion asignacionActualizada = asignacionRepository.save(asignacion);
+
+        return asignacionMapper.toResponse(asignacionActualizada);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Asignacion asignacion = getAsignacion(id);
-        asignacionRepository.delete(asignacion);
+        Long asignacionId = validarId(id);
+        getAsignacionById(asignacionId);
+        asignacionRepository.deleteById(asignacionId);
     }
 
-    private Asignacion getAsignacion(Long id) {
-        return asignacionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Asignacion no encontrada: " + id));
+    private Asignacion getAsignacionById(Long id) {
+        Long asignacionId = validarId(id);
+
+        return asignacionRepository.findById(asignacionId)
+                .orElseThrow(() -> new EntityNotFoundException("Asignacion no encontrada con id: " + asignacionId));
     }
 
-    private ProjHabitacion getHabitacion(String numeroHabitacion) {
-        return habitacionRepository.findById(numeroHabitacion)
-                .orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada: " + numeroHabitacion));
+    private ProjHabitacion getHabitacionByNumero(String numeroHabitacion) {
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
+
+        return habitacionRepository.findById(numero)
+                .orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada: " + numero));
     }
 
-    private Tarea getTarea(String codigoTarea) {
-        return tareaRepository.findByCodigo(codigoTarea)
-                .orElseThrow(() -> new EntityNotFoundException("Tarea no encontrada: " + codigoTarea));
+    private Tarea getTareaByCodigo(String codigoTarea) {
+        String codigo = validarTexto(codigoTarea, "codigoTarea");
+
+        return tareaRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new EntityNotFoundException("Tarea no encontrada: " + codigo));
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private Integer validarInteger(Integer valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private LocalDate validarFecha(LocalDate valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
