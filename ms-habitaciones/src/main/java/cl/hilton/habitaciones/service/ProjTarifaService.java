@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.habitaciones.client.TarifaLookupClient;
 import cl.hilton.habitaciones.dto.ProjTarifaRequest;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class ProjTarifaService {
 
     private final ProjTarifaRepository projTarifaRepository;
@@ -35,9 +37,12 @@ public class ProjTarifaService {
         return projTarifaMapper.toResponse(tarifa);
     }
 
+    @Transactional
     public ProjTarifaResponse create(ProjTarifaRequest request) {
-        validarTipoHabitacionExiste(request.getTipoHabitacion());
-        validarTarifaUnica(request.getTipoHabitacion());
+        String tipoHabitacion = validarTexto(request.getTipoHabitacion(), "tipoHabitacion");
+
+        validarTipoHabitacionExiste(tipoHabitacion);
+        validarTarifaUnica(tipoHabitacion);
 
         ProjTarifa tarifa = projTarifaMapper.toEntity(request);
         tarifa.setActualizadoEn(LocalDate.now());
@@ -47,10 +52,13 @@ public class ProjTarifaService {
         return projTarifaMapper.toResponse(tarifaGuardada);
     }
 
+    @Transactional
     public ProjTarifaResponse update(String tipoHabitacion, ProjTarifaRequest request) {
-        ProjTarifa tarifa = getTarifaByTipoHabitacion(tipoHabitacion);
+        String tipo = validarTexto(tipoHabitacion, "tipoHabitacion");
+        ProjTarifa tarifa = getTarifaByTipoHabitacion(tipo);
 
         projTarifaMapper.updateEntity(request, tarifa);
+        tarifa.setTipoHabitacion(tipo);
         tarifa.setActualizadoEn(LocalDate.now());
 
         ProjTarifa tarifaActualizada = projTarifaRepository.save(tarifa);
@@ -58,11 +66,14 @@ public class ProjTarifaService {
         return projTarifaMapper.toResponse(tarifaActualizada);
     }
 
+    @Transactional
     public ProjTarifaResponse sincronizarPorTipoHabitacion(String tipoHabitacion) {
-        List<TarifaHabitacionResponse> tarifasExternas = tarifaLookupClient.buscarPorTipoHabitacionYActiva(tipoHabitacion, true);
+        String tipo = validarTexto(tipoHabitacion, "tipoHabitacion");
+
+        List<TarifaHabitacionResponse> tarifasExternas = tarifaLookupClient.buscarPorTipoHabitacionYActiva(tipo, true);
 
         if (tarifasExternas.isEmpty()) {
-            throw new EntityNotFoundException("No se encontraron tarifas activas para tipo habitacion: " + tipoHabitacion);
+            throw new EntityNotFoundException("No se encontraron tarifas activas para tipo habitacion: " + tipo);
         }
 
         TarifaHabitacionResponse externa = tarifasExternas.get(0);
@@ -78,14 +89,18 @@ public class ProjTarifaService {
         return projTarifaMapper.toResponse(tarifaGuardada);
     }
 
+    @Transactional
     public void deleteByTipoHabitacion(String tipoHabitacion) {
-        ProjTarifa tarifa = getTarifaByTipoHabitacion(tipoHabitacion);
-        projTarifaRepository.delete(tarifa);
+        String tipo = validarTexto(tipoHabitacion, "tipoHabitacion");
+        getTarifaByTipoHabitacion(tipo);
+        projTarifaRepository.deleteById(tipo);
     }
 
     private ProjTarifa getTarifaByTipoHabitacion(String tipoHabitacion) {
-        return projTarifaRepository.findByTipoHabitacion(tipoHabitacion)
-                .orElseThrow(() -> new EntityNotFoundException("Tarifa proyectada no encontrada para tipo habitacion: " + tipoHabitacion));
+        String tipo = validarTexto(tipoHabitacion, "tipoHabitacion");
+
+        return projTarifaRepository.findByTipoHabitacion(tipo)
+                .orElseThrow(() -> new EntityNotFoundException("Tarifa proyectada no encontrada para tipo habitacion: " + tipo));
     }
 
     private void validarTarifaUnica(String tipoHabitacion) {
@@ -101,5 +116,12 @@ public class ProjTarifaService {
         if (!Boolean.TRUE.equals(tipoHabitacion.getActivo())) {
             throw new IllegalArgumentException("El tipo de habitacion no esta activo: " + codigo);
         }
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
