@@ -3,6 +3,7 @@ package cl.hilton.habitaciones.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.habitaciones.dto.TipoHabitacionRequest;
 import cl.hilton.habitaciones.dto.TipoHabitacionResponse;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class TipoHabitacionService {
 
     private final TipoHabitacionRepository tipoHabitacionRepository;
@@ -29,30 +31,38 @@ public class TipoHabitacionService {
     }
 
     public TipoHabitacionResponse findByCodigo(String codigo) {
-        TipoHabitacion tipoHabitacion = tipoHabitacionRepository.findByCodigo(codigo)
-                .orElseThrow(() -> new EntityNotFoundException("Tipo de habitacion no encontrado con codigo: " + codigo));
+        String codigoValido = validarTexto(codigo, "codigo");
+
+        TipoHabitacion tipoHabitacion = tipoHabitacionRepository.findByCodigo(codigoValido)
+                .orElseThrow(() -> new EntityNotFoundException("Tipo de habitacion no encontrado con codigo: " + codigoValido));
 
         return tipoHabitacionMapper.toResponse(tipoHabitacion);
     }
 
     public List<TipoHabitacionResponse> findByActivo(Boolean activo) {
-        return tipoHabitacionMapper.toResponseList(tipoHabitacionRepository.findByActivo(activo));
+        Boolean estado = validarBoolean(activo, "activo");
+        return tipoHabitacionMapper.toResponseList(tipoHabitacionRepository.findByActivo(estado));
     }
 
     public List<TipoHabitacionResponse> findByCapacidadMax(Integer capacidadMax) {
-        return tipoHabitacionMapper.toResponseList(tipoHabitacionRepository.findByCapacidadMax(capacidadMax));
+        Integer capacidad = validarInteger(capacidadMax, "capacidadMax");
+        return tipoHabitacionMapper.toResponseList(tipoHabitacionRepository.findByCapacidadMax(capacidad));
     }
 
     public List<TipoHabitacionResponse> findByCapacidadMinima(Integer capacidadMax) {
-        return tipoHabitacionMapper.toResponseList(tipoHabitacionRepository.findByCapacidadMaxGreaterThanEqual(capacidadMax));
+        Integer capacidad = validarInteger(capacidadMax, "capacidadMax");
+        return tipoHabitacionMapper.toResponseList(tipoHabitacionRepository.findByCapacidadMaxGreaterThanEqual(capacidad));
     }
 
     public List<TipoHabitacionResponse> findByDescripcion(String descripcion) {
-        return tipoHabitacionMapper.toResponseList(tipoHabitacionRepository.findByDescripcionContainingIgnoreCase(descripcion));
+        String texto = validarTexto(descripcion, "descripcion");
+        return tipoHabitacionMapper.toResponseList(tipoHabitacionRepository.findByDescripcionContainingIgnoreCase(texto));
     }
 
+    @Transactional
     public TipoHabitacionResponse create(TipoHabitacionRequest request) {
-        validarCodigoUnico(request.getCodigo());
+        String codigo = validarTexto(request.getCodigo(), "codigo");
+        validarCodigoUnico(codigo);
 
         TipoHabitacion tipoHabitacion = tipoHabitacionMapper.toEntity(request);
         tipoHabitacion.setCapacidadMax(request.getCapacidadMax() != null ? request.getCapacidadMax() : 2);
@@ -63,13 +73,17 @@ public class TipoHabitacionService {
         return tipoHabitacionMapper.toResponse(tipoHabitacionGuardado);
     }
 
+    @Transactional
     public TipoHabitacionResponse update(Long id, TipoHabitacionRequest request) {
-        TipoHabitacion tipoHabitacion = getTipoHabitacionById(id);
+        Long tipoId = validarId(id);
+        String codigo = validarTexto(request.getCodigo(), "codigo");
+
+        TipoHabitacion tipoHabitacion = getTipoHabitacionById(tipoId);
         Integer capacidadActual = tipoHabitacion.getCapacidadMax();
         Boolean activoActual = tipoHabitacion.getActivo();
 
-        if (!tipoHabitacion.getCodigo().equalsIgnoreCase(request.getCodigo())) {
-            validarCodigoUnico(request.getCodigo());
+        if (!tipoHabitacion.getCodigo().equalsIgnoreCase(codigo)) {
+            validarCodigoUnico(codigo);
         }
 
         tipoHabitacionMapper.updateEntity(request, tipoHabitacion);
@@ -81,19 +95,51 @@ public class TipoHabitacionService {
         return tipoHabitacionMapper.toResponse(tipoHabitacionActualizado);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        TipoHabitacion tipoHabitacion = getTipoHabitacionById(id);
-        tipoHabitacionRepository.delete(tipoHabitacion);
+        Long tipoId = validarId(id);
+        getTipoHabitacionById(tipoId);
+        tipoHabitacionRepository.deleteById(tipoId);
     }
 
     private TipoHabitacion getTipoHabitacionById(Long id) {
-        return tipoHabitacionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tipo de habitacion no encontrado con id: " + id));
+        Long tipoId = validarId(id);
+
+        return tipoHabitacionRepository.findById(tipoId)
+                .orElseThrow(() -> new EntityNotFoundException("Tipo de habitacion no encontrado con id: " + tipoId));
     }
 
     private void validarCodigoUnico(String codigo) {
         if (tipoHabitacionRepository.existsByCodigo(codigo)) {
             throw new IllegalArgumentException("Ya existe un tipo de habitacion con codigo: " + codigo);
         }
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private Integer validarInteger(Integer valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private Boolean validarBoolean(Boolean valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
