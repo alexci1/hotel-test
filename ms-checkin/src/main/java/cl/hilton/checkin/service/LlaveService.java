@@ -2,9 +2,9 @@ package cl.hilton.checkin.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.checkin.dto.LlaveRequest;
 import cl.hilton.checkin.dto.LlaveResponse;
@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class LlaveService {
 
     private final LlaveRepository llaveRepository;
@@ -29,11 +30,12 @@ public class LlaveService {
     }
 
     public LlaveResponse findById(Long id) {
-        return llaveMapper.toResponse(getLlave(id));
+        Llave llave = getLlaveById(id);
+        return llaveMapper.toResponse(llave);
     }
 
     public LlaveResponse findByCodigoLlave(String codigoLlave) {
-        String codigo = Objects.requireNonNull(codigoLlave, "codigoLlave no puede ser null");
+        String codigo = validarTexto(codigoLlave, "codigoLlave");
 
         Llave llave = llaveRepository.findByCodigoLlave(codigo)
                 .orElseThrow(() -> new EntityNotFoundException("Llave no encontrada: " + codigo));
@@ -42,38 +44,42 @@ public class LlaveService {
     }
 
     public List<LlaveResponse> findByNumeroHabitacion(String numeroHabitacion) {
-        String numero = Objects.requireNonNull(numeroHabitacion, "numeroHabitacion no puede ser null");
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
         return llaveMapper.toResponseList(llaveRepository.findByNumeroHabitacion(numero));
     }
 
     public List<LlaveResponse> findByActiva(Boolean activa) {
-        Boolean estado = Objects.requireNonNull(activa, "activa no puede ser null");
+        Boolean estado = validarBoolean(activa, "activa");
         return llaveMapper.toResponseList(llaveRepository.findByActiva(estado));
     }
 
     public List<LlaveResponse> findByCodigoReserva(String codigoReserva) {
-        String codigo = Objects.requireNonNull(codigoReserva, "codigoReserva no puede ser null");
+        String codigo = validarTexto(codigoReserva, "codigoReserva");
         return llaveMapper.toResponseList(llaveRepository.findByReservaCodigoReserva(codigo));
     }
 
+    @Transactional
     public LlaveResponse create(LlaveRequest request) {
-        String codigoLlave = Objects.requireNonNull(request.getCodigoLlave(), "codigoLlave no puede ser null");
-        validateCodigoLlaveDisponible(codigoLlave);
+        String codigoLlave = validarTexto(request.getCodigoLlave(), "codigoLlave");
+
+        validarCodigoLlaveUnico(codigoLlave);
 
         ProjReserva reserva = getReservaOpcional(request.getCodigoReserva());
         Llave llave = llaveMapper.toEntity(request, reserva);
         llave.setActiva(request.getActiva() != null ? request.getActiva() : Boolean.TRUE);
         llave.setEmitidaEn(LocalDate.now());
 
-        Llave saved = llaveRepository.save(Objects.requireNonNull(llave));
-        return llaveMapper.toResponse(saved);
+        Llave llaveGuardada = llaveRepository.save(llave);
+
+        return llaveMapper.toResponse(llaveGuardada);
     }
 
+    @Transactional
     public LlaveResponse update(Long id, LlaveRequest request) {
-        Long llaveId = Objects.requireNonNull(id, "id no puede ser null");
-        String codigoLlave = Objects.requireNonNull(request.getCodigoLlave(), "codigoLlave no puede ser null");
+        Long llaveId = validarId(id);
+        String codigoLlave = validarTexto(request.getCodigoLlave(), "codigoLlave");
 
-        Llave llave = getLlave(llaveId);
+        Llave llave = getLlaveById(llaveId);
 
         llaveRepository.findByCodigoLlave(codigoLlave)
                 .filter(existente -> !existente.getId().equals(llaveId))
@@ -82,32 +88,41 @@ public class LlaveService {
                 });
 
         ProjReserva reserva = getReservaOpcional(request.getCodigoReserva());
-        llaveMapper.updateEntity(request, reserva, llave);
-        llave.setActiva(request.getActiva() != null ? request.getActiva() : Boolean.TRUE);
+        Boolean activaActual = llave.getActiva();
 
-        Llave saved = llaveRepository.save(Objects.requireNonNull(llave));
-        return llaveMapper.toResponse(saved);
+        llaveMapper.updateEntity(request, reserva, llave);
+        llave.setActiva(request.getActiva() != null ? request.getActiva() : activaActual);
+
+        Llave llaveActualizada = llaveRepository.save(llave);
+
+        return llaveMapper.toResponse(llaveActualizada);
     }
 
+    @Transactional
     public LlaveResponse updateEstado(Long id, Boolean activa) {
-        Boolean estado = Objects.requireNonNull(activa, "activa no puede ser null");
-        Llave llave = getLlave(id);
+        Long llaveId = validarId(id);
+        Boolean estado = validarBoolean(activa, "activa");
+
+        Llave llave = getLlaveById(llaveId);
         llave.setActiva(estado);
 
-        Llave saved = llaveRepository.save(Objects.requireNonNull(llave));
-        return llaveMapper.toResponse(saved);
+        Llave llaveActualizada = llaveRepository.save(llave);
+
+        return llaveMapper.toResponse(llaveActualizada);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Llave llave = getLlave(id);
-        llaveRepository.delete(Objects.requireNonNull(llave));
+        Long llaveId = validarId(id);
+        getLlaveById(llaveId);
+        llaveRepository.deleteById(llaveId);
     }
 
-    private Llave getLlave(Long id) {
-        Long llaveId = Objects.requireNonNull(id, "id no puede ser null");
+    private Llave getLlaveById(Long id) {
+        Long llaveId = validarId(id);
 
         return llaveRepository.findById(llaveId)
-                .orElseThrow(() -> new EntityNotFoundException("Llave no encontrada: " + llaveId));
+                .orElseThrow(() -> new EntityNotFoundException("Llave no encontrada con id: " + llaveId));
     }
 
     private ProjReserva getReservaOpcional(String codigoReserva) {
@@ -119,11 +134,30 @@ public class LlaveService {
                 .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada: " + codigoReserva));
     }
 
-    private void validateCodigoLlaveDisponible(String codigoLlave) {
-        String codigo = Objects.requireNonNull(codigoLlave, "codigoLlave no puede ser null");
-
-        if (llaveRepository.existsByCodigoLlave(codigo)) {
-            throw new IllegalArgumentException("Ya existe una llave con codigo: " + codigo);
+    private void validarCodigoLlaveUnico(String codigoLlave) {
+        if (llaveRepository.existsByCodigoLlave(codigoLlave)) {
+            throw new IllegalArgumentException("Ya existe una llave con codigo: " + codigoLlave);
         }
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private Boolean validarBoolean(Boolean valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
