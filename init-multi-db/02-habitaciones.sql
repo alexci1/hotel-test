@@ -73,7 +73,7 @@ INSERT INTO habitaciones (numero_habitacion, piso, codigo_tipo, activa) VALUES
 ('202', 2, 'DOBLE', TRUE),
 ('303', 3, 'SUITE', TRUE),
 ('404', 4, 'SIMPLE', FALSE),
-('PH1', 5, 'SUITE', TRUE);
+('PH1', 5, 'SUITE', TRUE);y8
 
 INSERT INTO estados_habitacion (numero_habitacion, estado, observacion) VALUES
 ('101', 'LIMPIA', NULL),
