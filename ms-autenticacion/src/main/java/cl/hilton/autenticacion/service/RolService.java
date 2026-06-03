@@ -1,9 +1,9 @@
 package cl.hilton.autenticacion.service;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.autenticacion.dto.RolRequest;
 import cl.hilton.autenticacion.dto.RolResponse;
@@ -11,11 +11,11 @@ import cl.hilton.autenticacion.mapper.RolMapper;
 import cl.hilton.autenticacion.model.Rol;
 import cl.hilton.autenticacion.repository.RolRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class RolService {
 
     private final RolRepository rolRepository;
@@ -40,6 +40,7 @@ public class RolService {
     public List<RolResponse> findByActivo(Boolean activo) {
         return rolMapper.toResponseList(rolRepository.findByActivo(activo));
     }
+
     @Transactional
     public RolResponse create(RolRequest request) {
         validarCodigoUnico(request.getCodigo());
@@ -51,6 +52,7 @@ public class RolService {
 
         return rolMapper.toResponse(rolGuardado);
     }
+
     @Transactional
     public RolResponse update(Long id, RolRequest request) {
         Rol rol = getRolById(id);
@@ -67,10 +69,11 @@ public class RolService {
 
         return rolMapper.toResponse(rolActualizado);
     }
+
     @Transactional
     public void deleteById(Long id) {
-        Rol rol =Objects.requireNonNull(getRolById(id),"el rol no puede ser nulo");
-        rolRepository.delete(rol);
+        getRolById(id);
+        rolRepository.deleteById(id);
     }
 
     private Rol getRolById(Long id) {
