@@ -1,9 +1,9 @@
 package cl.hilton.housekeeping.service;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.housekeeping.dto.ProjHabitacionRequest;
 import cl.hilton.housekeeping.dto.ProjHabitacionResponse;
@@ -26,42 +26,71 @@ public class ProjHabitacionService {
     }
 
     public ProjHabitacionResponse findByNumeroHabitacion(String numeroHabitacion) {
-        return habitacionMapper.toResponse(getHabitacion(numeroHabitacion));
+        ProjHabitacion habitacion = getHabitacionByNumero(numeroHabitacion);
+        return habitacionMapper.toResponse(habitacion);
     }
 
     public List<ProjHabitacionResponse> findByTipo(String tipo) {
-        return habitacionMapper.toResponseList(habitacionRepository.findByTipo(tipo));
+        String tipoValido = validarTexto(tipo, "tipo");
+        return habitacionMapper.toResponseList(habitacionRepository.findByTipo(tipoValido));
     }
 
     public List<ProjHabitacionResponse> findByPiso(Integer piso) {
-        return habitacionMapper.toResponseList(habitacionRepository.findByPiso(piso));
+        Integer pisoValido = validarInteger(piso, "piso");
+        return habitacionMapper.toResponseList(habitacionRepository.findByPiso(pisoValido));
     }
 
+    @Transactional
     public ProjHabitacionResponse create(ProjHabitacionRequest request) {
-        if (habitacionRepository.existsById(request.getNumeroHabitacion())) {
-            throw new IllegalArgumentException("Ya existe una habitacion con numero: " + request.getNumeroHabitacion());
+        String numeroHabitacion = validarTexto(request.getNumeroHabitacion(), "numeroHabitacion");
+
+        if (habitacionRepository.existsById(numeroHabitacion)) {
+            throw new IllegalArgumentException("Ya existe una habitacion con numero: " + numeroHabitacion);
         }
 
         ProjHabitacion habitacion = habitacionMapper.toEntity(request);
-        ProjHabitacion saved = habitacionRepository.save(Objects.requireNonNull(habitacion));
-        return habitacionMapper.toResponse(saved);
+        ProjHabitacion habitacionGuardada = habitacionRepository.save(habitacion);
+
+        return habitacionMapper.toResponse(habitacionGuardada);
     }
 
+    @Transactional
     public ProjHabitacionResponse update(String numeroHabitacion, ProjHabitacionRequest request) {
-        ProjHabitacion habitacion = getHabitacion(numeroHabitacion);
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
+
+        ProjHabitacion habitacion = getHabitacionByNumero(numero);
         habitacionMapper.updateEntity(habitacion, request);
 
-        ProjHabitacion saved = habitacionRepository.save(Objects.requireNonNull(habitacion));
-        return habitacionMapper.toResponse(saved);
+        ProjHabitacion habitacionActualizada = habitacionRepository.save(habitacion);
+
+        return habitacionMapper.toResponse(habitacionActualizada);
     }
 
+    @Transactional
     public void deleteByNumeroHabitacion(String numeroHabitacion) {
-        ProjHabitacion habitacion = getHabitacion(numeroHabitacion);
-        habitacionRepository.delete(Objects.requireNonNull(habitacion));
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
+        getHabitacionByNumero(numero);
+        habitacionRepository.deleteById(numero);
     }
 
-    private ProjHabitacion getHabitacion(String numeroHabitacion) {
-        return habitacionRepository.findById(numeroHabitacion)
-                .orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada: " + numeroHabitacion));
+    private ProjHabitacion getHabitacionByNumero(String numeroHabitacion) {
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
+
+        return habitacionRepository.findById(numero)
+                .orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada: " + numero));
+    }
+
+    private Integer validarInteger(Integer valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
