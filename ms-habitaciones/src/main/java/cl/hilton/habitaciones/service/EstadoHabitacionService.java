@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.habitaciones.dto.EstadoHabitacionRequest;
 import cl.hilton.habitaciones.dto.EstadoHabitacionResponse;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class EstadoHabitacionService {
 
     private final EstadoHabitacionRepository estadoHabitacionRepository;
@@ -33,27 +35,33 @@ public class EstadoHabitacionService {
     }
 
     public EstadoHabitacionResponse findByNumeroHabitacion(String numeroHabitacion) {
-        EstadoHabitacion estadoHabitacion = estadoHabitacionRepository.findByHabitacionNumeroHabitacion(numeroHabitacion)
-                .orElseThrow(() -> new EntityNotFoundException("Estado no encontrado para habitacion: " + numeroHabitacion));
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
+
+        EstadoHabitacion estadoHabitacion = estadoHabitacionRepository.findByHabitacionNumeroHabitacion(numero)
+                .orElseThrow(() -> new EntityNotFoundException("Estado no encontrado para habitacion: " + numero));
 
         return estadoHabitacionMapper.toResponse(estadoHabitacion);
     }
 
     public List<EstadoHabitacionResponse> findByEstado(String estado) {
-        return estadoHabitacionMapper.toResponseList(estadoHabitacionRepository.findByEstado(estado));
+        String estadoValido = validarTexto(estado, "estado");
+        return estadoHabitacionMapper.toResponseList(estadoHabitacionRepository.findByEstado(estadoValido));
     }
 
     public List<EstadoHabitacionResponse> findByActualizadoEn(LocalDate actualizadoEn) {
-        return estadoHabitacionMapper.toResponseList(estadoHabitacionRepository.findByActualizadoEn(actualizadoEn));
+        LocalDate fecha = validarFecha(actualizadoEn, "actualizadoEn");
+        return estadoHabitacionMapper.toResponseList(estadoHabitacionRepository.findByActualizadoEn(fecha));
     }
 
+    @Transactional
     public EstadoHabitacionResponse create(EstadoHabitacionRequest request) {
-        if (estadoHabitacionRepository.existsByHabitacionNumeroHabitacion(request.getNumeroHabitacion())) {
-            throw new IllegalArgumentException("Ya existe estado para la habitacion: " + request.getNumeroHabitacion());
+        String numeroHabitacion = validarTexto(request.getNumeroHabitacion(), "numeroHabitacion");
+
+        if (estadoHabitacionRepository.existsByHabitacionNumeroHabitacion(numeroHabitacion)) {
+            throw new IllegalArgumentException("Ya existe estado para la habitacion: " + numeroHabitacion);
         }
 
-        Habitacion habitacion = habitacionRepository.findByNumeroHabitacion(request.getNumeroHabitacion())
-                .orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada con numero: " + request.getNumeroHabitacion()));
+        Habitacion habitacion = getHabitacionByNumero(numeroHabitacion);
 
         EstadoHabitacion estadoHabitacion = estadoHabitacionMapper.toEntity(request);
         estadoHabitacion.setHabitacion(habitacion);
@@ -65,20 +73,23 @@ public class EstadoHabitacionService {
         return estadoHabitacionMapper.toResponse(estadoGuardado);
     }
 
+    @Transactional
     public EstadoHabitacionResponse update(Long id, EstadoHabitacionRequest request) {
-        EstadoHabitacion estadoHabitacion = getEstadoHabitacionById(id);
+        Long estadoId = validarId(id);
+        EstadoHabitacion estadoHabitacion = getEstadoHabitacionById(estadoId);
         String estadoActual = estadoHabitacion.getEstado();
 
-        if (request.getNumeroHabitacion() != null
-                && !estadoHabitacion.getHabitacion().getNumeroHabitacion().equalsIgnoreCase(request.getNumeroHabitacion())) {
-            if (estadoHabitacionRepository.existsByHabitacionNumeroHabitacion(request.getNumeroHabitacion())) {
-                throw new IllegalArgumentException("Ya existe estado para la habitacion: " + request.getNumeroHabitacion());
+        if (request.getNumeroHabitacion() != null && !request.getNumeroHabitacion().isBlank()) {
+            String numeroHabitacion = request.getNumeroHabitacion();
+
+            if (!estadoHabitacion.getHabitacion().getNumeroHabitacion().equalsIgnoreCase(numeroHabitacion)) {
+                if (estadoHabitacionRepository.existsByHabitacionNumeroHabitacion(numeroHabitacion)) {
+                    throw new IllegalArgumentException("Ya existe estado para la habitacion: " + numeroHabitacion);
+                }
+
+                Habitacion habitacion = getHabitacionByNumero(numeroHabitacion);
+                estadoHabitacion.setHabitacion(habitacion);
             }
-
-            Habitacion habitacion = habitacionRepository.findByNumeroHabitacion(request.getNumeroHabitacion())
-                    .orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada con numero: " + request.getNumeroHabitacion()));
-
-            estadoHabitacion.setHabitacion(habitacion);
         }
 
         estadoHabitacionMapper.updateEntity(request, estadoHabitacion);
@@ -90,11 +101,15 @@ public class EstadoHabitacionService {
         return estadoHabitacionMapper.toResponse(estadoActualizado);
     }
 
+    @Transactional
     public EstadoHabitacionResponse cambiarEstado(String numeroHabitacion, String estado) {
-        EstadoHabitacion estadoHabitacion = estadoHabitacionRepository.findByHabitacionNumeroHabitacion(numeroHabitacion)
-                .orElseThrow(() -> new EntityNotFoundException("Estado no encontrado para habitacion: " + numeroHabitacion));
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
+        String estadoValido = validarTexto(estado, "estado");
 
-        estadoHabitacion.setEstado(estado);
+        EstadoHabitacion estadoHabitacion = estadoHabitacionRepository.findByHabitacionNumeroHabitacion(numero)
+                .orElseThrow(() -> new EntityNotFoundException("Estado no encontrado para habitacion: " + numero));
+
+        estadoHabitacion.setEstado(estadoValido);
         estadoHabitacion.setActualizadoEn(LocalDate.now());
 
         EstadoHabitacion estadoActualizado = estadoHabitacionRepository.save(estadoHabitacion);
@@ -102,13 +117,45 @@ public class EstadoHabitacionService {
         return estadoHabitacionMapper.toResponse(estadoActualizado);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        EstadoHabitacion estadoHabitacion = getEstadoHabitacionById(id);
-        estadoHabitacionRepository.delete(estadoHabitacion);
+        Long estadoId = validarId(id);
+        getEstadoHabitacionById(estadoId);
+        estadoHabitacionRepository.deleteById(estadoId);
     }
 
     private EstadoHabitacion getEstadoHabitacionById(Long id) {
-        return estadoHabitacionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Estado de habitacion no encontrado con id: " + id));
+        Long estadoId = validarId(id);
+
+        return estadoHabitacionRepository.findById(estadoId)
+                .orElseThrow(() -> new EntityNotFoundException("Estado de habitacion no encontrado con id: " + estadoId));
+    }
+
+    private Habitacion getHabitacionByNumero(String numeroHabitacion) {
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
+
+        return habitacionRepository.findByNumeroHabitacion(numero)
+                .orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada con numero: " + numero));
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private LocalDate validarFecha(LocalDate valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
