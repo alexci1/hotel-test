@@ -2,9 +2,9 @@ package cl.hilton.checkin.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.checkin.dto.CheckoutRequest;
 import cl.hilton.checkin.dto.CheckoutResponse;
@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class CheckoutService {
 
     private final CheckoutRepository checkoutRepository;
@@ -29,40 +30,41 @@ public class CheckoutService {
     }
 
     public CheckoutResponse findById(Long id) {
-        return checkoutMapper.toResponse(getCheckout(id));
+        Checkout checkout = getCheckoutById(id);
+        return checkoutMapper.toResponse(checkout);
     }
 
     public CheckoutResponse findByCodigoReserva(String codigoReserva) {
-        String codigo = Objects.requireNonNull(codigoReserva, "codigoReserva no puede ser null");
+        String codigo = validarTexto(codigoReserva, "codigoReserva");
 
-        Checkout checkout = checkoutRepository
-                .findByReservaCodigoReserva(codigo)
+        Checkout checkout = checkoutRepository.findByReservaCodigoReserva(codigo)
                 .orElseThrow(() -> new EntityNotFoundException("Checkout no encontrado para reserva: " + codigo));
 
         return checkoutMapper.toResponse(checkout);
     }
 
+    @Transactional
     public CheckoutResponse create(CheckoutRequest request) {
-        String codigoReserva = Objects.requireNonNull(request.getCodigoReserva(), "codigoReserva no puede ser null");
+        String codigoReserva = validarTexto(request.getCodigoReserva(), "codigoReserva");
 
-        if (checkoutRepository.findByReservaCodigoReserva(codigoReserva).isPresent()) {
-            throw new IllegalArgumentException("Ya existe un checkout para la reserva: " + codigoReserva);
-        }
+        validarCheckoutUnico(codigoReserva);
 
-        ProjReserva reserva = getReserva(codigoReserva);
+        ProjReserva reserva = getReservaByCodigo(codigoReserva);
         Checkout checkout = checkoutMapper.toEntity(request, reserva);
         checkout.setFechaHora(LocalDate.now());
 
-        Checkout saved = checkoutRepository.save(Objects.requireNonNull(checkout));
-        return checkoutMapper.toResponse(saved);
+        Checkout checkoutGuardado = checkoutRepository.save(checkout);
+
+        return checkoutMapper.toResponse(checkoutGuardado);
     }
 
+    @Transactional
     public CheckoutResponse update(Long id, CheckoutRequest request) {
-        Long checkoutId = Objects.requireNonNull(id, "id no puede ser null");
-        String codigoReserva = Objects.requireNonNull(request.getCodigoReserva(), "codigoReserva no puede ser null");
+        Long checkoutId = validarId(id);
+        String codigoReserva = validarTexto(request.getCodigoReserva(), "codigoReserva");
 
-        Checkout checkout = getCheckout(checkoutId);
-        ProjReserva reserva = getReserva(codigoReserva);
+        Checkout checkout = getCheckoutById(checkoutId);
+        ProjReserva reserva = getReservaByCodigo(codigoReserva);
 
         checkoutRepository.findByReservaCodigoReserva(codigoReserva)
                 .filter(existente -> !existente.getId().equals(checkoutId))
@@ -72,26 +74,49 @@ public class CheckoutService {
 
         checkoutMapper.updateEntity(request, reserva, checkout);
 
-        Checkout saved = checkoutRepository.save(Objects.requireNonNull(checkout));
-        return checkoutMapper.toResponse(saved);
+        Checkout checkoutActualizado = checkoutRepository.save(checkout);
+
+        return checkoutMapper.toResponse(checkoutActualizado);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Checkout checkout = getCheckout(id);
-        checkoutRepository.delete(Objects.requireNonNull(checkout));
+        Long checkoutId = validarId(id);
+        getCheckoutById(checkoutId);
+        checkoutRepository.deleteById(checkoutId);
     }
 
-    private Checkout getCheckout(Long id) {
-        Long checkoutId = Objects.requireNonNull(id, "id no puede ser null");
+    private Checkout getCheckoutById(Long id) {
+        Long checkoutId = validarId(id);
 
         return checkoutRepository.findById(checkoutId)
-                .orElseThrow(() -> new EntityNotFoundException("Checkout no encontrado: " + checkoutId));
+                .orElseThrow(() -> new EntityNotFoundException("Checkout no encontrado con id: " + checkoutId));
     }
 
-    private ProjReserva getReserva(String codigoReserva) {
-        String codigo = Objects.requireNonNull(codigoReserva, "codigoReserva no puede ser null");
+    private ProjReserva getReservaByCodigo(String codigoReserva) {
+        String codigo = validarTexto(codigoReserva, "codigoReserva");
 
         return reservaRepository.findById(codigo)
                 .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada: " + codigo));
+    }
+
+    private void validarCheckoutUnico(String codigoReserva) {
+        if (checkoutRepository.findByReservaCodigoReserva(codigoReserva).isPresent()) {
+            throw new IllegalArgumentException("Ya existe un checkout para la reserva: " + codigoReserva);
+        }
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
