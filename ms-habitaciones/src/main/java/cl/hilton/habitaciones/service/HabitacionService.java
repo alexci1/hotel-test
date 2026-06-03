@@ -3,6 +3,7 @@ package cl.hilton.habitaciones.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.habitaciones.dto.HabitacionRequest;
 import cl.hilton.habitaciones.dto.HabitacionResponse;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class HabitacionService {
 
     private final HabitacionRepository habitacionRepository;
@@ -32,33 +34,43 @@ public class HabitacionService {
     }
 
     public HabitacionResponse findByNumeroHabitacion(String numeroHabitacion) {
-        Habitacion habitacion = habitacionRepository.findByNumeroHabitacion(numeroHabitacion)
-                .orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada con numero: " + numeroHabitacion));
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
+
+        Habitacion habitacion = habitacionRepository.findByNumeroHabitacion(numero)
+                .orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada con numero: " + numero));
 
         return habitacionMapper.toResponse(habitacion);
     }
 
     public List<HabitacionResponse> findByPiso(Integer piso) {
-        return habitacionMapper.toResponseList(habitacionRepository.findByPiso(piso));
+        Integer pisoValido = validarInteger(piso, "piso");
+        return habitacionMapper.toResponseList(habitacionRepository.findByPiso(pisoValido));
     }
 
     public List<HabitacionResponse> findByActiva(Boolean activa) {
-        return habitacionMapper.toResponseList(habitacionRepository.findByActiva(activa));
+        Boolean estado = validarBoolean(activa, "activa");
+        return habitacionMapper.toResponseList(habitacionRepository.findByActiva(estado));
     }
 
     public List<HabitacionResponse> findByCodigoTipo(String codigoTipo) {
-        return habitacionMapper.toResponseList(habitacionRepository.findByTipoHabitacionCodigo(codigoTipo));
+        String codigo = validarTexto(codigoTipo, "codigoTipo");
+        return habitacionMapper.toResponseList(habitacionRepository.findByTipoHabitacionCodigo(codigo));
     }
 
     public List<HabitacionResponse> findByCodigoTipoAndActiva(String codigoTipo, Boolean activa) {
-        return habitacionMapper.toResponseList(habitacionRepository.findByTipoHabitacionCodigoAndActiva(codigoTipo, activa));
+        String codigo = validarTexto(codigoTipo, "codigoTipo");
+        Boolean estado = validarBoolean(activa, "activa");
+        return habitacionMapper.toResponseList(habitacionRepository.findByTipoHabitacionCodigoAndActiva(codigo, estado));
     }
 
+    @Transactional
     public HabitacionResponse create(HabitacionRequest request) {
-        validarNumeroHabitacionUnico(request.getNumeroHabitacion());
+        String numeroHabitacion = validarTexto(request.getNumeroHabitacion(), "numeroHabitacion");
+        String codigoTipo = validarTexto(request.getCodigoTipo(), "codigoTipo");
 
-        TipoHabitacion tipoHabitacion = tipoHabitacionRepository.findByCodigo(request.getCodigoTipo())
-                .orElseThrow(() -> new EntityNotFoundException("Tipo de habitacion no encontrado con codigo: " + request.getCodigoTipo()));
+        validarNumeroHabitacionUnico(numeroHabitacion);
+
+        TipoHabitacion tipoHabitacion = getTipoHabitacionByCodigo(codigoTipo);
 
         Habitacion habitacion = habitacionMapper.toEntity(request);
         habitacion.setTipoHabitacion(tipoHabitacion);
@@ -69,16 +81,20 @@ public class HabitacionService {
         return habitacionMapper.toResponse(habitacionGuardada);
     }
 
+    @Transactional
     public HabitacionResponse update(Long id, HabitacionRequest request) {
-        Habitacion habitacion = getHabitacionById(id);
+        Long habitacionId = validarId(id);
+        String numeroHabitacion = validarTexto(request.getNumeroHabitacion(), "numeroHabitacion");
+        String codigoTipo = validarTexto(request.getCodigoTipo(), "codigoTipo");
+
+        Habitacion habitacion = getHabitacionById(habitacionId);
         Boolean activaActual = habitacion.getActiva();
 
-        if (!habitacion.getNumeroHabitacion().equalsIgnoreCase(request.getNumeroHabitacion())) {
-            validarNumeroHabitacionUnico(request.getNumeroHabitacion());
+        if (!habitacion.getNumeroHabitacion().equalsIgnoreCase(numeroHabitacion)) {
+            validarNumeroHabitacionUnico(numeroHabitacion);
         }
 
-        TipoHabitacion tipoHabitacion = tipoHabitacionRepository.findByCodigo(request.getCodigoTipo())
-                .orElseThrow(() -> new EntityNotFoundException("Tipo de habitacion no encontrado con codigo: " + request.getCodigoTipo()));
+        TipoHabitacion tipoHabitacion = getTipoHabitacionByCodigo(codigoTipo);
 
         habitacionMapper.updateEntity(request, habitacion);
         habitacion.setTipoHabitacion(tipoHabitacion);
@@ -89,28 +105,71 @@ public class HabitacionService {
         return habitacionMapper.toResponse(habitacionActualizada);
     }
 
+    @Transactional
     public HabitacionResponse cambiarActiva(Long id, Boolean activa) {
-        Habitacion habitacion = getHabitacionById(id);
-        habitacion.setActiva(activa);
+        Long habitacionId = validarId(id);
+        Boolean estado = validarBoolean(activa, "activa");
+
+        Habitacion habitacion = getHabitacionById(habitacionId);
+        habitacion.setActiva(estado);
 
         Habitacion habitacionActualizada = habitacionRepository.save(habitacion);
 
         return habitacionMapper.toResponse(habitacionActualizada);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Habitacion habitacion = getHabitacionById(id);
-        habitacionRepository.delete(habitacion);
+        Long habitacionId = validarId(id);
+        getHabitacionById(habitacionId);
+        habitacionRepository.deleteById(habitacionId);
     }
 
     private Habitacion getHabitacionById(Long id) {
-        return habitacionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada con id: " + id));
+        Long habitacionId = validarId(id);
+
+        return habitacionRepository.findById(habitacionId)
+                .orElseThrow(() -> new EntityNotFoundException("Habitacion no encontrada con id: " + habitacionId));
+    }
+
+    private TipoHabitacion getTipoHabitacionByCodigo(String codigoTipo) {
+        String codigo = validarTexto(codigoTipo, "codigoTipo");
+
+        return tipoHabitacionRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new EntityNotFoundException("Tipo de habitacion no encontrado con codigo: " + codigo));
     }
 
     private void validarNumeroHabitacionUnico(String numeroHabitacion) {
         if (habitacionRepository.existsByNumeroHabitacion(numeroHabitacion)) {
             throw new IllegalArgumentException("Ya existe una habitacion con numero: " + numeroHabitacion);
         }
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private Integer validarInteger(Integer valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private Boolean validarBoolean(Boolean valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
