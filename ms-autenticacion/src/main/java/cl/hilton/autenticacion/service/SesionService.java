@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class SesionService {
 
     private final SesionRepository sesionRepository;
@@ -54,6 +55,7 @@ public class SesionService {
     public List<SesionResponse> findActivas() {
         return sesionMapper.toResponseList(sesionRepository.findByInvalidadaFalse());
     }
+
     @Transactional
     public SesionResponse create(SesionRequest request) {
         validarTokenHashUnico(request.getTokenHash());
@@ -74,6 +76,7 @@ public class SesionService {
 
         return sesionMapper.toResponse(sesionGuardada);
     }
+
     @Transactional
     public SesionResponse update(Long id, SesionRequest request) {
         Sesion sesion = getSesionById(id);
@@ -100,6 +103,7 @@ public class SesionService {
         return sesionMapper.toResponse(sesionActualizada);
     }
 
+    @Transactional
     public SesionResponse invalidar(Long id) {
         Sesion sesion = getSesionById(id);
         sesion.setInvalidada(true);
@@ -108,15 +112,27 @@ public class SesionService {
 
         return sesionMapper.toResponse(sesionActualizada);
     }
+
     @Transactional
     public void deleteById(Long id) {
-        Sesion sesion = getSesionById(id);
-        sesionRepository.delete(sesion);
+        Long idValido = validarId(id);
+        getSesionById(idValido);
+        sesionRepository.deleteById(idValido);
     }
 
     private Sesion getSesionById(Long id) {
-        return sesionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Sesion no encontrada con id: " + id));
+        Long idValido = validarId(id);
+
+        return sesionRepository.findById(idValido)
+                .orElseThrow(() -> new EntityNotFoundException("Sesion no encontrada con id: " + idValido));
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+
+        return Long.valueOf(id.longValue());
     }
 
     private void validarTokenHashUnico(String tokenHash) {

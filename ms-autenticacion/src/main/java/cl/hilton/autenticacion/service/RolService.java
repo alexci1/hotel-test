@@ -53,7 +53,6 @@ public class RolService {
 
         return rolMapper.toResponse(rolGuardado);
     }
-
     @Transactional
     public RolResponse update(@NonNull Long id, RolRequest request) {
         Rol rol = getRolById(id);
@@ -70,18 +69,15 @@ public class RolService {
 
         return rolMapper.toResponse(rolActualizado);
     }
-
     @Transactional
     public void deleteById(@NonNull Long id) {
         getRolById(id);
         rolRepository.deleteById(id);
     }
-
     private Rol getRolById(@NonNull Long id) {
         return rolRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Rol no encontrado con id: " + id));
     }
-
     private void validarCodigoUnico(String codigo) {
         if (rolRepository.existsByCodigo(codigo)) {
             throw new IllegalArgumentException("Ya existe un rol con el codigo: " + codigo);
