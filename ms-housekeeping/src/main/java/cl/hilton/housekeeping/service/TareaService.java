@@ -3,6 +3,7 @@ package cl.hilton.housekeeping.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.housekeeping.dto.TareaRequest;
 import cl.hilton.housekeeping.dto.TareaResponse;
@@ -25,58 +26,103 @@ public class TareaService {
     }
 
     public TareaResponse findById(Long id) {
-        return tareaMapper.toResponse(getTarea(id));
+        Tarea tarea = getTareaById(id);
+        return tareaMapper.toResponse(tarea);
     }
 
     public TareaResponse findByCodigo(String codigo) {
-        Tarea tarea = tareaRepository.findByCodigo(codigo)
-                .orElseThrow(() -> new EntityNotFoundException("Tarea no encontrada: " + codigo));
+        String codigoValido = validarTexto(codigo, "codigo");
+
+        Tarea tarea = tareaRepository.findByCodigo(codigoValido)
+                .orElseThrow(() -> new EntityNotFoundException("Tarea no encontrada con codigo: " + codigoValido));
+
         return tareaMapper.toResponse(tarea);
     }
 
     public List<TareaResponse> findByActiva(Boolean activa) {
-        return tareaMapper.toResponseList(tareaRepository.findByActiva(activa));
+        Boolean estado = validarBoolean(activa, "activa");
+        return tareaMapper.toResponseList(tareaRepository.findByActiva(estado));
     }
 
     public List<TareaResponse> findByDescripcion(String descripcion) {
-        return tareaMapper.toResponseList(tareaRepository.findByDescripcionContainingIgnoreCase(descripcion));
+        String texto = validarTexto(descripcion, "descripcion");
+        return tareaMapper.toResponseList(tareaRepository.findByDescripcionContainingIgnoreCase(texto));
     }
 
+    @Transactional
     public TareaResponse create(TareaRequest request) {
-        if (tareaRepository.existsByCodigo(request.getCodigo())) {
-            throw new IllegalArgumentException("Ya existe una tarea con codigo: " + request.getCodigo());
-        }
+        String codigo = validarTexto(request.getCodigo(), "codigo");
+
+        validarCodigoUnico(codigo);
 
         Tarea tarea = tareaMapper.toEntity(request);
         tarea.setActiva(request.getActiva() != null ? request.getActiva() : Boolean.TRUE);
 
-        Tarea saved = tareaRepository.save(tarea);
-        return tareaMapper.toResponse(saved);
+        Tarea tareaGuardada = tareaRepository.save(tarea);
+
+        return tareaMapper.toResponse(tareaGuardada);
     }
 
+    @Transactional
     public TareaResponse update(Long id, TareaRequest request) {
-        Tarea tarea = getTarea(id);
+        Long tareaId = validarId(id);
+        String codigo = validarTexto(request.getCodigo(), "codigo");
 
-        tareaRepository.findByCodigo(request.getCodigo())
-                .filter(existente -> !existente.getId().equals(id))
+        Tarea tarea = getTareaById(tareaId);
+        Boolean activaActual = tarea.getActiva();
+
+        tareaRepository.findByCodigo(codigo)
+                .filter(existente -> !existente.getId().equals(tareaId))
                 .ifPresent(existente -> {
-                    throw new IllegalArgumentException("Ya existe una tarea con codigo: " + request.getCodigo());
+                    throw new IllegalArgumentException("Ya existe una tarea con codigo: " + codigo);
                 });
 
         tareaMapper.updateEntity(request, tarea);
-        tarea.setActiva(request.getActiva() != null ? request.getActiva() : Boolean.TRUE);
+        tarea.setActiva(request.getActiva() != null ? request.getActiva() : activaActual);
 
-        Tarea saved = tareaRepository.save(tarea);
-        return tareaMapper.toResponse(saved);
+        Tarea tareaActualizada = tareaRepository.save(tarea);
+
+        return tareaMapper.toResponse(tareaActualizada);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Tarea tarea = getTarea(id);
-        tareaRepository.delete(tarea);
+        Long tareaId = validarId(id);
+        getTareaById(tareaId);
+        tareaRepository.deleteById(tareaId);
     }
 
-    private Tarea getTarea(Long id) {
-        return tareaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tarea no encontrada: " + id));
+    private Tarea getTareaById(Long id) {
+        Long tareaId = validarId(id);
+
+        return tareaRepository.findById(tareaId)
+                .orElseThrow(() -> new EntityNotFoundException("Tarea no encontrada con id: " + tareaId));
+    }
+
+    private void validarCodigoUnico(String codigo) {
+        if (tareaRepository.existsByCodigo(codigo)) {
+            throw new IllegalArgumentException("Ya existe una tarea con codigo: " + codigo);
+        }
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private Boolean validarBoolean(Boolean valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
