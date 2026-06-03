@@ -1,8 +1,8 @@
 package cl.hilton.autenticacion.service;
 
 import java.util.List;
-import java.util.Objects;
 
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import cl.hilton.autenticacion.dto.RolRequest;
@@ -25,7 +25,7 @@ public class RolService {
         return rolMapper.toResponseList(rolRepository.findAll());
     }
 
-    public RolResponse findById(Long id) {
+    public RolResponse findById(@NonNull Long id) {
         Rol rol = getRolById(id);
         return rolMapper.toResponse(rol);
     }
@@ -40,6 +40,7 @@ public class RolService {
     public List<RolResponse> findByActivo(Boolean activo) {
         return rolMapper.toResponseList(rolRepository.findByActivo(activo));
     }
+
     @Transactional
     public RolResponse create(RolRequest request) {
         validarCodigoUnico(request.getCodigo());
@@ -51,8 +52,9 @@ public class RolService {
 
         return rolMapper.toResponse(rolGuardado);
     }
+
     @Transactional
-    public RolResponse update(Long id, RolRequest request) {
+    public RolResponse update(@NonNull Long id, RolRequest request) {
         Rol rol = getRolById(id);
         Boolean activoActual = rol.getActivo();
 
@@ -67,13 +69,14 @@ public class RolService {
 
         return rolMapper.toResponse(rolActualizado);
     }
+
     @Transactional
-    public void deleteById(Long id) {
-        Rol rol =Objects.requireNonNull(getRolById(id),"el rol no puede ser nulo");
-        rolRepository.delete(rol);
+    public void deleteById(@NonNull Long id) {
+        getRolById(id);
+        rolRepository.deleteById(id);
     }
 
-    private Rol getRolById(Long id) {
+    private Rol getRolById(@NonNull Long id) {
         return rolRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Rol no encontrado con id: " + id));
     }
