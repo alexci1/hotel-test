@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface MiniBarRepository extends JpaRepository<MiniBar, Long> {
+public interface MinibarRepository extends JpaRepository<MiniBar, Long> {
 
     List<MiniBar> findByHabitacionNumeroHabitacion(String numeroHabitacion);
 
