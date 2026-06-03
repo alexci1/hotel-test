@@ -3,6 +3,7 @@ package cl.hilton.huespedes.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.huespedes.dto.PreferenciaRequest;
 import cl.hilton.huespedes.dto.PreferenciaResponse;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class PreferenciaService {
 
     private final PreferenciaRepository preferenciaRepository;
@@ -32,26 +34,33 @@ public class PreferenciaService {
     }
 
     public PreferenciaResponse findByEmailHuesped(String emailHuesped) {
-        Preferencia preferencia = preferenciaRepository.findByHuespedEmail(emailHuesped)
-                .orElseThrow(() -> new EntityNotFoundException("Preferencia no encontrada para huesped: " + emailHuesped));
+        String email = validarTexto(emailHuesped, "emailHuesped");
+
+        Preferencia preferencia = preferenciaRepository.findByHuespedEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Preferencia no encontrada para huesped: " + email));
 
         return preferenciaMapper.toResponse(preferencia);
     }
 
     public List<PreferenciaResponse> findByTipoCama(String tipoCama) {
-        return preferenciaMapper.toResponseList(preferenciaRepository.findByTipoCama(tipoCama));
+        String tipo = validarTexto(tipoCama, "tipoCama");
+        return preferenciaMapper.toResponseList(preferenciaRepository.findByTipoCama(tipo));
     }
 
     public List<PreferenciaResponse> findByPisoPreferido(Integer pisoPreferido) {
-        return preferenciaMapper.toResponseList(preferenciaRepository.findByPisoPreferido(pisoPreferido));
+        Integer piso = validarInteger(pisoPreferido, "pisoPreferido");
+        return preferenciaMapper.toResponseList(preferenciaRepository.findByPisoPreferido(piso));
     }
 
+    @Transactional
     public PreferenciaResponse create(PreferenciaRequest request) {
-        if (preferenciaRepository.existsByHuespedEmail(request.getEmailHuesped())) {
-            throw new IllegalArgumentException("Ya existe una preferencia para el huesped: " + request.getEmailHuesped());
+        String emailHuesped = validarTexto(request.getEmailHuesped(), "emailHuesped");
+
+        if (preferenciaRepository.existsByHuespedEmail(emailHuesped)) {
+            throw new IllegalArgumentException("Ya existe una preferencia para el huesped: " + emailHuesped);
         }
 
-        Huesped huesped = getHuespedByEmail(request.getEmailHuesped());
+        Huesped huesped = getHuespedByEmail(emailHuesped);
 
         Preferencia preferencia = preferenciaMapper.toEntity(request);
         preferencia.setHuesped(huesped);
@@ -61,17 +70,22 @@ public class PreferenciaService {
         return preferenciaMapper.toResponse(preferenciaGuardada);
     }
 
+    @Transactional
     public PreferenciaResponse update(Long id, PreferenciaRequest request) {
-        Preferencia preferencia = getPreferenciaById(id);
+        Long preferenciaId = validarId(id);
+        Preferencia preferencia = getPreferenciaById(preferenciaId);
 
-        if (request.getEmailHuesped() != null
-                && !preferencia.getHuesped().getEmail().equalsIgnoreCase(request.getEmailHuesped())) {
-            if (preferenciaRepository.existsByHuespedEmail(request.getEmailHuesped())) {
-                throw new IllegalArgumentException("Ya existe una preferencia para el huesped: " + request.getEmailHuesped());
+        if (request.getEmailHuesped() != null && !request.getEmailHuesped().isBlank()) {
+            String emailHuesped = request.getEmailHuesped();
+
+            if (!preferencia.getHuesped().getEmail().equalsIgnoreCase(emailHuesped)) {
+                if (preferenciaRepository.existsByHuespedEmail(emailHuesped)) {
+                    throw new IllegalArgumentException("Ya existe una preferencia para el huesped: " + emailHuesped);
+                }
+
+                Huesped huesped = getHuespedByEmail(emailHuesped);
+                preferencia.setHuesped(huesped);
             }
-
-            Huesped huesped = getHuespedByEmail(request.getEmailHuesped());
-            preferencia.setHuesped(huesped);
         }
 
         preferenciaMapper.updateEntity(request, preferencia);
@@ -81,18 +95,45 @@ public class PreferenciaService {
         return preferenciaMapper.toResponse(preferenciaActualizada);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Preferencia preferencia = getPreferenciaById(id);
-        preferenciaRepository.delete(preferencia);
+        Long preferenciaId = validarId(id);
+        getPreferenciaById(preferenciaId);
+        preferenciaRepository.deleteById(preferenciaId);
     }
 
     private Preferencia getPreferenciaById(Long id) {
-        return preferenciaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Preferencia no encontrada con id: " + id));
+        Long preferenciaId = validarId(id);
+
+        return preferenciaRepository.findById(preferenciaId)
+                .orElseThrow(() -> new EntityNotFoundException("Preferencia no encontrada con id: " + preferenciaId));
     }
 
     private Huesped getHuespedByEmail(String email) {
-        return huespedRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Huesped no encontrado con email: " + email));
+        String emailValido = validarTexto(email, "email");
+
+        return huespedRepository.findByEmail(emailValido)
+                .orElseThrow(() -> new EntityNotFoundException("Huesped no encontrado con email: " + emailValido));
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private Integer validarInteger(Integer valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
