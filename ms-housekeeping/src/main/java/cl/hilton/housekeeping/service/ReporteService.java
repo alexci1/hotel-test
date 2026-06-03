@@ -2,9 +2,9 @@ package cl.hilton.housekeeping.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.housekeeping.dto.ReporteRequest;
 import cl.hilton.housekeeping.dto.ReporteResponse;
@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class ReporteService {
 
     private final ReporteRepository reporteRepository;
@@ -29,11 +30,13 @@ public class ReporteService {
     }
 
     public ReporteResponse findById(Long id) {
-        return reporteMapper.toResponse(getReporte(id));
+        Reporte reporte = getReporteById(id);
+        return reporteMapper.toResponse(reporte);
     }
 
     public ReporteResponse findByAsignacionId(Long asignacionId) {
-        Long idAsignacion = Objects.requireNonNull(asignacionId);
+        Long idAsignacion = validarId(asignacionId);
+
         Reporte reporte = reporteRepository.findByAsignacionId(idAsignacion)
                 .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado para asignacion: " + idAsignacion));
 
@@ -41,37 +44,41 @@ public class ReporteService {
     }
 
     public List<ReporteResponse> findByAprobado(Boolean aprobado) {
-        Boolean estado = Objects.requireNonNull(aprobado);
+        Boolean estado = validarBoolean(aprobado, "aprobado");
         return reporteMapper.toResponseList(reporteRepository.findByAprobado(estado));
     }
 
     public List<ReporteResponse> findByInspector(String inspector) {
-        String inspectorReporte = Objects.requireNonNull(inspector);
+        String inspectorReporte = validarTexto(inspector, "inspector");
         return reporteMapper.toResponseList(reporteRepository.findByInspector(inspectorReporte));
     }
 
+    @Transactional
     public ReporteResponse create(ReporteRequest request) {
-        Long asignacionId = Objects.requireNonNull(request.getAsignacionId());
+        Long asignacionId = validarId(request.getAsignacionId());
 
         if (reporteRepository.existsByAsignacionId(asignacionId)) {
             throw new IllegalArgumentException("Ya existe un reporte para la asignacion: " + asignacionId);
         }
 
-        Asignacion asignacion = getAsignacion(asignacionId);
+        Asignacion asignacion = getAsignacionById(asignacionId);
         Reporte reporte = reporteMapper.toEntity(request, asignacion);
         reporte.setAprobado(request.getAprobado() != null ? request.getAprobado() : Boolean.FALSE);
         reporte.setInspeccionadoEn(LocalDate.now());
 
-        Reporte saved = reporteRepository.save(Objects.requireNonNull(reporte));
-        return reporteMapper.toResponse(saved);
+        Reporte reporteGuardado = reporteRepository.save(reporte);
+
+        return reporteMapper.toResponse(reporteGuardado);
     }
 
+    @Transactional
     public ReporteResponse update(Long id, ReporteRequest request) {
-        Long reporteId = Objects.requireNonNull(id);
-        Long asignacionId = Objects.requireNonNull(request.getAsignacionId());
+        Long reporteId = validarId(id);
+        Long asignacionId = validarId(request.getAsignacionId());
 
-        Reporte reporte = getReporte(reporteId);
-        Asignacion asignacion = getAsignacion(asignacionId);
+        Reporte reporte = getReporteById(reporteId);
+        Asignacion asignacion = getAsignacionById(asignacionId);
+        Boolean aprobadoActual = reporte.getAprobado();
 
         reporteRepository.findByAsignacionId(asignacionId)
                 .filter(existente -> !existente.getId().equals(reporteId))
@@ -80,27 +87,53 @@ public class ReporteService {
                 });
 
         reporteMapper.updateEntity(request, asignacion, reporte);
-        reporte.setAprobado(request.getAprobado() != null ? request.getAprobado() : Boolean.FALSE);
+        reporte.setAprobado(request.getAprobado() != null ? request.getAprobado() : aprobadoActual);
         reporte.setInspeccionadoEn(LocalDate.now());
 
-        Reporte saved = reporteRepository.save(Objects.requireNonNull(reporte));
-        return reporteMapper.toResponse(saved);
+        Reporte reporteActualizado = reporteRepository.save(reporte);
+
+        return reporteMapper.toResponse(reporteActualizado);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Reporte reporte = getReporte(id);
-        reporteRepository.delete(Objects.requireNonNull(reporte));
+        Long reporteId = validarId(id);
+        getReporteById(reporteId);
+        reporteRepository.deleteById(reporteId);
     }
 
-    private Reporte getReporte(Long id) {
-        Long reporteId = Objects.requireNonNull(id);
+    private Reporte getReporteById(Long id) {
+        Long reporteId = validarId(id);
+
         return reporteRepository.findById(reporteId)
-                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado: " + reporteId));
+                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado con id: " + reporteId));
     }
 
-    private Asignacion getAsignacion(Long asignacionId) {
-        Long idAsignacion = Objects.requireNonNull(asignacionId);
+    private Asignacion getAsignacionById(Long asignacionId) {
+        Long idAsignacion = validarId(asignacionId);
+
         return asignacionRepository.findById(idAsignacion)
-                .orElseThrow(() -> new EntityNotFoundException("Asignacion no encontrada: " + idAsignacion));
+                .orElseThrow(() -> new EntityNotFoundException("Asignacion no encontrada con id: " + idAsignacion));
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private Boolean validarBoolean(Boolean valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
