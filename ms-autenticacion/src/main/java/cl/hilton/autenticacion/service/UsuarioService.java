@@ -2,7 +2,6 @@ package cl.hilton.autenticacion.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
@@ -49,11 +49,19 @@ public class UsuarioService {
         return usuarioMapper.toResponseList(usuarioRepository.findByActivo(activo));
     }
 
+    public List<UsuarioResponse> findByCreadoEn(LocalDate creadoEn) {
+        return usuarioMapper.toResponseList(usuarioRepository.findByCreadoEn(creadoEn));
+    }
+
+    public List<UsuarioResponse> findByUltimoAcceso(LocalDate ultimoAcceso) {
+        return usuarioMapper.toResponseList(usuarioRepository.findByUltimoAcceso(ultimoAcceso));
+    }
+
+    @Transactional
     public UsuarioResponse create(UsuarioRequest request) {
         validarEmailUnico(request.getEmail());
 
-        Rol rol = rolRepository.findByCodigo(request.getRol())
-                .orElseThrow(() -> new EntityNotFoundException("Rol no encontrado: " + request.getRol()));
+        Rol rol = getRolByCodigo(request.getRol());
 
         Usuario usuario = usuarioMapper.toEntity(request);
         usuario.setRol(rol);
@@ -65,6 +73,7 @@ public class UsuarioService {
         return usuarioMapper.toResponse(usuarioGuardado);
     }
 
+    @Transactional
     public UsuarioResponse update(Long id, UsuarioRequest request) {
         Usuario usuario = getUsuarioById(id);
         Boolean activoActual = usuario.getActivo();
@@ -73,8 +82,7 @@ public class UsuarioService {
             validarEmailUnico(request.getEmail());
         }
 
-        Rol rol = rolRepository.findByCodigo(request.getRol())
-                .orElseThrow(() -> new EntityNotFoundException("Rol no encontrado: " + request.getRol()));
+        Rol rol = getRolByCodigo(request.getRol());
 
         usuarioMapper.updateEntity(request, usuario);
         usuario.setRol(rol);
@@ -87,10 +95,11 @@ public class UsuarioService {
 
     @Transactional
     public void deleteById(Long id) {
-        Usuario usuario = Objects.requireNonNull(getUsuarioById(id), "el usuario no puede ser nulo");
-        usuarioRepository.delete(usuario);
+        getUsuarioById(id);
+        usuarioRepository.deleteById(id);
     }
 
+    @Transactional
     public UsuarioResponse activar(Long id) {
         Usuario usuario = getUsuarioById(id);
         usuario.setActivo(true);
@@ -100,6 +109,7 @@ public class UsuarioService {
         return usuarioMapper.toResponse(usuarioActualizado);
     }
 
+    @Transactional
     public UsuarioResponse desactivar(Long id) {
         Usuario usuario = getUsuarioById(id);
         usuario.setActivo(false);
@@ -112,6 +122,11 @@ public class UsuarioService {
     private Usuario getUsuarioById(Long id) {
         return usuarioRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + id));
+    }
+
+    private Rol getRolByCodigo(String codigoRol) {
+        return rolRepository.findByCodigo(codigoRol)
+                .orElseThrow(() -> new EntityNotFoundException("Rol no encontrado: " + codigoRol));
     }
 
     private void validarEmailUnico(String email) {

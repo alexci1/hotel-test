@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.autenticacion.dto.RolRequest;
 import cl.hilton.autenticacion.dto.RolResponse;
@@ -11,11 +12,11 @@ import cl.hilton.autenticacion.mapper.RolMapper;
 import cl.hilton.autenticacion.model.Rol;
 import cl.hilton.autenticacion.repository.RolRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class RolService {
 
     private final RolRepository rolRepository;
