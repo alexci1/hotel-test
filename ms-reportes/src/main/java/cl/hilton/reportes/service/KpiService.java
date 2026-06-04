@@ -2,9 +2,9 @@ package cl.hilton.reportes.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.reportes.dto.KpiRequest;
 import cl.hilton.reportes.dto.KpiResponse;
@@ -30,11 +30,13 @@ public class KpiService {
     }
 
     public KpiResponse findById(Long id) {
-        return kpiMapper.toResponse(getKpiById(id));
+        Kpi kpi = getKpiById(id);
+        return kpiMapper.toResponse(kpi);
     }
 
     public KpiResponse findByNombre(String nombre) {
-        String nombreKpi = Objects.requireNonNull(nombre);
+        String nombreKpi = validarTexto(nombre, "nombre");
+
         Kpi kpi = kpiRepository.findByNombre(nombreKpi)
                 .orElseThrow(() -> new EntityNotFoundException("KPI no encontrado con nombre: " + nombreKpi));
 
@@ -42,33 +44,35 @@ public class KpiService {
     }
 
     public List<KpiResponse> findByReporte(String codigoReporte) {
-        String codigo = Objects.requireNonNull(codigoReporte);
+        String codigo = validarTexto(codigoReporte, "codigoReporte");
         return kpiMapper.toResponseList(kpiRepository.findByReporteCodigo(codigo));
     }
 
     public List<KpiResponse> findByNombreContaining(String nombre) {
-        String nombreKpi = Objects.requireNonNull(nombre);
+        String nombreKpi = validarTexto(nombre, "nombre");
         return kpiMapper.toResponseList(kpiRepository.findByNombreContainingIgnoreCase(nombreKpi));
     }
 
     public List<KpiResponse> findByPeriodo(String periodo) {
-        String periodoKpi = Objects.requireNonNull(periodo);
+        String periodoKpi = validarTexto(periodo, "periodo");
         return kpiMapper.toResponseList(kpiRepository.findByPeriodo(periodoKpi));
     }
 
     public List<KpiResponse> findByUnidad(String unidad) {
-        String unidadKpi = Objects.requireNonNull(unidad);
+        String unidadKpi = validarTexto(unidad, "unidad");
         return kpiMapper.toResponseList(kpiRepository.findByUnidad(unidadKpi));
     }
 
     public List<KpiResponse> findByActualizadoEn(LocalDate actualizadoEn) {
-        LocalDate fecha = Objects.requireNonNull(actualizadoEn);
+        LocalDate fecha = validarFecha(actualizadoEn, "actualizadoEn");
         return kpiMapper.toResponseList(kpiRepository.findByActualizadoEn(fecha));
     }
 
+    @Transactional
     public KpiResponse create(KpiRequest request) {
-        String nombre = Objects.requireNonNull(request.getNombre());
-        String codigoReporte = Objects.requireNonNull(request.getCodigoReporte());
+        String nombre = validarTexto(request.getNombre(), "nombre");
+        String codigoReporte = validarTexto(request.getCodigoReporte(), "codigoReporte");
+
         validarNombreUnico(nombre);
 
         Reporte reporte = getReporteByCodigo(codigoReporte);
@@ -77,14 +81,16 @@ public class KpiService {
         kpi.setPeriodo(request.getPeriodo() != null ? request.getPeriodo() : "MENSUAL");
         kpi.setActualizadoEn(LocalDate.now());
 
-        Kpi saved = kpiRepository.save(Objects.requireNonNull(kpi));
-        return kpiMapper.toResponse(saved);
+        Kpi kpiGuardado = kpiRepository.save(kpi);
+
+        return kpiMapper.toResponse(kpiGuardado);
     }
 
+    @Transactional
     public KpiResponse update(Long id, KpiRequest request) {
-        Long kpiId = Objects.requireNonNull(id);
-        String nombre = Objects.requireNonNull(request.getNombre());
-        String codigoReporte = Objects.requireNonNull(request.getCodigoReporte());
+        Long kpiId = validarId(id);
+        String nombre = validarTexto(request.getNombre(), "nombre");
+        String codigoReporte = validarTexto(request.getCodigoReporte(), "codigoReporte");
 
         Kpi kpi = getKpiById(kpiId);
         String periodoActual = kpi.getPeriodo();
@@ -99,31 +105,56 @@ public class KpiService {
         kpi.setPeriodo(request.getPeriodo() != null ? request.getPeriodo() : periodoActual);
         kpi.setActualizadoEn(LocalDate.now());
 
-        Kpi saved = kpiRepository.save(Objects.requireNonNull(kpi));
-        return kpiMapper.toResponse(saved);
+        Kpi kpiActualizado = kpiRepository.save(kpi);
+
+        return kpiMapper.toResponse(kpiActualizado);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Kpi kpi = getKpiById(id);
-        kpiRepository.delete(Objects.requireNonNull(kpi));
+        Long kpiId = validarId(id);
+        getKpiById(kpiId);
+        kpiRepository.deleteById(kpiId);
     }
 
     private Kpi getKpiById(Long id) {
-        Long kpiId = Objects.requireNonNull(id);
+        Long kpiId = validarId(id);
+
         return kpiRepository.findById(kpiId)
                 .orElseThrow(() -> new EntityNotFoundException("KPI no encontrado con id: " + kpiId));
     }
 
     private Reporte getReporteByCodigo(String codigoReporte) {
-        String codigo = Objects.requireNonNull(codigoReporte);
+        String codigo = validarTexto(codigoReporte, "codigoReporte");
+
         return reporteRepository.findByCodigo(codigo)
                 .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado con codigo: " + codigo));
     }
 
     private void validarNombreUnico(String nombre) {
-        String nombreKpi = Objects.requireNonNull(nombre);
-        if (kpiRepository.existsByNombre(nombreKpi)) {
-            throw new IllegalArgumentException("Ya existe un KPI con nombre: " + nombreKpi);
+        if (kpiRepository.existsByNombre(nombre)) {
+            throw new IllegalArgumentException("Ya existe un KPI con nombre: " + nombre);
         }
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private LocalDate validarFecha(LocalDate valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
