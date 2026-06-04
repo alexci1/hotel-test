@@ -60,6 +60,7 @@ public class MovimientoService {
         return movimientoMapper.toResponseList(movimientoRepository.findByCantidadLessThan(cantidad));
     }
 
+    @SuppressWarnings("null")
     public MovimientoResponse create(MovimientoRequest request) {
         validarCantidad(request.getCantidad());
 

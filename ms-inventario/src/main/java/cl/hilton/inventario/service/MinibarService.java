@@ -11,7 +11,7 @@ import cl.hilton.inventario.mapper.MiniBarMapper;
 import cl.hilton.inventario.model.MiniBar;
 import cl.hilton.inventario.model.Producto;
 import cl.hilton.inventario.model.ProjHabitacion;
-import cl.hilton.inventario.repository.MiniBarRepository;
+import cl.hilton.inventario.repository.MinibarRepository;
 import cl.hilton.inventario.repository.ProductoRepository;
 import cl.hilton.inventario.repository.ProjHabitacionRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,9 +20,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @SuppressWarnings("null")
-public class MiniBarService {
+public class MinibarService {
 
-    private final MiniBarRepository miniBarRepository;
+    private final MinibarRepository miniBarRepository;
     private final ProductoRepository productoRepository;
     private final ProjHabitacionRepository habitacionRepository;
     private final MiniBarMapper miniBarMapper;
