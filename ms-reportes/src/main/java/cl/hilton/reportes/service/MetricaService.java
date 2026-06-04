@@ -2,9 +2,9 @@ package cl.hilton.reportes.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.reportes.dto.MetricaRequest;
 import cl.hilton.reportes.dto.MetricaResponse;
@@ -30,39 +30,46 @@ public class MetricaService {
     }
 
     public MetricaResponse findById(Long id) {
-        return metricaMapper.toResponse(getMetricaById(id));
+        Metrica metrica = getMetricaById(id);
+        return metricaMapper.toResponse(metrica);
     }
 
     public List<MetricaResponse> findByReporte(String codigoReporte) {
-        String codigo = Objects.requireNonNull(codigoReporte);
+        String codigo = validarTexto(codigoReporte, "codigoReporte");
         return metricaMapper.toResponseList(metricaRepository.findByReporteCodigo(codigo));
     }
 
     public List<MetricaResponse> findByPeriodo(LocalDate periodo) {
-        LocalDate fecha = Objects.requireNonNull(periodo);
+        LocalDate fecha = validarFecha(periodo, "periodo");
         return metricaMapper.toResponseList(metricaRepository.findByPeriodo(fecha));
     }
 
     public List<MetricaResponse> findByRangoFechas(LocalDate desde, LocalDate hasta) {
-        LocalDate fechaDesde = Objects.requireNonNull(desde);
-        LocalDate fechaHasta = Objects.requireNonNull(hasta);
+        LocalDate fechaDesde = validarFecha(desde, "desde");
+        LocalDate fechaHasta = validarFecha(hasta, "hasta");
+
+        if (fechaDesde.isAfter(fechaHasta)) {
+            throw new IllegalArgumentException("La fecha desde no puede ser posterior a la fecha hasta");
+        }
+
         return metricaMapper.toResponseList(metricaRepository.findByPeriodoBetween(fechaDesde, fechaHasta));
     }
 
     public List<MetricaResponse> findByNombreMetrica(String nombreMetrica) {
-        String nombre = Objects.requireNonNull(nombreMetrica);
+        String nombre = validarTexto(nombreMetrica, "nombreMetrica");
         return metricaMapper.toResponseList(metricaRepository.findByNombreMetrica(nombre));
     }
 
     public List<MetricaResponse> findByCalculadoEn(LocalDate calculadoEn) {
-        LocalDate fecha = Objects.requireNonNull(calculadoEn);
+        LocalDate fecha = validarFecha(calculadoEn, "calculadoEn");
         return metricaMapper.toResponseList(metricaRepository.findByCalculadoEn(fecha));
     }
 
+    @Transactional
     public MetricaResponse create(MetricaRequest request) {
-        String codigoReporte = Objects.requireNonNull(request.getCodigoReporte());
-        LocalDate periodo = Objects.requireNonNull(request.getPeriodo());
-        String nombreMetrica = Objects.requireNonNull(request.getNombreMetrica());
+        String codigoReporte = validarTexto(request.getCodigoReporte(), "codigoReporte");
+        LocalDate periodo = validarFecha(request.getPeriodo(), "periodo");
+        String nombreMetrica = validarTexto(request.getNombreMetrica(), "nombreMetrica");
 
         validarMetricaUnica(codigoReporte, periodo, nombreMetrica);
 
@@ -71,15 +78,17 @@ public class MetricaService {
         metrica.setReporte(reporte);
         metrica.setCalculadoEn(LocalDate.now());
 
-        Metrica saved = metricaRepository.save(Objects.requireNonNull(metrica));
-        return metricaMapper.toResponse(saved);
+        Metrica metricaGuardada = metricaRepository.save(metrica);
+
+        return metricaMapper.toResponse(metricaGuardada);
     }
 
+    @Transactional
     public MetricaResponse update(Long id, MetricaRequest request) {
-        Long metricaId = Objects.requireNonNull(id);
-        String codigoReporte = Objects.requireNonNull(request.getCodigoReporte());
-        LocalDate periodo = Objects.requireNonNull(request.getPeriodo());
-        String nombreMetrica = Objects.requireNonNull(request.getNombreMetrica());
+        Long metricaId = validarId(id);
+        String codigoReporte = validarTexto(request.getCodigoReporte(), "codigoReporte");
+        LocalDate periodo = validarFecha(request.getPeriodo(), "periodo");
+        String nombreMetrica = validarTexto(request.getNombreMetrica(), "nombreMetrica");
 
         Metrica metrica = getMetricaById(metricaId);
 
@@ -93,34 +102,56 @@ public class MetricaService {
         metricaMapper.updateEntity(request, metrica);
         metrica.setReporte(reporte);
 
-        Metrica saved = metricaRepository.save(Objects.requireNonNull(metrica));
-        return metricaMapper.toResponse(saved);
+        Metrica metricaActualizada = metricaRepository.save(metrica);
+
+        return metricaMapper.toResponse(metricaActualizada);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Metrica metrica = getMetricaById(id);
-        metricaRepository.delete(Objects.requireNonNull(metrica));
+        Long metricaId = validarId(id);
+        getMetricaById(metricaId);
+        metricaRepository.deleteById(metricaId);
     }
 
     private Metrica getMetricaById(Long id) {
-        Long metricaId = Objects.requireNonNull(id);
+        Long metricaId = validarId(id);
+
         return metricaRepository.findById(metricaId)
                 .orElseThrow(() -> new EntityNotFoundException("Metrica no encontrada con id: " + metricaId));
     }
 
     private Reporte getReporteByCodigo(String codigoReporte) {
-        String codigo = Objects.requireNonNull(codigoReporte);
+        String codigo = validarTexto(codigoReporte, "codigoReporte");
+
         return reporteRepository.findByCodigo(codigo)
                 .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado con codigo: " + codigo));
     }
 
     private void validarMetricaUnica(String codigoReporte, LocalDate periodo, String nombreMetrica) {
-        String codigo = Objects.requireNonNull(codigoReporte);
-        LocalDate fecha = Objects.requireNonNull(periodo);
-        String nombre = Objects.requireNonNull(nombreMetrica);
-
-        if (metricaRepository.existsByReporteCodigoAndPeriodoAndNombreMetrica(codigo, fecha, nombre)) {
+        if (metricaRepository.existsByReporteCodigoAndPeriodoAndNombreMetrica(codigoReporte, periodo, nombreMetrica)) {
             throw new IllegalArgumentException("Ya existe esa metrica para el reporte y periodo indicado");
         }
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private LocalDate validarFecha(LocalDate valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
