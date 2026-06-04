@@ -3,6 +3,7 @@ package cl.hilton.reportes.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.reportes.dto.ReporteRequest;
 import cl.hilton.reportes.dto.ReporteResponse;
@@ -30,30 +31,38 @@ public class ReporteService {
     }
 
     public ReporteResponse findByCodigo(String codigo) {
-        Reporte reporte = reporteRepository.findByCodigo(codigo)
-                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado con codigo: " + codigo));
+        String codigoValido = validarTexto(codigo, "codigo");
+
+        Reporte reporte = reporteRepository.findByCodigo(codigoValido)
+                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado con codigo: " + codigoValido));
 
         return reporteMapper.toResponse(reporte);
     }
 
     public List<ReporteResponse> findByTipo(String tipo) {
-        return reporteMapper.toResponseList(reporteRepository.findByTipo(tipo));
+        String tipoValido = validarTexto(tipo, "tipo");
+        return reporteMapper.toResponseList(reporteRepository.findByTipo(tipoValido));
     }
 
     public List<ReporteResponse> findByFrecuencia(String frecuencia) {
-        return reporteMapper.toResponseList(reporteRepository.findByFrecuencia(frecuencia));
+        String frecuenciaValida = validarTexto(frecuencia, "frecuencia");
+        return reporteMapper.toResponseList(reporteRepository.findByFrecuencia(frecuenciaValida));
     }
 
     public List<ReporteResponse> findByActivo(Boolean activo) {
-        return reporteMapper.toResponseList(reporteRepository.findByActivo(activo));
+        Boolean estado = validarBoolean(activo, "activo");
+        return reporteMapper.toResponseList(reporteRepository.findByActivo(estado));
     }
 
     public List<ReporteResponse> findByNombre(String nombre) {
-        return reporteMapper.toResponseList(reporteRepository.findByNombreContainingIgnoreCase(nombre));
+        String nombreValido = validarTexto(nombre, "nombre");
+        return reporteMapper.toResponseList(reporteRepository.findByNombreContainingIgnoreCase(nombreValido));
     }
 
+    @Transactional
     public ReporteResponse create(ReporteRequest request) {
-        validarCodigoUnico(request.getCodigo());
+        String codigo = validarTexto(request.getCodigo(), "codigo");
+        validarCodigoUnico(codigo);
 
         Reporte reporte = reporteMapper.toEntity(request);
         reporte.setFrecuencia(request.getFrecuencia() != null ? request.getFrecuencia() : "DIARIO");
@@ -64,13 +73,17 @@ public class ReporteService {
         return reporteMapper.toResponse(reporteGuardado);
     }
 
+    @Transactional
     public ReporteResponse update(Long id, ReporteRequest request) {
-        Reporte reporte = getReporteById(id);
+        Long reporteId = validarId(id);
+        String codigo = validarTexto(request.getCodigo(), "codigo");
+
+        Reporte reporte = getReporteById(reporteId);
         Boolean activoActual = reporte.getActivo();
         String frecuenciaActual = reporte.getFrecuencia();
 
-        if (!reporte.getCodigo().equalsIgnoreCase(request.getCodigo())) {
-            validarCodigoUnico(request.getCodigo());
+        if (!reporte.getCodigo().equalsIgnoreCase(codigo)) {
+            validarCodigoUnico(codigo);
         }
 
         reporteMapper.updateEntity(request, reporte);
@@ -82,19 +95,44 @@ public class ReporteService {
         return reporteMapper.toResponse(reporteActualizado);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Reporte reporte = getReporteById(id);
-        reporteRepository.delete(reporte);
+        Long reporteId = validarId(id);
+        getReporteById(reporteId);
+        reporteRepository.deleteById(reporteId);
     }
 
     private Reporte getReporteById(Long id) {
-        return reporteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado con id: " + id));
+        Long reporteId = validarId(id);
+
+        return reporteRepository.findById(reporteId)
+                .orElseThrow(() -> new EntityNotFoundException("Reporte no encontrado con id: " + reporteId));
     }
 
     private void validarCodigoUnico(String codigo) {
         if (reporteRepository.existsByCodigo(codigo)) {
             throw new IllegalArgumentException("Ya existe un reporte con codigo: " + codigo);
         }
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private Boolean validarBoolean(Boolean valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
