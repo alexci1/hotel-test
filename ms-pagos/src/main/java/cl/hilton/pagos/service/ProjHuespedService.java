@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.pagos.client.HuespedClient;
 import cl.hilton.pagos.dto.ProjHuespedRequest;
@@ -12,11 +13,11 @@ import cl.hilton.pagos.mapper.ProjHuespedMapper;
 import cl.hilton.pagos.model.ProjHuesped;
 import cl.hilton.pagos.repository.ProjHuespedRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class ProjHuespedService {
 
     private final ProjHuespedRepository huespedRepository;
@@ -33,11 +34,14 @@ public class ProjHuespedService {
     }
 
     public List<ProjHuespedResponse> findByNombreCompleto(String nombreCompleto) {
-        return huespedMapper.toResponseList(huespedRepository.findByNombreCompletoContainingIgnoreCase(nombreCompleto));
+        String nombre = validarTexto(nombreCompleto, "nombreCompleto");
+        return huespedMapper.toResponseList(huespedRepository.findByNombreCompletoContainingIgnoreCase(nombre));
     }
+
     @Transactional
     public ProjHuespedResponse create(ProjHuespedRequest request) {
-        validarEmailUnico(request.getEmail());
+        String email = validarTexto(request.getEmail(), "email");
+        validarEmailUnico(email);
 
         ProjHuesped huesped = huespedMapper.toEntity(request);
         huesped.setActualizadoEn(LocalDate.now());
@@ -46,11 +50,14 @@ public class ProjHuespedService {
 
         return huespedMapper.toResponse(huespedGuardado);
     }
+
     @Transactional
     public ProjHuespedResponse update(String email, ProjHuespedRequest request) {
-        ProjHuesped huesped = getHuespedByEmail(email);
+        String emailValido = validarTexto(email, "email");
+        ProjHuesped huesped = getHuespedByEmail(emailValido);
 
         huespedMapper.updateEntity(request, huesped);
+        huesped.setEmail(emailValido);
         huesped.setActualizadoEn(LocalDate.now());
 
         ProjHuesped huespedActualizado = huespedRepository.save(huesped);
@@ -58,8 +65,11 @@ public class ProjHuespedService {
         return huespedMapper.toResponse(huespedActualizado);
     }
 
+    @Transactional
     public ProjHuespedResponse sincronizarPorEmail(String email) {
-        ProjHuespedResponse externo = huespedClient.buscarPorEmail(email);
+        String emailValido = validarTexto(email, "email");
+
+        ProjHuespedResponse externo = huespedClient.buscarPorEmail(emailValido);
         ProjHuesped huesped = huespedRepository.findByEmail(externo.getEmail())
                 .orElseGet(ProjHuesped::new);
 
@@ -71,20 +81,31 @@ public class ProjHuespedService {
 
         return huespedMapper.toResponse(huespedGuardado);
     }
+
     @Transactional
     public void deleteByEmail(String email) {
-        ProjHuesped huesped = getHuespedByEmail(email);
-        huespedRepository.delete(huesped);
+        String emailValido = validarTexto(email, "email");
+        getHuespedByEmail(emailValido);
+        huespedRepository.deleteById(emailValido);
     }
 
     private ProjHuesped getHuespedByEmail(String email) {
-        return huespedRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Huesped proyectado no encontrado con email: " + email));
+        String emailValido = validarTexto(email, "email");
+
+        return huespedRepository.findByEmail(emailValido)
+                .orElseThrow(() -> new EntityNotFoundException("Huesped proyectado no encontrado con email: " + emailValido));
     }
 
     private void validarEmailUnico(String email) {
         if (huespedRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Ya existe un huesped proyectado con email: " + email);
         }
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
