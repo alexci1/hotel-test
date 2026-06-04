@@ -72,8 +72,7 @@ INSERT INTO habitaciones (numero_habitacion, piso, codigo_tipo, activa) VALUES
 ('201', 2, 'DOBLE', TRUE),
 ('202', 2, 'DOBLE', TRUE),
 ('303', 3, 'SUITE', TRUE),
-('404', 4, 'SIMPLE', FALSE),
-('PH1', 5, 'SUITE', TRUE);y8
+('404', 4, 'SIMPLE', FALSE);
 
 INSERT INTO estados_habitacion (numero_habitacion, estado, observacion) VALUES
 ('101', 'LIMPIA', NULL),
@@ -81,5 +80,4 @@ INSERT INTO estados_habitacion (numero_habitacion, estado, observacion) VALUES
 ('201', 'OCUPADA', NULL),
 ('202', 'EN_MANTENIMIENTO', 'Fuga en bano, plomero programado'),
 ('303', 'LIMPIA', NULL),
-('404', 'BLOQUEADA', 'Habitacion fuera de servicio indefinido'),
-('PH1', 'LIMPIA', NULL);
+('404', 'BLOQUEADA', 'Habitacion fuera de servicio indefinido');
