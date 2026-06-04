@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cl.hilton.inventario.dto.MiniBarRequest;
 import cl.hilton.inventario.dto.MiniBarResponse;
-import cl.hilton.inventario.service.MiniBarService;
+import cl.hilton.inventario.service.MinibarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MiniBarController {
 
-    private final MiniBarService miniBarService;
+    private final MinibarService miniBarService;
 
     @GetMapping
     public List<MiniBarResponse> findAll() {
