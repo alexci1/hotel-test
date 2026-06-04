@@ -6,13 +6,13 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cl.hilton.common.exception.EntityNotFoundException;
 import cl.hilton.reservas.client.HuespedClient;
 import cl.hilton.reservas.dto.ProjHuespedRequest;
 import cl.hilton.reservas.dto.ProjHuespedResponse;
 import cl.hilton.reservas.mapper.ProjHuespedMapper;
 import cl.hilton.reservas.model.ProjHuesped;
 import cl.hilton.reservas.repository.ProjHuespedRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
