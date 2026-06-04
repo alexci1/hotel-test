@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.reservas.dto.ReservaRequest;
 import cl.hilton.reservas.dto.ReservaResponse;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class ReservaService {
 
     private final ReservaRepository reservaRepository;
@@ -36,45 +38,60 @@ public class ReservaService {
     }
 
     public ReservaResponse findByCodigoReserva(String codigoReserva) {
-        Reserva reserva = reservaRepository.findByCodigoReserva(codigoReserva)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con codigo: " + codigoReserva));
+        String codigo = validarTexto(codigoReserva, "codigoReserva");
+
+        Reserva reserva = reservaRepository.findByCodigoReserva(codigo)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con codigo: " + codigo));
 
         return reservaMapper.toResponse(reserva);
     }
 
     public List<ReservaResponse> findByEmailHuesped(String emailHuesped) {
-        return reservaMapper.toResponseList(reservaRepository.findByHuespedEmail(emailHuesped));
+        String email = validarTexto(emailHuesped, "emailHuesped");
+        return reservaMapper.toResponseList(reservaRepository.findByHuespedEmail(email));
     }
 
     public List<ReservaResponse> findByNumeroHabitacion(String numeroHabitacion) {
-        return reservaMapper.toResponseList(reservaRepository.findByHabitacionNumeroHabitacion(numeroHabitacion));
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
+        return reservaMapper.toResponseList(reservaRepository.findByHabitacionNumeroHabitacion(numero));
     }
 
     public List<ReservaResponse> findByEstado(String estado) {
-        return reservaMapper.toResponseList(reservaRepository.findByEstado(estado));
+        String estadoValido = validarTexto(estado, "estado");
+        return reservaMapper.toResponseList(reservaRepository.findByEstado(estadoValido));
     }
 
     public List<ReservaResponse> findByFechaEntrada(LocalDate fechaEntrada) {
-        return reservaMapper.toResponseList(reservaRepository.findByFechaEntrada(fechaEntrada));
+        LocalDate fecha = validarFecha(fechaEntrada, "fechaEntrada");
+        return reservaMapper.toResponseList(reservaRepository.findByFechaEntrada(fecha));
     }
 
     public List<ReservaResponse> findByFechaSalida(LocalDate fechaSalida) {
-        return reservaMapper.toResponseList(reservaRepository.findByFechaSalida(fechaSalida));
+        LocalDate fecha = validarFecha(fechaSalida, "fechaSalida");
+        return reservaMapper.toResponseList(reservaRepository.findByFechaSalida(fecha));
     }
 
     public List<ReservaResponse> findByRangoEntrada(LocalDate desde, LocalDate hasta) {
-        return reservaMapper.toResponseList(reservaRepository.findByFechaEntradaBetween(desde, hasta));
+        LocalDate fechaDesde = validarFecha(desde, "desde");
+        LocalDate fechaHasta = validarFecha(hasta, "hasta");
+        validarRangoFechas(fechaDesde, fechaHasta);
+
+        return reservaMapper.toResponseList(reservaRepository.findByFechaEntradaBetween(fechaDesde, fechaHasta));
     }
 
+    @Transactional
     public ReservaResponse create(ReservaRequest request) {
-        validarCodigoUnico(request.getCodigoReserva());
-        validarFechas(request.getFechaEntrada(), request.getFechaSalida());
+        String codigoReserva = validarTexto(request.getCodigoReserva(), "codigoReserva");
+        String emailHuesped = validarTexto(request.getEmailHuesped(), "emailHuesped");
+        String numeroHabitacion = validarTexto(request.getNumeroHabitacion(), "numeroHabitacion");
+        LocalDate fechaEntrada = validarFecha(request.getFechaEntrada(), "fechaEntrada");
+        LocalDate fechaSalida = validarFecha(request.getFechaSalida(), "fechaSalida");
 
-        ProjHuesped huesped = huespedRepository.findByEmail(request.getEmailHuesped())
-                .orElseThrow(() -> new EntityNotFoundException("Huesped proyectado no encontrado: " + request.getEmailHuesped()));
+        validarCodigoUnico(codigoReserva);
+        validarFechas(fechaEntrada, fechaSalida);
 
-        ProjHabitacion habitacion = habitacionRepository.findByNumeroHabitacion(request.getNumeroHabitacion())
-                .orElseThrow(() -> new EntityNotFoundException("Habitacion proyectada no encontrada: " + request.getNumeroHabitacion()));
+        ProjHuesped huesped = getHuespedByEmail(emailHuesped);
+        ProjHabitacion habitacion = getHabitacionByNumero(numeroHabitacion);
 
         Reserva reserva = reservaMapper.toEntity(request);
         reserva.setHuesped(huesped);
@@ -87,21 +104,26 @@ public class ReservaService {
         return reservaMapper.toResponse(reservaGuardada);
     }
 
+    @Transactional
     public ReservaResponse update(Long id, ReservaRequest request) {
-        Reserva reserva = getReservaById(id);
+        Long reservaId = validarId(id);
+        String codigoReserva = validarTexto(request.getCodigoReserva(), "codigoReserva");
+        String emailHuesped = validarTexto(request.getEmailHuesped(), "emailHuesped");
+        String numeroHabitacion = validarTexto(request.getNumeroHabitacion(), "numeroHabitacion");
+        LocalDate fechaEntrada = validarFecha(request.getFechaEntrada(), "fechaEntrada");
+        LocalDate fechaSalida = validarFecha(request.getFechaSalida(), "fechaSalida");
+
+        Reserva reserva = getReservaById(reservaId);
         String estadoActual = reserva.getEstado();
 
-        if (!reserva.getCodigoReserva().equalsIgnoreCase(request.getCodigoReserva())) {
-            validarCodigoUnico(request.getCodigoReserva());
+        if (!reserva.getCodigoReserva().equalsIgnoreCase(codigoReserva)) {
+            validarCodigoUnico(codigoReserva);
         }
 
-        validarFechas(request.getFechaEntrada(), request.getFechaSalida());
+        validarFechas(fechaEntrada, fechaSalida);
 
-        ProjHuesped huesped = huespedRepository.findByEmail(request.getEmailHuesped())
-                .orElseThrow(() -> new EntityNotFoundException("Huesped proyectado no encontrado: " + request.getEmailHuesped()));
-
-        ProjHabitacion habitacion = habitacionRepository.findByNumeroHabitacion(request.getNumeroHabitacion())
-                .orElseThrow(() -> new EntityNotFoundException("Habitacion proyectada no encontrada: " + request.getNumeroHabitacion()));
+        ProjHuesped huesped = getHuespedByEmail(emailHuesped);
+        ProjHabitacion habitacion = getHabitacionByNumero(numeroHabitacion);
 
         reservaMapper.updateEntity(request, reserva);
         reserva.setHuesped(huesped);
@@ -113,14 +135,32 @@ public class ReservaService {
         return reservaMapper.toResponse(reservaActualizada);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Reserva reserva = getReservaById(id);
-        reservaRepository.delete(reserva);
+        Long reservaId = validarId(id);
+        getReservaById(reservaId);
+        reservaRepository.deleteById(reservaId);
     }
 
     private Reserva getReservaById(Long id) {
-        return reservaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con id: " + id));
+        Long reservaId = validarId(id);
+
+        return reservaRepository.findById(reservaId)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con id: " + reservaId));
+    }
+
+    private ProjHuesped getHuespedByEmail(String emailHuesped) {
+        String email = validarTexto(emailHuesped, "emailHuesped");
+
+        return huespedRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Huesped proyectado no encontrado: " + email));
+    }
+
+    private ProjHabitacion getHabitacionByNumero(String numeroHabitacion) {
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
+
+        return habitacionRepository.findByNumeroHabitacion(numero)
+                .orElseThrow(() -> new EntityNotFoundException("Habitacion proyectada no encontrada: " + numero));
     }
 
     private void validarCodigoUnico(String codigoReserva) {
@@ -133,5 +173,32 @@ public class ReservaService {
         if (!fechaSalida.isAfter(fechaEntrada)) {
             throw new IllegalArgumentException("La fecha de salida debe ser posterior a la fecha de entrada");
         }
+    }
+
+    private void validarRangoFechas(LocalDate desde, LocalDate hasta) {
+        if (desde.isAfter(hasta)) {
+            throw new IllegalArgumentException("La fecha desde no puede ser posterior a la fecha hasta");
+        }
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private LocalDate validarFecha(LocalDate valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
