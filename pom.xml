@@ -17,6 +17,7 @@
     -->
     <modules>
         <module>eureka</module>      <!-- Servidor Eureka -->
+        <module>common</module>      <!-- Libreria comun Hilton -->
         <module>ms-reservas</module>      <!-- Microservicio reservas -->
         <module>ms-habitaciones</module>      <!-- Microservicio habitaciones -->
         <module>ms-huespedes</module>      <!-- Microservicio huespedes -->
@@ -64,6 +65,7 @@
         <com-h2database.version>2.3.232</com-h2database.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <jakarta.el.version>4.0.2</jakarta.el.version>
+        <cl-hilton-common.version>0.0.1-SNAPSHOT</cl-hilton-common.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
