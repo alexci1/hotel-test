@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import cl.hilton.notificaciones.dto.ProjHuespedResponse;
 
+// Como estoy usando Eureka no necesito especificar el puerto en la Feign Client, por lo que:
+// Puedo usar: @FeignClient(name = "ms-huespedes")
+// en vez de:  @FeignClient(name = "ms-huespedes", url = "http://localhost:XXXX/api/v1/huespedes")
 @FeignClient(name = "ms-huespedes")
 public interface HuespedClient {
 
@@ -15,8 +18,9 @@ public interface HuespedClient {
     List<ProjHuespedResponse> listar();
 
     @GetMapping("/api/v1/huespedes/{id}")
-    ProjHuespedResponse buscarPorId(@PathVariable("id") Long id);
+    ProjHuespedResponse buscarPorId(@PathVariable Long id);
 
     @GetMapping("/api/v1/huespedes/email/{email}")
-    ProjHuespedResponse buscarPorEmail(@PathVariable("email") String email);
+    ProjHuespedResponse buscarPorEmail(@PathVariable String email);
 }
+
