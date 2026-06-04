@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cl.hilton.common.exception.EntityNotFoundException;
 import cl.hilton.reservas.dto.ReservaRequest;
 import cl.hilton.reservas.dto.ReservaResponse;
 import cl.hilton.reservas.mapper.ReservaMapper;
@@ -15,7 +16,6 @@ import cl.hilton.reservas.model.Reserva;
 import cl.hilton.reservas.repository.ProjHabitacionRepository;
 import cl.hilton.reservas.repository.ProjHuespedRepository;
 import cl.hilton.reservas.repository.ReservaRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
