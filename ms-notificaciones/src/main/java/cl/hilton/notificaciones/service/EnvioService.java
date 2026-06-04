@@ -132,6 +132,7 @@ public class EnvioService {
         return id;
     }
 
+    @SuppressWarnings("unused")
     private Integer validarInteger(Integer valor, String campo) {
         if (valor == null) {
             throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
