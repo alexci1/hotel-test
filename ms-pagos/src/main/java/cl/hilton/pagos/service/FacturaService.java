@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.pagos.dto.FacturaRequest;
 import cl.hilton.pagos.dto.FacturaResponse;
@@ -15,11 +16,11 @@ import cl.hilton.pagos.repository.FacturaRepository;
 import cl.hilton.pagos.repository.ProjHuespedRepository;
 import cl.hilton.pagos.repository.ProjReservaRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class FacturaService {
 
     private final FacturaRepository facturaRepository;
@@ -37,43 +38,52 @@ public class FacturaService {
     }
 
     public FacturaResponse findByNumeroFactura(String numeroFactura) {
-        Factura factura = facturaRepository.findByNumeroFactura(numeroFactura)
-                .orElseThrow(() -> new EntityNotFoundException("Factura no encontrada con numero: " + numeroFactura));
+        String numero = validarTexto(numeroFactura, "numeroFactura");
+
+        Factura factura = facturaRepository.findByNumeroFactura(numero)
+                .orElseThrow(() -> new EntityNotFoundException("Factura no encontrada con numero: " + numero));
 
         return facturaMapper.toResponse(factura);
     }
 
     public FacturaResponse findByCodigoReserva(String codigoReserva) {
-        Factura factura = facturaRepository.findByReservaCodigoReserva(codigoReserva)
-                .orElseThrow(() -> new EntityNotFoundException("Factura no encontrada para reserva: " + codigoReserva));
+        String codigo = validarTexto(codigoReserva, "codigoReserva");
+
+        Factura factura = facturaRepository.findByReservaCodigoReserva(codigo)
+                .orElseThrow(() -> new EntityNotFoundException("Factura no encontrada para reserva: " + codigo));
 
         return facturaMapper.toResponse(factura);
     }
 
     public List<FacturaResponse> findByEmailHuesped(String emailHuesped) {
-        return facturaMapper.toResponseList(facturaRepository.findByHuespedEmail(emailHuesped));
+        String email = validarTexto(emailHuesped, "emailHuesped");
+        return facturaMapper.toResponseList(facturaRepository.findByHuespedEmail(email));
     }
 
     public List<FacturaResponse> findByEstado(String estado) {
-        return facturaMapper.toResponseList(facturaRepository.findByEstado(estado));
+        String estadoValido = validarTexto(estado, "estado");
+        return facturaMapper.toResponseList(facturaRepository.findByEstado(estadoValido));
     }
 
     public List<FacturaResponse> findByEmitidaEn(LocalDate emitidaEn) {
-        return facturaMapper.toResponseList(facturaRepository.findByEmitidaEn(emitidaEn));
+        LocalDate fecha = validarFecha(emitidaEn, "emitidaEn");
+        return facturaMapper.toResponseList(facturaRepository.findByEmitidaEn(fecha));
     }
+
     @Transactional
     public FacturaResponse create(FacturaRequest request) {
-        validarNumeroFacturaUnico(request.getNumeroFactura());
+        String numeroFactura = validarTexto(request.getNumeroFactura(), "numeroFactura");
+        String codigoReserva = validarTexto(request.getCodigoReserva(), "codigoReserva");
+        String emailHuesped = validarTexto(request.getEmailHuesped(), "emailHuesped");
 
-        if (facturaRepository.existsByReservaCodigoReserva(request.getCodigoReserva())) {
-            throw new IllegalArgumentException("Ya existe una factura para la reserva: " + request.getCodigoReserva());
+        validarNumeroFacturaUnico(numeroFactura);
+
+        if (facturaRepository.existsByReservaCodigoReserva(codigoReserva)) {
+            throw new IllegalArgumentException("Ya existe una factura para la reserva: " + codigoReserva);
         }
 
-        ProjReserva reserva = reservaRepository.findByCodigoReserva(request.getCodigoReserva())
-                .orElseThrow(() -> new EntityNotFoundException("Reserva proyectada no encontrada: " + request.getCodigoReserva()));
-
-        ProjHuesped huesped = huespedRepository.findByEmail(request.getEmailHuesped())
-                .orElseThrow(() -> new EntityNotFoundException("Huesped proyectado no encontrado: " + request.getEmailHuesped()));
+        ProjReserva reserva = getReservaByCodigo(codigoReserva);
+        ProjHuesped huesped = getHuespedByEmail(emailHuesped);
 
         Factura factura = facturaMapper.toEntity(request);
         factura.setReserva(reserva);
@@ -84,24 +94,27 @@ public class FacturaService {
 
         return facturaMapper.toResponse(facturaGuardada);
     }
+
     @Transactional
     public FacturaResponse update(Long id, FacturaRequest request) {
-        Factura factura = getFacturaById(id);
+        Long facturaId = validarId(id);
+        String numeroFactura = validarTexto(request.getNumeroFactura(), "numeroFactura");
+        String codigoReserva = validarTexto(request.getCodigoReserva(), "codigoReserva");
+        String emailHuesped = validarTexto(request.getEmailHuesped(), "emailHuesped");
 
-        if (!factura.getNumeroFactura().equalsIgnoreCase(request.getNumeroFactura())) {
-            validarNumeroFacturaUnico(request.getNumeroFactura());
+        Factura factura = getFacturaById(facturaId);
+
+        if (!factura.getNumeroFactura().equalsIgnoreCase(numeroFactura)) {
+            validarNumeroFacturaUnico(numeroFactura);
         }
 
-        if (!factura.getReserva().getCodigoReserva().equalsIgnoreCase(request.getCodigoReserva())
-                && facturaRepository.existsByReservaCodigoReserva(request.getCodigoReserva())) {
-            throw new IllegalArgumentException("Ya existe una factura para la reserva: " + request.getCodigoReserva());
+        if (!factura.getReserva().getCodigoReserva().equalsIgnoreCase(codigoReserva)
+                && facturaRepository.existsByReservaCodigoReserva(codigoReserva)) {
+            throw new IllegalArgumentException("Ya existe una factura para la reserva: " + codigoReserva);
         }
 
-        ProjReserva reserva = reservaRepository.findByCodigoReserva(request.getCodigoReserva())
-                .orElseThrow(() -> new EntityNotFoundException("Reserva proyectada no encontrada: " + request.getCodigoReserva()));
-
-        ProjHuesped huesped = huespedRepository.findByEmail(request.getEmailHuesped())
-                .orElseThrow(() -> new EntityNotFoundException("Huesped proyectado no encontrado: " + request.getEmailHuesped()));
+        ProjReserva reserva = getReservaByCodigo(codigoReserva);
+        ProjHuesped huesped = getHuespedByEmail(emailHuesped);
 
         facturaMapper.updateEntity(request, factura);
         factura.setReserva(reserva);
@@ -111,20 +124,59 @@ public class FacturaService {
 
         return facturaMapper.toResponse(facturaActualizada);
     }
+
     @Transactional
     public void deleteById(Long id) {
-        Factura factura = getFacturaById(id);
-        facturaRepository.delete(factura);
+        Long facturaId = validarId(id);
+        getFacturaById(facturaId);
+        facturaRepository.deleteById(facturaId);
     }
 
     private Factura getFacturaById(Long id) {
-        return facturaRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Factura no encontrada con id: " + id));
+        Long facturaId = validarId(id);
+
+        return facturaRepository.findById(facturaId)
+                .orElseThrow(() -> new EntityNotFoundException("Factura no encontrada con id: " + facturaId));
+    }
+
+    private ProjReserva getReservaByCodigo(String codigoReserva) {
+        String codigo = validarTexto(codigoReserva, "codigoReserva");
+
+        return reservaRepository.findByCodigoReserva(codigo)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva proyectada no encontrada: " + codigo));
+    }
+
+    private ProjHuesped getHuespedByEmail(String emailHuesped) {
+        String email = validarTexto(emailHuesped, "emailHuesped");
+
+        return huespedRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Huesped proyectado no encontrado: " + email));
     }
 
     private void validarNumeroFacturaUnico(String numeroFactura) {
         if (facturaRepository.existsByNumeroFactura(numeroFactura)) {
             throw new IllegalArgumentException("Ya existe una factura con numero: " + numeroFactura);
         }
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private LocalDate validarFecha(LocalDate valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
