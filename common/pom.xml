@@ -15,15 +15,15 @@
 
     <!-- Herencia del proyecto padre que centraliza configuracion, BOM y versiones -->
     <parent>
-        <groupId>cl.triskeledu</groupId>
-        <artifactId>biblioteca</artifactId>
+        <groupId>cl.hilton</groupId>
+        <artifactId>hotel</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <!-- Coordenadas GAV (GroupId, ArtifactId, Version) de este modulo -->
-    <groupId>cl.triskeledu</groupId>
-    <artifactId>cl-triskeledu-common</artifactId>
+    <groupId>cl.hilton</groupId>
+    <artifactId>cl-hilton-common</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <!-- Nombre y descripcion del modulo -->
