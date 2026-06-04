@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.reservas.dto.CancelacionRequest;
 import cl.hilton.reservas.dto.CancelacionResponse;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class CancelacionService {
 
     private final CancelacionRepository cancelacionRepository;
@@ -33,23 +35,28 @@ public class CancelacionService {
     }
 
     public CancelacionResponse findByCodigoReserva(String codigoReserva) {
-        Cancelacion cancelacion = cancelacionRepository.findByReservaCodigoReserva(codigoReserva)
-                .orElseThrow(() -> new EntityNotFoundException("Cancelacion no encontrada para reserva: " + codigoReserva));
+        String codigo = validarTexto(codigoReserva, "codigoReserva");
+
+        Cancelacion cancelacion = cancelacionRepository.findByReservaCodigoReserva(codigo)
+                .orElseThrow(() -> new EntityNotFoundException("Cancelacion no encontrada para reserva: " + codigo));
 
         return cancelacionMapper.toResponse(cancelacion);
     }
 
     public List<CancelacionResponse> findByCanceladoEn(LocalDate canceladoEn) {
-        return cancelacionMapper.toResponseList(cancelacionRepository.findByCanceladoEn(canceladoEn));
+        LocalDate fecha = validarFecha(canceladoEn, "canceladoEn");
+        return cancelacionMapper.toResponseList(cancelacionRepository.findByCanceladoEn(fecha));
     }
 
+    @Transactional
     public CancelacionResponse create(CancelacionRequest request) {
-        if (cancelacionRepository.existsByReservaCodigoReserva(request.getCodigoReserva())) {
-            throw new IllegalArgumentException("Ya existe una cancelacion para la reserva: " + request.getCodigoReserva());
+        String codigoReserva = validarTexto(request.getCodigoReserva(), "codigoReserva");
+
+        if (cancelacionRepository.existsByReservaCodigoReserva(codigoReserva)) {
+            throw new IllegalArgumentException("Ya existe una cancelacion para la reserva: " + codigoReserva);
         }
 
-        Reserva reserva = reservaRepository.findByCodigoReserva(request.getCodigoReserva())
-                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con codigo: " + request.getCodigoReserva()));
+        Reserva reserva = getReservaByCodigo(codigoReserva);
 
         Cancelacion cancelacion = cancelacionMapper.toEntity(request);
         cancelacion.setReserva(reserva);
@@ -64,33 +71,69 @@ public class CancelacionService {
         return cancelacionMapper.toResponse(cancelacionGuardada);
     }
 
+    @Transactional
     public CancelacionResponse update(Long id, CancelacionRequest request) {
-        Cancelacion cancelacion = getCancelacionById(id);
+        Long cancelacionId = validarId(id);
+        String codigoReserva = validarTexto(request.getCodigoReserva(), "codigoReserva");
 
-        if (!cancelacion.getReserva().getCodigoReserva().equalsIgnoreCase(request.getCodigoReserva())
-                && cancelacionRepository.existsByReservaCodigoReserva(request.getCodigoReserva())) {
-            throw new IllegalArgumentException("Ya existe una cancelacion para la reserva: " + request.getCodigoReserva());
+        Cancelacion cancelacion = getCancelacionById(cancelacionId);
+        Integer penalidadActual = cancelacion.getPenalidadUsd();
+
+        if (!cancelacion.getReserva().getCodigoReserva().equalsIgnoreCase(codigoReserva)
+                && cancelacionRepository.existsByReservaCodigoReserva(codigoReserva)) {
+            throw new IllegalArgumentException("Ya existe una cancelacion para la reserva: " + codigoReserva);
         }
 
-        Reserva reserva = reservaRepository.findByCodigoReserva(request.getCodigoReserva())
-                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con codigo: " + request.getCodigoReserva()));
+        Reserva reserva = getReservaByCodigo(codigoReserva);
 
         cancelacionMapper.updateEntity(request, cancelacion);
         cancelacion.setReserva(reserva);
-        cancelacion.setPenalidadUsd(request.getPenalidadUsd() != null ? request.getPenalidadUsd() : cancelacion.getPenalidadUsd());
+        cancelacion.setPenalidadUsd(request.getPenalidadUsd() != null ? request.getPenalidadUsd() : penalidadActual);
 
         Cancelacion cancelacionActualizada = cancelacionRepository.save(cancelacion);
 
         return cancelacionMapper.toResponse(cancelacionActualizada);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        Cancelacion cancelacion = getCancelacionById(id);
-        cancelacionRepository.delete(cancelacion);
+        Long cancelacionId = validarId(id);
+        getCancelacionById(cancelacionId);
+        cancelacionRepository.deleteById(cancelacionId);
     }
 
     private Cancelacion getCancelacionById(Long id) {
-        return cancelacionRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Cancelacion no encontrada con id: " + id));
+        Long cancelacionId = validarId(id);
+
+        return cancelacionRepository.findById(cancelacionId)
+                .orElseThrow(() -> new EntityNotFoundException("Cancelacion no encontrada con id: " + cancelacionId));
+    }
+
+    private Reserva getReservaByCodigo(String codigoReserva) {
+        String codigo = validarTexto(codigoReserva, "codigoReserva");
+
+        return reservaRepository.findByCodigoReserva(codigo)
+                .orElseThrow(() -> new EntityNotFoundException("Reserva no encontrada con codigo: " + codigo));
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private LocalDate validarFecha(LocalDate valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
