@@ -1,4 +1,4 @@
-package cl.triskeledu.common.exception;
+package cl.hilton.common.exception;
 
 public class ReferentialIntegrityException extends RuntimeException {
 

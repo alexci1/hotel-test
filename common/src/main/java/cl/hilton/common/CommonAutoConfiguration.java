@@ -1,4 +1,4 @@
-package cl.triskeledu.common;
+package cl.hilton.common;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;

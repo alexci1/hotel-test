@@ -1,4 +1,4 @@
-package cl.triskeledu.common.exception;
+package cl.hilton.common.exception;
 
 import java.time.LocalDateTime;
 import java.util.List;
