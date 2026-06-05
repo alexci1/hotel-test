@@ -16,6 +16,7 @@ public interface CheckoutMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "reserva", source = "reserva")
+    @Mapping(target = "fechaHora", ignore = true)
     Checkout toEntity(CheckoutRequest request, ProjReserva reserva);
 
     @Mapping(target = "codigoReserva", source = "reserva.codigoReserva")
@@ -25,5 +26,6 @@ public interface CheckoutMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "reserva", source = "reserva")
+    @Mapping(target = "fechaHora", ignore = true)
     void updateEntity(CheckoutRequest request, ProjReserva reserva, @MappingTarget Checkout checkout);
 }
