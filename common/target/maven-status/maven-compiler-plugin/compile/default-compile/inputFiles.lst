@@ -1,6 +1,6 @@
-C:\26-biblioteca-v04\common\src\main\java\cl\triskeledu\common\exception\ReferentialIntegrityException.java
-C:\26-biblioteca-v04\common\src\main\java\cl\triskeledu\common\exception\EntityNotFoundException.java
-C:\26-biblioteca-v04\common\src\main\java\cl\triskeledu\common\exception\DuplicateResourceException.java
-C:\26-biblioteca-v04\common\src\main\java\cl\triskeledu\common\exception\ApiError.java
-C:\26-biblioteca-v04\common\src\main\java\cl\triskeledu\common\CommonAutoConfiguration.java
-C:\26-biblioteca-v04\common\src\main\java\cl\triskeledu\common\exception\GlobalExceptionHandler.java
+C:\26-hotel-v04\common\src\main\java\cl\hilton\common\exception\ReferentialIntegrityException.java
+C:\26-hotel-v04\common\src\main\java\cl\hilton\common\exception\EntityNotFoundException.java
+C:\26-hotel-v04\common\src\main\java\cl\hilton\common\exception\DuplicateResourceException.java
+C:\26-hotel-v04\common\src\main\java\cl\hilton\common\exception\ApiError.java
+C:\26-hotel-v04\common\src\main\java\cl\hilton\common\CommonAutoConfiguration.java
+C:\26-hotel-v04\common\src\main\java\cl\hilton\common\exception\GlobalExceptionHandler.java

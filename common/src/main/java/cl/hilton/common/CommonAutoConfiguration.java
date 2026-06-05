@@ -18,7 +18,7 @@ import org.springframework.context.annotation.ComponentScan;
  * en el futuro sin modificar esta clase.
  */
 @AutoConfiguration
-@ComponentScan(basePackages = "cl.triskeledu.common")
+@ComponentScan(basePackages = "cl.hilton.common")
 public class CommonAutoConfiguration {
     // Clase de configuración pura: no necesita cuerpo.
     // Spring Boot la procesa al arrancar cualquier microservicio
