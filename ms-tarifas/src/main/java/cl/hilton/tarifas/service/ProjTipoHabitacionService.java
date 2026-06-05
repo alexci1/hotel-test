@@ -11,7 +11,7 @@ import cl.hilton.tarifas.dto.ProjTipoHabitacionResponse;
 import cl.hilton.tarifas.mapper.ProjTipoHabitacionMapper;
 import cl.hilton.tarifas.model.ProjTipoHabitacion;
 import cl.hilton.tarifas.repository.ProjTipoHabitacionRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

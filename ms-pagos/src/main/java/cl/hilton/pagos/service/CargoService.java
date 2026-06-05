@@ -13,7 +13,7 @@ import cl.hilton.pagos.model.Cargo;
 import cl.hilton.pagos.model.Factura;
 import cl.hilton.pagos.repository.CargoRepository;
 import cl.hilton.pagos.repository.FacturaRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

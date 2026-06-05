@@ -10,7 +10,7 @@ import cl.hilton.reportes.dto.ReporteResponse;
 import cl.hilton.reportes.mapper.ReporteMapper;
 import cl.hilton.reportes.model.Reporte;
 import cl.hilton.reportes.repository.ReporteRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

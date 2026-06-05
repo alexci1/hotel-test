@@ -13,7 +13,7 @@ import cl.hilton.reportes.model.Kpi;
 import cl.hilton.reportes.model.Reporte;
 import cl.hilton.reportes.repository.KpiRepository;
 import cl.hilton.reportes.repository.ReporteRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

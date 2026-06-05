@@ -10,7 +10,7 @@ import cl.hilton.tarifas.dto.DescuentoResponse;
 import cl.hilton.tarifas.mapper.DescuentoMapper;
 import cl.hilton.tarifas.model.Descuento;
 import cl.hilton.tarifas.repository.DescuentoRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

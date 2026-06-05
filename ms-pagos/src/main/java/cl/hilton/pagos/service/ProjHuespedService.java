@@ -12,7 +12,7 @@ import cl.hilton.pagos.dto.ProjHuespedResponse;
 import cl.hilton.pagos.mapper.ProjHuespedMapper;
 import cl.hilton.pagos.model.ProjHuesped;
 import cl.hilton.pagos.repository.ProjHuespedRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
