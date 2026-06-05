@@ -4,6 +4,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@SuppressWarnings("null")
 public class MovimientoEventProducer {
 
     public static final String MOVIMIENTO_CREATED_TOPIC = "movimiento.created";

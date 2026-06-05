@@ -4,6 +4,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
+@SuppressWarnings("null")
 public class ProductoEventProducer {
 
     public static final String PRODUCTO_CREATED_TOPIC = "producto.created";
