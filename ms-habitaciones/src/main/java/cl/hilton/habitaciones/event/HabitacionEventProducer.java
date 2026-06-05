@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
+@RequiredArgsConstructorA
 public class HabitacionEventProducer {
 
     private static final String TOPIC_BASE = "habitaciones.habitacion";

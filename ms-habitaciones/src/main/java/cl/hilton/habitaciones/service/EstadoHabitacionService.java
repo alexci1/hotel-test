@@ -13,7 +13,7 @@ import cl.hilton.habitaciones.model.EstadoHabitacion;
 import cl.hilton.habitaciones.model.Habitacion;
 import cl.hilton.habitaciones.repository.EstadoHabitacionRepository;
 import cl.hilton.habitaciones.repository.HabitacionRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

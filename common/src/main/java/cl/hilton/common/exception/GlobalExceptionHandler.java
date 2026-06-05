@@ -216,7 +216,6 @@ public class GlobalExceptionHandler {
                 .message("Ocurrió un error interno inesperado. Por favor, intente más tarde.")
                 .path(request.getRequestURI())
                 .build();
-
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 

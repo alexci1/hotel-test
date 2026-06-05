@@ -7,12 +7,6 @@
     <!-- Modelo base de Maven -->
     <modelVersion>4.0.0</modelVersion>
 
-    <!--
-        *******************************************
-        CGV INICIO: PERSONALIZAR PARA CADA PROYECTO
-        *******************************************
-    -->
-
     <!-- Herencia del proyecto padre que centraliza configuracion, BOM y versiones -->
     <parent>
         <groupId>cl.hilton</groupId>
@@ -21,31 +15,29 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <!-- Coordenadas GAV (GroupId, ArtifactId, Version) de este modulo -->
+    <!-- Coordenadas GAV de este modulo -->
     <groupId>cl.hilton</groupId>
     <artifactId>cl-hilton-checkin</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <!-- Nombre y descripcion del modulo -->
     <name>Modulo de Checkin</name>
     <description>Servicio de Checkin.</description>
-
-    <!--
-        *******************************************
-        CGV FIN: PERSONALIZAR PARA CADA PROYECTO
-        *******************************************
-    -->
 
     <!-- Forma de empaquetado es .jar -->
     <packaging>jar</packaging>
 
-    <!-- Dependencias necesarias para este microservicio -->
     <dependencies>
 
         <!-- Spring Web: Controladores REST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Common: excepciones y clases compartidas -->
+        <dependency>
+            <groupId>cl.hilton</groupId>
+            <artifactId>cl-hilton-common</artifactId>
         </dependency>
 
         <!-- Spring JPA: acceso a base de datos con Hibernate -->
@@ -74,7 +66,7 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- Lombok para reducir boilerplate con anotaciones como @Getter, @Builder -->
+        <!-- Lombok para reducir boilerplate -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -100,19 +92,19 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Cliente Eureka: registro y descubrimiento de este microservicio -->
+        <!-- Cliente Eureka -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
-        <!-- OpenFeign: cliente HTTP declarativo para comunicacion entre microservicios -->
+        <!-- OpenFeign -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- Spring Boot DevTools: recarga automatica en desarrollo -->
+        <!-- Spring Boot DevTools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -121,9 +113,10 @@
 
     </dependencies>
 
-    <!-- Empaquetado ejecutable con Spring Boot -->
     <build>
         <plugins>
+
+            <!-- Empaquetado ejecutable con Spring Boot -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -139,7 +132,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Plugin de compilacion para procesadores de anotaciones (MapStruct + Lombok) -->
+            <!-- Plugin de compilacion para MapStruct + Lombok -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -161,6 +154,7 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 

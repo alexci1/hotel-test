@@ -10,7 +10,7 @@ import cl.hilton.habitaciones.dto.TipoHabitacionResponse;
 import cl.hilton.habitaciones.mapper.TipoHabitacionMapper;
 import cl.hilton.habitaciones.model.TipoHabitacion;
 import cl.hilton.habitaciones.repository.TipoHabitacionRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
