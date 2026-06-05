@@ -13,7 +13,7 @@ import cl.hilton.housekeeping.model.Asignacion;
 import cl.hilton.housekeeping.model.Reporte;
 import cl.hilton.housekeeping.repository.AsignacionRepository;
 import cl.hilton.housekeeping.repository.ReporteRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
