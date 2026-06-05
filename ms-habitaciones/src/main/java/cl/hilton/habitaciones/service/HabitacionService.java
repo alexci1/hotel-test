@@ -7,11 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cl.hilton.habitaciones.dto.HabitacionRequest;
 import cl.hilton.habitaciones.dto.HabitacionResponse;
+import cl.hilton.habitaciones.event.HabitacionEventProducer;
 import cl.hilton.habitaciones.mapper.HabitacionMapper;
 import cl.hilton.habitaciones.model.Habitacion;
 import cl.hilton.habitaciones.model.TipoHabitacion;
 import cl.hilton.habitaciones.repository.HabitacionRepository;
 import cl.hilton.habitaciones.repository.TipoHabitacionRepository;
+import cl.hilton.common.event.HabitacionCreatedEvent;
 import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +24,7 @@ public class HabitacionService {
     private final HabitacionRepository habitacionRepository;
     private final TipoHabitacionRepository tipoHabitacionRepository;
     private final HabitacionMapper habitacionMapper;
+    private final HabitacionEventProducer habitacionEventProducer;
 
     public List<HabitacionResponse> findAll() {
         return habitacionMapper.toResponseList(habitacionRepository.findAll());
@@ -76,6 +79,14 @@ public class HabitacionService {
         habitacion.setActiva(request.getActiva() != null ? request.getActiva() : true);
 
         Habitacion habitacionGuardada = habitacionRepository.save(habitacion);
+        HabitacionCreatedEvent event = new HabitacionCreatedEvent(
+            habitacion.getId(), 
+            habitacion.getNumeroHabitacion(), 
+            habitacion.getPiso(), 
+            habitacion.getTipoHabitacion().getDescripcion(), 
+            habitacion.getActiva());
+
+        habitacionEventProducer.sendCreated(habitacion.getNumeroHabitacion(), event);
 
         return habitacionMapper.toResponse(habitacionGuardada);
     }

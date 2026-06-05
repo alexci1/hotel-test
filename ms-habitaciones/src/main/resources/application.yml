@@ -6,16 +6,36 @@ server:
 spring:
   application:
     name: ms-habitaciones
+  
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5433/habitaciones
     username: postgres
     password: 123
+  
   jpa:
     hibernate:
       ddl-auto: update
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  # ==========================================
+  # CONFIGURACIÓN DE APACHE KAFKA
+  # ==========================================
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: habitaciones-group
+      auto-offset-reset: earliest
+      # Deserializadores para leer mensajes
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "cl.hilton.*" # Permite deserializar objetos de tus paquetes
+    producer:
+      # Serializadores para enviar mensajes
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 eureka:
   client:

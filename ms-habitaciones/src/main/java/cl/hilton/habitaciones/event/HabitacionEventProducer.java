@@ -26,17 +26,7 @@ public class HabitacionEventProducer {
     private void send(String numeroHabitacion, HabitacionEvent event, String eventType) {
         String topic  = Objects.requireNonNull(String.format("%s.%s", TOPIC_BASE, eventType), TOPIC_NOT_NULL);
         String numero = Objects.requireNonNull(numeroHabitacion, NUMERO_NOT_NULL);
-
-        log.debug("********************");
-        log.debug("********************");
-        log.debug("********************");
-        log.debug("");
         log.debug("Enviando evento Kafka → topic: {}, key: {}", topic, numero);
-        log.debug("");
-        log.debug("********************");
-        log.debug("********************");
-        log.debug("********************");
-
         kafkaTemplate.send(topic, numero, event);
     }
 
