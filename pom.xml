@@ -156,12 +156,6 @@
                 <artifactId>cl-hilton-common</artifactId>
                 <version>${cl-hilton-common.version}</version>
 
-            <dependency>
-                <groupId>org.springframework.kafka</groupId>
-                <artifactId>spring-kafka</artifactId>
-                <version>${spring-kafka.version}</version>
-            </dependency>
-
             </dependency>
 
         </dependencies>
