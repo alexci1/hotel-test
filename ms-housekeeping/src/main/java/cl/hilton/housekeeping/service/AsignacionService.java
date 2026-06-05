@@ -15,7 +15,7 @@ import cl.hilton.housekeeping.model.Tarea;
 import cl.hilton.housekeeping.repository.AsignacionRepository;
 import cl.hilton.housekeeping.repository.ProjHabitacionRepository;
 import cl.hilton.housekeeping.repository.TareaRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

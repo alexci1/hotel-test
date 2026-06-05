@@ -13,7 +13,7 @@ import cl.hilton.tarifas.model.Temporada;
 import cl.hilton.tarifas.repository.ProjTipoHabitacionRepository;
 import cl.hilton.tarifas.repository.TarifasRepository;
 import cl.hilton.tarifas.repository.TemporadaRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

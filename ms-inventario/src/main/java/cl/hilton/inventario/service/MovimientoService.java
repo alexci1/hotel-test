@@ -12,7 +12,7 @@ import cl.hilton.inventario.model.Movimiento;
 import cl.hilton.inventario.model.Producto;
 import cl.hilton.inventario.repository.MovimientoRepository;
 import cl.hilton.inventario.repository.ProductoRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

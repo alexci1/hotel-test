@@ -9,7 +9,7 @@ import cl.hilton.restaurante.dto.MesaResponse;
 import cl.hilton.restaurante.mapper.MesaMapper;
 import cl.hilton.restaurante.model.Mesa;
 import cl.hilton.restaurante.repository.MesaRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

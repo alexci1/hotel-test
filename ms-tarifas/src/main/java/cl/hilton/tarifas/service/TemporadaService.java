@@ -10,7 +10,7 @@ import cl.hilton.tarifas.dto.TemporadaResponse;
 import cl.hilton.tarifas.mapper.TemporadaMapper;
 import cl.hilton.tarifas.model.Temporada;
 import cl.hilton.tarifas.repository.TemporadaRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

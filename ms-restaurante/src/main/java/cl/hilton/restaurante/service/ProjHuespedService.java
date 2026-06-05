@@ -11,7 +11,7 @@ import cl.hilton.restaurante.dto.ProjHuespedResponse;
 import cl.hilton.restaurante.mapper.ProjHuespedMapper;
 import cl.hilton.restaurante.model.ProjHuesped;
 import cl.hilton.restaurante.repository.ProjHuespedRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

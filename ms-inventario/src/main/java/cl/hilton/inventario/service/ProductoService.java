@@ -10,7 +10,7 @@ import cl.hilton.inventario.dto.ProductoResponse;
 import cl.hilton.inventario.mapper.ProductoMapper;
 import cl.hilton.inventario.model.Producto;
 import cl.hilton.inventario.repository.ProductoRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

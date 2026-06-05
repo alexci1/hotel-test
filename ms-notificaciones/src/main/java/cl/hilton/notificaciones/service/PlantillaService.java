@@ -10,7 +10,7 @@ import cl.hilton.notificaciones.dto.PlantillaResponse;
 import cl.hilton.notificaciones.mapper.PlantillaMapper;
 import cl.hilton.notificaciones.model.Plantilla;
 import cl.hilton.notificaciones.repository.PlantillaRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

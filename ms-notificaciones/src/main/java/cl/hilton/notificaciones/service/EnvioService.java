@@ -13,7 +13,7 @@ import cl.hilton.notificaciones.model.Envio;
 import cl.hilton.notificaciones.model.Notificacion;
 import cl.hilton.notificaciones.repository.EnvioRepository;
 import cl.hilton.notificaciones.repository.NotificacionRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

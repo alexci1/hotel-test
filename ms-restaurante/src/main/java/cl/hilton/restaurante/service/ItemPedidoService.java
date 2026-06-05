@@ -11,7 +11,7 @@ import cl.hilton.restaurante.model.ItemPedido;
 import cl.hilton.restaurante.model.Pedido;
 import cl.hilton.restaurante.repository.ItemPedidoRepository;
 import cl.hilton.restaurante.repository.PedidoRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

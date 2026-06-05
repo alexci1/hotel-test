@@ -42,18 +42,23 @@
     <!-- Dependencias necesarias para este microservicio -->
     <dependencies>
 
-        <!-- Spring Web: Controladores REST -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+       <!-- Spring Web: Controladores REST -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
 
-        <!-- Spring JPA: acceso a base de datos con Hibernate -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
+<!-- Common: excepciones y clases compartidas -->
+<dependency>
+    <groupId>cl.hilton</groupId>
+    <artifactId>cl-hilton-common</artifactId>
+</dependency>
 
+<!-- Spring JPA: acceso a base de datos con Hibernate -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
         <!-- PostgreSQL JDBC: driver JDBC para PostgreSQL -->
         <dependency>
             <groupId>org.postgresql</groupId>

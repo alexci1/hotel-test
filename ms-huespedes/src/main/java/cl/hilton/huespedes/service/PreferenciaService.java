@@ -12,7 +12,7 @@ import cl.hilton.huespedes.model.Huesped;
 import cl.hilton.huespedes.model.Preferencia;
 import cl.hilton.huespedes.repository.HuespedRepository;
 import cl.hilton.huespedes.repository.PreferenciaRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

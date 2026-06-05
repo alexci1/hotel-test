@@ -12,7 +12,7 @@ import cl.hilton.pagos.dto.ProjReservaResponse;
 import cl.hilton.pagos.mapper.ProjReservaMapper;
 import cl.hilton.pagos.model.ProjReserva;
 import cl.hilton.pagos.repository.ProjReservaRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
