@@ -10,7 +10,7 @@ import cl.hilton.housekeeping.dto.TareaResponse;
 import cl.hilton.housekeeping.mapper.TareaMapper;
 import cl.hilton.housekeeping.model.Tarea;
 import cl.hilton.housekeeping.repository.TareaRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

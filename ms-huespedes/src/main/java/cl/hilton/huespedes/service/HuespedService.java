@@ -11,7 +11,7 @@ import cl.hilton.huespedes.dto.HuespedResponse;
 import cl.hilton.huespedes.mapper.HuespedMapper;
 import cl.hilton.huespedes.model.Huesped;
 import cl.hilton.huespedes.repository.HuespedRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service

@@ -15,7 +15,7 @@ import cl.hilton.notificaciones.model.ProjHuesped;
 import cl.hilton.notificaciones.repository.NotificacionRepository;
 import cl.hilton.notificaciones.repository.PlantillaRepository;
 import cl.hilton.notificaciones.repository.ProjHuespedRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
