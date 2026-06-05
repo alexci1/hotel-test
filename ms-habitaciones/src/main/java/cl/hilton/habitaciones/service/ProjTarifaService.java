@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("null")
 public class ProjTarifaService {
 
     private final ProjTarifaRepository projTarifaRepository;

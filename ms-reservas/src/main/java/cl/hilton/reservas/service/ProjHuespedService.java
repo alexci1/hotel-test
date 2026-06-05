@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("null")
 public class ProjHuespedService {
 
     private final ProjHuespedRepository huespedRepository;

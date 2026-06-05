@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("null")
 public class MovimientoService {
 
     private final MovimientoRepository movimientoRepository;
@@ -61,7 +60,6 @@ public class MovimientoService {
         return movimientoMapper.toResponseList(movimientoRepository.findByCantidadLessThan(cantidad));
     }
 
-    @SuppressWarnings("null")
     public MovimientoResponse create(MovimientoRequest request) {
         validarCantidad(request.getCantidad());
 

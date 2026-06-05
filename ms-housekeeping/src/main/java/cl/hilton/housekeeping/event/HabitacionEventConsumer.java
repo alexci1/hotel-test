@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@SuppressWarnings("null")
 public class HabitacionEventConsumer {
 
     private final ProjHabitacionRepository habitacionRepository;

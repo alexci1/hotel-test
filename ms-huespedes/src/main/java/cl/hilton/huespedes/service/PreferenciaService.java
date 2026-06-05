@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("null")
 public class PreferenciaService {
 
     private final PreferenciaRepository preferenciaRepository;

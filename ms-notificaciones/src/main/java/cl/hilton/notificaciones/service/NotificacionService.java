@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("null")
 public class NotificacionService {
 
     private final NotificacionRepository notificacionRepository;

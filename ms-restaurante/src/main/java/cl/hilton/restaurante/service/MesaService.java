@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("null")
 public class MesaService {
 
     private final MesaRepository mesaRepository;

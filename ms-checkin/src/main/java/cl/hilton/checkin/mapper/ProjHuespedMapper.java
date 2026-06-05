@@ -22,5 +22,6 @@ public interface ProjHuespedMapper {
 
     @Mapping(target = "email", ignore = true)
     @Mapping(target = "checkins", ignore = true)
+    @Mapping(target = "actualizadoEn", ignore = true)
     void updateEntity(ProjHuespedRequest request, @MappingTarget ProjHuesped huesped);
 }
