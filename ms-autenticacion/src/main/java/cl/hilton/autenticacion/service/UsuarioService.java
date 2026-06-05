@@ -13,7 +13,7 @@ import cl.hilton.autenticacion.model.Rol;
 import cl.hilton.autenticacion.model.Usuario;
 import cl.hilton.autenticacion.repository.RolRepository;
 import cl.hilton.autenticacion.repository.UsuarioRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -35,33 +35,42 @@ public class UsuarioService {
     }
 
     public UsuarioResponse findByEmail(String email) {
-        Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con email: " + email));
+        String emailValido = validarTexto(email, "email");
+
+        Usuario usuario = usuarioRepository.findByEmail(emailValido)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con email: " + emailValido));
 
         return usuarioMapper.toResponse(usuario);
     }
 
     public List<UsuarioResponse> findByRolCodigo(String rolCodigo) {
-        return usuarioMapper.toResponseList(usuarioRepository.findByRolCodigo(rolCodigo));
+        String codigo = validarTexto(rolCodigo, "rolCodigo");
+        return usuarioMapper.toResponseList(usuarioRepository.findByRolCodigo(codigo));
     }
 
     public List<UsuarioResponse> findByActivo(Boolean activo) {
-        return usuarioMapper.toResponseList(usuarioRepository.findByActivo(activo));
+        Boolean estado = validarBoolean(activo, "activo");
+        return usuarioMapper.toResponseList(usuarioRepository.findByActivo(estado));
     }
 
     public List<UsuarioResponse> findByCreadoEn(LocalDate creadoEn) {
-        return usuarioMapper.toResponseList(usuarioRepository.findByCreadoEn(creadoEn));
+        LocalDate fecha = validarFecha(creadoEn, "creadoEn");
+        return usuarioMapper.toResponseList(usuarioRepository.findByCreadoEn(fecha));
     }
 
     public List<UsuarioResponse> findByUltimoAcceso(LocalDate ultimoAcceso) {
-        return usuarioMapper.toResponseList(usuarioRepository.findByUltimoAcceso(ultimoAcceso));
+        LocalDate fecha = validarFecha(ultimoAcceso, "ultimoAcceso");
+        return usuarioMapper.toResponseList(usuarioRepository.findByUltimoAcceso(fecha));
     }
 
     @Transactional
     public UsuarioResponse create(UsuarioRequest request) {
-        validarEmailUnico(request.getEmail());
+        String email = validarTexto(request.getEmail(), "email");
+        String codigoRol = validarTexto(request.getRol(), "rol");
 
-        Rol rol = getRolByCodigo(request.getRol());
+        validarEmailUnico(email);
+
+        Rol rol = getRolByCodigo(codigoRol);
 
         Usuario usuario = usuarioMapper.toEntity(request);
         usuario.setRol(rol);
@@ -75,14 +84,18 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponse update(Long id, UsuarioRequest request) {
-        Usuario usuario = getUsuarioById(id);
+        Long usuarioId = validarId(id);
+        String email = validarTexto(request.getEmail(), "email");
+        String codigoRol = validarTexto(request.getRol(), "rol");
+
+        Usuario usuario = getUsuarioById(usuarioId);
         Boolean activoActual = usuario.getActivo();
 
-        if (!usuario.getEmail().equalsIgnoreCase(request.getEmail())) {
-            validarEmailUnico(request.getEmail());
+        if (!usuario.getEmail().equalsIgnoreCase(email)) {
+            validarEmailUnico(email);
         }
 
-        Rol rol = getRolByCodigo(request.getRol());
+        Rol rol = getRolByCodigo(codigoRol);
 
         usuarioMapper.updateEntity(request, usuario);
         usuario.setRol(rol);
@@ -95,8 +108,9 @@ public class UsuarioService {
 
     @Transactional
     public void deleteById(Long id) {
-        getUsuarioById(id);
-        usuarioRepository.deleteById(id);
+        Long usuarioId = validarId(id);
+        getUsuarioById(usuarioId);
+        usuarioRepository.deleteById(usuarioId);
     }
 
     @Transactional
@@ -120,18 +134,50 @@ public class UsuarioService {
     }
 
     private Usuario getUsuarioById(Long id) {
-        return usuarioRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + id));
+        Long usuarioId = validarId(id);
+
+        return usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id: " + usuarioId));
     }
 
     private Rol getRolByCodigo(String codigoRol) {
-        return rolRepository.findByCodigo(codigoRol)
-                .orElseThrow(() -> new EntityNotFoundException("Rol no encontrado: " + codigoRol));
+        String codigo = validarTexto(codigoRol, "rol");
+
+        return rolRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new EntityNotFoundException("Rol no encontrado: " + codigo));
     }
 
     private void validarEmailUnico(String email) {
         if (usuarioRepository.existsByEmail(email)) {
             throw new IllegalArgumentException("Ya existe un usuario con el email: " + email);
         }
+    }
+
+    private Long validarId(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("El id no puede ser nulo");
+        }
+        return id;
+    }
+
+    private LocalDate validarFecha(LocalDate valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private Boolean validarBoolean(Boolean valor, String campo) {
+        if (valor == null) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo");
+        }
+        return valor;
+    }
+
+    private String validarTexto(String valor, String campo) {
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("El campo " + campo + " no puede ser nulo o vacio");
+        }
+        return valor;
     }
 }
