@@ -13,7 +13,7 @@ import cl.hilton.checkin.model.Checkout;
 import cl.hilton.checkin.model.ProjReserva;
 import cl.hilton.checkin.repository.CheckoutRepository;
 import cl.hilton.checkin.repository.ProjReservaRepository;
-import jakarta.persistence.EntityNotFoundException;
+import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
