@@ -13,6 +13,8 @@ import cl.hilton.checkin.model.ProjHuesped;
 @Mapper(componentModel = "spring")
 public interface ProjHuespedMapper {
 
+    @Mapping(target = "email", ignore = true)
+    @Mapping(target = "actualizadoEn", ignore = true)
     @Mapping(target = "checkins", ignore = true)
     ProjHuesped toEntity(ProjHuespedRequest request);
 
