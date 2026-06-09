@@ -1,5 +1,6 @@
 package cl.hilton.housekeeping.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -63,6 +64,23 @@ public class ProjHabitacionService {
         ProjHabitacion habitacionActualizada = habitacionRepository.save(habitacion);
 
         return habitacionMapper.toResponse(habitacionActualizada);
+    }
+
+    @Transactional
+    public void save(String numeroHabitacion, String codigoTipo, Integer piso) {
+        String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
+        String tipo = validarTexto(codigoTipo, "codigoTipo");
+        Integer pisoValido = validarInteger(piso, "piso");
+
+        ProjHabitacion habitacion = habitacionRepository.findById(numero)
+                .orElseGet(ProjHabitacion::new);
+
+        habitacion.setNumeroHabitacion(numero);
+        habitacion.setTipo(tipo);
+        habitacion.setPiso(pisoValido);
+        habitacion.setActualizadoEn(LocalDate.now());
+
+        habitacionRepository.save(habitacion);
     }
 
     @Transactional
