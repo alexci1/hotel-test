@@ -88,6 +88,19 @@ public class ProjHabitacionService {
     }
 
     @Transactional
+    public void save(String numeroHabitacion, String codigoTipo) {
+        ProjHabitacion habitacion = habitacionRepository
+                .findByNumeroHabitacion(numeroHabitacion)
+                .orElseGet(ProjHabitacion::new);
+
+        habitacion.setNumeroHabitacion(numeroHabitacion);
+        habitacion.setTipo(codigoTipo);
+        habitacion.setActualizadoEn(LocalDate.now());
+
+        habitacionRepository.save(habitacion);
+    }
+
+    @Transactional
     public void deleteByNumeroHabitacion(String numeroHabitacion) {
         String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
         getHabitacionByNumero(numero);
@@ -96,7 +109,6 @@ public class ProjHabitacionService {
 
     private ProjHabitacion getHabitacionByNumero(String numeroHabitacion) {
         String numero = validarTexto(numeroHabitacion, "numeroHabitacion");
-
         return habitacionRepository.findByNumeroHabitacion(numero)
                 .orElseThrow(() -> new EntityNotFoundException("Habitacion proyectada no encontrada con numero: " + numero));
     }
