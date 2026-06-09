@@ -22,7 +22,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/inventario/habitaciones")
+@RequestMapping("/api/v1/inventario/habitaciones-proyeccion")
 @RequiredArgsConstructor
 public class ProjHabitacionController {
 
