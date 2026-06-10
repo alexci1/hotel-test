@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/proj-habitaciones")
+@RequestMapping("/api/v1/habitaciones-proyeccion")
 @RequiredArgsConstructor
 public class ProjHabitacionController {
 
