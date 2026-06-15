@@ -83,7 +83,7 @@ public class HabitacionService {
             habitacion.getId(), 
             habitacion.getNumeroHabitacion(), 
             habitacion.getPiso(), 
-            habitacion.getTipoHabitacion().getDescripcion(), 
+            habitacion.getTipoHabitacion().getCodigo(), 
             habitacion.getActiva());
 
         habitacionEventProducer.sendCreated(habitacion.getNumeroHabitacion(), event);
