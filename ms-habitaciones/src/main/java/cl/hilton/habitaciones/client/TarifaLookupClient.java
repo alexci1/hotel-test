@@ -12,7 +12,7 @@ import cl.hilton.habitaciones.dto.TarifaHabitacionResponse;
 public interface TarifaLookupClient {
 
     @GetMapping("api/v1/tarifas/exists/temporada/{codigoTemporada}")
-    boolean existsByCodigoTemp(@PathVariable String codigoTemp);
+    boolean existsByCodigoTemp(@PathVariable String codigoTem);
 
     @GetMapping("/api/v1/tarifas/tarifas")
     List<TarifaHabitacionResponse> listar();
