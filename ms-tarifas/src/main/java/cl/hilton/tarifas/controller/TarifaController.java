@@ -70,6 +70,11 @@ public class TarifaController {
         return tarifaService.findByTipoHabitacionAndActiva(tipoHabitacion, activa);
     }
 
+    @GetMapping("/exists/tipo/{tipoHabitacion}/activa")
+    public boolean existsTarifaActivaByTipoHabitacion(@PathVariable String tipoHabitacion) {
+        return tarifaService.existsTarifaActivaByTipoHabitacion(tipoHabitacion);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TarifaResponse create(@Valid @RequestBody TarifaRequest request) {
