@@ -17,7 +17,9 @@ import cl.hilton.habitaciones.repository.TipoHabitacionRepository;
 import cl.hilton.common.event.HabitacionCreatedEvent;
 import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HabitacionService {
@@ -163,6 +165,7 @@ public class HabitacionService {
         boolean existeTarifaActiva = tarifaLookupClient.existsTarifaActivaByTipoHabitacion(codigoTipo);
 
         if (!existeTarifaActiva) {
+            log.warn("No se encontro tarifa activa para el tipo de habitacion: {}", codigoTipo);
             throw new EntityNotFoundException("No existe una tarifa activa para el tipo de habitacion: " + codigoTipo);
         }
     }
