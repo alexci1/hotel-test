@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Manejador global de excepciones para toda la API REST.
@@ -23,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
  *
  * Orden de prioridad de los handlers: Spring usa el más específico primero.
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -36,6 +38,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleLibroNotFound(
             EntityNotFoundException ex,
             HttpServletRequest request) {
+
+        log.warn("Recurso no encontrado. Path: {}", request.getRequestURI());
 
         ApiError error = ApiError.builder()
                 .timestamp(LocalDateTime.now())
@@ -58,6 +62,10 @@ public class GlobalExceptionHandler {
         if (status == null) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
+
+        log.error("Error Feign al comunicarse con microservicio externo. Status: {}, Path: {}",
+                ex.status(),
+                request.getRequestURI());
 
         ApiError error = ApiError.builder()
                 .timestamp(LocalDateTime.now())
