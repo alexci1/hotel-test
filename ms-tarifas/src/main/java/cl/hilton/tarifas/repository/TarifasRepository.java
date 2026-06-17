@@ -15,6 +15,8 @@ public interface TarifasRepository extends JpaRepository<Tarifa, Long> {
 
     boolean existsByTemporadaCodigoAndTipoHabitacionCodigo(String codigoTemporada, String tipoHabitacion);
 
+    boolean existsByTipoHabitacionCodigoAndActiva(String tipoHabitacion, Boolean activa);
+
     List<Tarifa> findByTemporadaCodigo(String codigoTemporada);
 
     List<Tarifa> findByTipoHabitacionCodigo(String tipoHabitacion);
