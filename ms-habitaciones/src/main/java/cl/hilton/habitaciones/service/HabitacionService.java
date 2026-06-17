@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cl.hilton.habitaciones.client.TarifaLookupClient;
 import cl.hilton.habitaciones.dto.HabitacionRequest;
 import cl.hilton.habitaciones.dto.HabitacionResponse;
 import cl.hilton.habitaciones.event.HabitacionEventProducer;
@@ -25,6 +26,7 @@ public class HabitacionService {
     private final TipoHabitacionRepository tipoHabitacionRepository;
     private final HabitacionMapper habitacionMapper;
     private final HabitacionEventProducer habitacionEventProducer;
+    private final TarifaLookupClient tarifaLookupClient;
 
     public List<HabitacionResponse> findAll() {
         return habitacionMapper.toResponseList(habitacionRepository.findAll());
@@ -73,6 +75,8 @@ public class HabitacionService {
         validarNumeroHabitacionUnico(numeroHabitacion);
 
         TipoHabitacion tipoHabitacion = getTipoHabitacionByCodigo(codigoTipo);
+
+        validarExisteTarifaActivaParaTipo(codigoTipo);
 
         Habitacion habitacion = habitacionMapper.toEntity(request);
         habitacion.setTipoHabitacion(tipoHabitacion);
@@ -152,6 +156,14 @@ public class HabitacionService {
     private void validarNumeroHabitacionUnico(String numeroHabitacion) {
         if (habitacionRepository.existsByNumeroHabitacion(numeroHabitacion)) {
             throw new IllegalArgumentException("Ya existe una habitacion con numero: " + numeroHabitacion);
+        }
+    }
+
+    private void validarExisteTarifaActivaParaTipo(String codigoTipo) {
+        boolean existeTarifaActiva = tarifaLookupClient.existsTarifaActivaByTipoHabitacion(codigoTipo);
+
+        if (!existeTarifaActiva) {
+            throw new EntityNotFoundException("No existe una tarifa activa para el tipo de habitacion: " + codigoTipo);
         }
     }
 
