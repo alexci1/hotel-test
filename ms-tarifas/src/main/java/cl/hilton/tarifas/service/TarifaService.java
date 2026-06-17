@@ -61,6 +61,10 @@ public class TarifaService {
         return tarifaMapper.toResponseList(tarifasRepository.findByTipoHabitacionCodigoAndActiva(tipoHabitacion, activa));
     }
 
+    public boolean existsTarifaActivaByTipoHabitacion(String tipoHabitacion) {
+        return tarifasRepository.existsByTipoHabitacionCodigoAndActiva(tipoHabitacion, true);
+    }
+
     public TarifaResponse create(TarifaRequest request) {
         validarTarifaUnica(request.getCodigoTemporada(), request.getCodigoTipoHabitacion());
 
