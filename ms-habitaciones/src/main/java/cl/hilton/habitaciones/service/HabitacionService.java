@@ -15,6 +15,7 @@ import cl.hilton.habitaciones.model.TipoHabitacion;
 import cl.hilton.habitaciones.repository.HabitacionRepository;
 import cl.hilton.habitaciones.repository.TipoHabitacionRepository;
 import cl.hilton.common.event.HabitacionCreatedEvent;
+import cl.hilton.common.exception.DuplicateResourceException;
 import cl.hilton.common.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -157,7 +158,14 @@ public class HabitacionService {
 
     private void validarNumeroHabitacionUnico(String numeroHabitacion) {
         if (habitacionRepository.existsByNumeroHabitacion(numeroHabitacion)) {
-            throw new IllegalArgumentException("Ya existe una habitacion con numero: " + numeroHabitacion);
+            log.warn("Intento de guardar habitacion con numero duplicado: {}", numeroHabitacion);
+
+            throw new DuplicateResourceException(
+                    "Habitacion",
+                    "numeroHabitacion",
+                    numeroHabitacion,
+                    "Numero de habitacion duplicado"
+            );
         }
     }
 
