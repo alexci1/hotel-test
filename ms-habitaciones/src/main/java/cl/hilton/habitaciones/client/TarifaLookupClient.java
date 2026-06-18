@@ -11,16 +11,16 @@ import cl.hilton.habitaciones.dto.TarifaHabitacionResponse;
 @FeignClient(name = "ms-tarifas")
 public interface TarifaLookupClient {
 
-    @GetMapping("/api/v1/tarifas/tarifas/exists/tipo/{tipoHabitacion}/activa")
+    @GetMapping("/api/v1/tarifas/exists/tipo/{tipoHabitacion}/activa")
     boolean existsTarifaActivaByTipoHabitacion(@PathVariable("tipoHabitacion") String tipoHabitacion);
 
-    @GetMapping("/api/v1/tarifas/tarifas")
+    @GetMapping("/api/v1/tarifas")
     List<TarifaHabitacionResponse> listar();
 
-    @GetMapping("/api/v1/tarifas/tarifas/{id}")
+    @GetMapping("/api/v1/tarifas/{id}")
     TarifaHabitacionResponse buscarPorId(@PathVariable("id") Long id);
 
-    @GetMapping("/api/v1/tarifas/tarifas/tipo/{tipoHabitacion}/activa/{activa}")
+    @GetMapping("/api/v1/tarifas/tipo/{tipoHabitacion}/activa/{activa}")
     List<TarifaHabitacionResponse> buscarPorTipoHabitacionYActiva(
             @PathVariable("tipoHabitacion") String tipoHabitacion,
             @PathVariable("activa") Boolean activa);
