@@ -19,6 +19,11 @@ spring:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+# formato base64
+# tokenSecretKeyHotel2026HiltonSecurity
+jwt:
+  secret: "dG9rZW5TZWNyZXRLZXlIb3RlbDIwMjZIaWx0b25TZWN1cml0eQ=="
+  expiration: 3600000
   # ==========================================
   # CONFIGURACIÓN DE APACHE KAFKA
   # ==========================================
