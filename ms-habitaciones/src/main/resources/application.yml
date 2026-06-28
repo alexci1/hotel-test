@@ -24,6 +24,16 @@ spring:
 jwt:
   secret: "dG9rZW5TZWNyZXRLZXlIb3RlbDIwMjZIaWx0b25TZWN1cml0eQ=="
   expiration: 3600000
+
+# [SWAGGER-INI] 
+# Configuración de SpringDoc/Swagger UI
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+# [SWAGGER-FIN] 
+
   # ==========================================
   # CONFIGURACIÓN DE APACHE KAFKA
   # ==========================================
