@@ -100,6 +100,12 @@ public class JwtTokenProvider {
         return getClaims(token).get("nombre", String.class);
     }
 
+    // [SWAGGER-INI]
+    public Date getExpirationFromToken(String token) {
+        return getClaims(token).getExpiration();
+    }
+    // [SWAGGER-FIN]
+
     // ─── Métodos privados ────────────────────────────────────────────────────
 
     /**
