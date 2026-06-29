@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,9 @@ import cl.hilton.tarifas.service.DescuentoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/api/v1/descuentos")
 @RequiredArgsConstructor
@@ -28,54 +32,72 @@ public class DescuentoController {
 
     private final DescuentoService descuentoService;
 
+    private DescuentoResponse addLinks(DescuentoResponse d) {
+        d.add(linkTo(methodOn(DescuentoController.class).findById(d.getId())).withSelfRel());
+        d.add(linkTo(methodOn(DescuentoController.class).update(d.getId(), null)).withRel("update").withTitle("PUT - Actualizar descuento"));
+        d.add(linkTo(methodOn(DescuentoController.class).deleteById(d.getId())).withRel("delete").withTitle("DELETE - Eliminar descuento"));
+        d.add(linkTo(methodOn(DescuentoController.class).findAll()).withRel("all").withTitle("GET - Todos los descuentos"));
+        return d;
+    }
+
     @GetMapping
-    public List<DescuentoResponse> findAll() {
-        return descuentoService.findAll();
+    public CollectionModel<DescuentoResponse> findAll() {
+        List<DescuentoResponse> list = descuentoService.findAll();
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(DescuentoController.class).findAll()).withSelfRel());
     }
 
     @GetMapping("/{id}")
     public DescuentoResponse findById(@PathVariable Long id) {
-        return descuentoService.findById(id);
+        return addLinks(descuentoService.findById(id));
     }
 
     @GetMapping("/codigo/{codigoDescuento}")
     public DescuentoResponse findByCodigoDescuento(@PathVariable String codigoDescuento) {
-        return descuentoService.findByCodigoDescuento(codigoDescuento);
+        return addLinks(descuentoService.findByCodigoDescuento(codigoDescuento));
     }
 
     @GetMapping("/aplica-a/{aplicaA}")
-    public List<DescuentoResponse> findByAplicaA(@PathVariable String aplicaA) {
-        return descuentoService.findByAplicaA(aplicaA);
+    public CollectionModel<DescuentoResponse> findByAplicaA(@PathVariable String aplicaA) {
+        List<DescuentoResponse> list = descuentoService.findByAplicaA(aplicaA);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(DescuentoController.class).findByAplicaA(aplicaA)).withSelfRel());
     }
 
     @GetMapping("/activo/{activo}")
-    public List<DescuentoResponse> findByActivo(@PathVariable Boolean activo) {
-        return descuentoService.findByActivo(activo);
+    public CollectionModel<DescuentoResponse> findByActivo(@PathVariable Boolean activo) {
+        List<DescuentoResponse> list = descuentoService.findByActivo(activo);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(DescuentoController.class).findByActivo(activo)).withSelfRel());
     }
 
     @GetMapping("/valido-desde/{validoDesde}")
-    public List<DescuentoResponse> findByValidoDesde(
+    public CollectionModel<DescuentoResponse> findByValidoDesde(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate validoDesde) {
-        return descuentoService.findByValidoDesde(validoDesde);
+        List<DescuentoResponse> list = descuentoService.findByValidoDesde(validoDesde);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(DescuentoController.class).findByValidoDesde(validoDesde)).withSelfRel());
     }
 
     @GetMapping("/valido-hasta/{validoHasta}")
-    public List<DescuentoResponse> findByValidoHasta(
+    public CollectionModel<DescuentoResponse> findByValidoHasta(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate validoHasta) {
-        return descuentoService.findByValidoHasta(validoHasta);
+        List<DescuentoResponse> list = descuentoService.findByValidoHasta(validoHasta);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(DescuentoController.class).findByValidoHasta(validoHasta)).withSelfRel());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public DescuentoResponse create(@Valid @RequestBody DescuentoRequest request) {
-        return descuentoService.create(request);
+        return addLinks(descuentoService.create(request));
     }
 
     @PutMapping("/{id}")
     public DescuentoResponse update(
             @PathVariable Long id,
             @Valid @RequestBody DescuentoRequest request) {
-        return descuentoService.update(id, request);
+        return addLinks(descuentoService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
