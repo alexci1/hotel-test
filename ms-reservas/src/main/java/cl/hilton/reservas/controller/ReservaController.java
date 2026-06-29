@@ -35,11 +35,11 @@ public class ReservaController {
 
     private ReservaResponse addLinks(ReservaResponse r) {
         r.add(linkTo(methodOn(ReservaController.class).findById(r.getId())).withSelfRel());
-        r.add(linkTo(methodOn(ReservaController.class).update(r.getId(), null)).withRel("update").withTitle("PUT - Actualizar reserva"));
-        r.add(linkTo(methodOn(ReservaController.class).deleteById(r.getId())).withRel("delete").withTitle("DELETE - Eliminar reserva"));
-        r.add(linkTo(methodOn(ReservaController.class).findByEmailHuesped(r.getEmailHuesped())).withRel("reservas-huesped").withTitle("GET - Reservas del huesped"));
-        r.add(linkTo(methodOn(ReservaController.class).findByEstado(r.getEstado())).withRel("reservas-estado").withTitle("GET - Reservas por estado"));
-        r.add(linkTo(methodOn(ReservaController.class).findAll()).withRel("all").withTitle("GET - Todas las reservas"));
+        r.add(linkTo(methodOn(ReservaController.class).update(r.getId(), null)).withRel("update"));
+        r.add(linkTo(methodOn(ReservaController.class).findById(r.getId())).withRel("delete"));
+        r.add(linkTo(methodOn(ReservaController.class).findByEmailHuesped(r.getEmailHuesped())).withRel("reservas-huesped"));
+        r.add(linkTo(methodOn(ReservaController.class).findByEstado(r.getEstado())).withRel("reservas-estado"));
+        r.add(linkTo(methodOn(ReservaController.class).findAll()).withRel("all"));
         return r;
     }
 
