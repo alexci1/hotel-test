@@ -36,9 +36,9 @@ public class CancelacionController {
 
     private CancelacionResponse addLinks(CancelacionResponse c) {
         c.add(linkTo(methodOn(CancelacionController.class).findById(c.getId())).withSelfRel());
-        c.add(linkTo(methodOn(CancelacionController.class).update(c.getId(), null)).withRel("update").withTitle("PUT - Actualizar cancelacion"));
-        c.add(linkTo(methodOn(CancelacionController.class).deleteById(c.getId())).withRel("delete").withTitle("DELETE - Eliminar cancelacion"));
-        c.add(linkTo(methodOn(CancelacionController.class).findAll()).withRel("all").withTitle("GET - Todas las cancelaciones"));
+        c.add(linkTo(methodOn(CancelacionController.class).update(c.getId(), null)).withRel("update"));
+        c.add(linkTo(methodOn(CancelacionController.class).findById(c.getId())).withRel("delete"));
+        c.add(linkTo(methodOn(CancelacionController.class).findAll()).withRel("all"));
         return c;
     }
 
