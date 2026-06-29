@@ -22,6 +22,7 @@ public interface CheckinMapper {
     @Mapping(target = "fechaHora", ignore = true)
     Checkin toEntity(CheckinRequest request, ProjReserva reserva, ProjHuesped huesped);
 
+    @Mapping(target = "links", ignore = true)
     @Mapping(target = "codigoReserva", source = "reserva.codigoReserva")
     @Mapping(target = "emailHuesped", source = "huesped.email")
     @Mapping(target = "nombreHuesped", source = "huesped.nombreCompleto")
