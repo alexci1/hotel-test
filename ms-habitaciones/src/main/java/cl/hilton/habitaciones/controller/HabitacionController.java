@@ -34,10 +34,10 @@ public class HabitacionController {
 
     private HabitacionResponse addLinks(HabitacionResponse h) {
         h.add(linkTo(methodOn(HabitacionController.class).findById(h.getId())).withSelfRel());
-        h.add(linkTo(methodOn(HabitacionController.class).update(h.getId(), null)).withRel("update").withTitle("PUT - Actualizar habitacion"));
-        h.add(linkTo(methodOn(HabitacionController.class).deleteById(h.getId())).withRel("delete").withTitle("DELETE - Eliminar habitacion"));
-        h.add(linkTo(methodOn(HabitacionController.class).cambiarActiva(h.getId(), null)).withRel("cambiar-activa").withTitle("PATCH - Cambiar estado activa"));
-        h.add(linkTo(methodOn(HabitacionController.class).findAll()).withRel("all").withTitle("GET - Todas las habitaciones"));
+        h.add(linkTo(methodOn(HabitacionController.class).update(h.getId(), null)).withRel("update"));
+        h.add(linkTo(methodOn(HabitacionController.class).findById(h.getId())).withRel("delete"));
+        h.add(linkTo(methodOn(HabitacionController.class).cambiarActiva(h.getId(), null)).withRel("cambiar-activa"));
+        h.add(linkTo(methodOn(HabitacionController.class).findAll()).withRel("all"));
         return h;
     }
 
