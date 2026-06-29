@@ -1,12 +1,13 @@
 package cl.hilton.pagos.dto;
 
 import java.time.LocalDate;
-
+import org.springframework.hateoas.RepresentationModel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class PagoResponse {
-
+@EqualsAndHashCode(callSuper = false)
+public class PagoResponse extends RepresentationModel<PagoResponse> {
     private Long id;
     private String numeroFactura;
     private Integer montoUsd;

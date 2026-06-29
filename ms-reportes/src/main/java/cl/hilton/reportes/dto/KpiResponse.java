@@ -1,20 +1,21 @@
 package cl.hilton.reportes.dto;
 
 import java.time.LocalDate;
-
+import org.springframework.hateoas.RepresentationModel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class KpiResponse {
-
+@EqualsAndHashCode(callSuper = false)
+public class KpiResponse extends RepresentationModel<KpiResponse> {
     private Long id;
     private String codigoReporte;
     private String nombreReporte;

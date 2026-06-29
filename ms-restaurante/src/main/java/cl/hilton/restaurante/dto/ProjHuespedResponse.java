@@ -1,16 +1,21 @@
 package cl.hilton.restaurante.dto;
 
-import lombok.*;
-
 import java.time.LocalDate;
+import org.springframework.hateoas.RepresentationModel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProjHuespedResponse {
-
+@EqualsAndHashCode(callSuper = false)
+public class ProjHuespedResponse extends RepresentationModel<ProjHuespedResponse> {
     private String email;
     private String nombreCompleto;
     private String numeroHabitacion;

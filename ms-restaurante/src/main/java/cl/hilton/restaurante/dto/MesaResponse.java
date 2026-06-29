@@ -1,14 +1,20 @@
 package cl.hilton.restaurante.dto;
 
-import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MesaResponse {
-
+@EqualsAndHashCode(callSuper = false)
+public class MesaResponse extends RepresentationModel<MesaResponse> {
     private Long id;
     private String numeroMesa;
     private Integer capacidad;

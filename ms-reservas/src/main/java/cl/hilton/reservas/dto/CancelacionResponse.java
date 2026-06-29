@@ -1,12 +1,13 @@
 package cl.hilton.reservas.dto;
 
 import java.time.LocalDate;
-
+import org.springframework.hateoas.RepresentationModel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class CancelacionResponse {
-    
+@EqualsAndHashCode(callSuper = false)
+public class CancelacionResponse extends RepresentationModel<CancelacionResponse> {
     private Long id;
     private String codigoReserva;
     private String motivo;
