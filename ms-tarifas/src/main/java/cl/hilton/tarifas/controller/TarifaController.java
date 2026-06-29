@@ -32,9 +32,8 @@ public class TarifaController {
 
     private TarifaResponse addLinks(TarifaResponse t) {
         t.add(linkTo(methodOn(TarifaController.class).findById(t.getId())).withSelfRel());
-        t.add(linkTo(methodOn(TarifaController.class).update(t.getId(), null)).withRel("update").withTitle("PUT - Actualizar tarifa"));
-        t.add(linkTo(methodOn(TarifaController.class).deleteById(t.getId())).withRel("delete").withTitle("DELETE - Eliminar tarifa"));
-        t.add(linkTo(methodOn(TarifaController.class).findAll()).withRel("all").withTitle("GET - Todas las tarifas"));
+        t.add(linkTo(methodOn(TarifaController.class).update(t.getId(), null)).withRel("update"));
+        t.add(linkTo(methodOn(TarifaController.class).findAll()).withRel("all"));
         return t;
     }
 
