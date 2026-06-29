@@ -34,7 +34,7 @@ public class FacturaController {
     private FacturaResponse addLinks(FacturaResponse f) {
         f.add(linkTo(methodOn(FacturaController.class).findById(f.getId())).withSelfRel());
         f.add(linkTo(methodOn(FacturaController.class).update(f.getId(), null)).withRel("update").withTitle("PUT - Actualizar factura"));
-        f.add(linkTo(methodOn(FacturaController.class).deleteById(f.getId())).withRel("delete").withTitle("DELETE - Eliminar factura"));
+        f.add(linkTo(FacturaController.class).slash(f.getId()).withRel("delete"));
         f.add(linkTo(methodOn(FacturaController.class).findByEmailHuesped(f.getEmailHuesped())).withRel("facturas-huesped").withTitle("GET - Facturas del huesped"));
         f.add(linkTo(methodOn(FacturaController.class).findAll()).withRel("all").withTitle("GET - Todas las facturas"));
         return f;
