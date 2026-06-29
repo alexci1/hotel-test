@@ -34,10 +34,10 @@ public class MesaController {
 
     private MesaResponse addLinks(MesaResponse m) {
         m.add(linkTo(methodOn(MesaController.class).findById(m.getId())).withSelfRel());
-        m.add(linkTo(methodOn(MesaController.class).update(m.getId(), null)).withRel("update").withTitle("PUT - Actualizar mesa"));
-        m.add(linkTo(methodOn(MesaController.class).deleteById(m.getId())).withRel("delete").withTitle("DELETE - Eliminar mesa"));
-        m.add(linkTo(methodOn(MesaController.class).cambiarDisponibilidad(m.getId(), null)).withRel("cambiar-disponibilidad").withTitle("PATCH - Cambiar disponibilidad"));
-        m.add(linkTo(methodOn(MesaController.class).findAll()).withRel("all").withTitle("GET - Todas las mesas"));
+        m.add(linkTo(methodOn(MesaController.class).update(m.getId(), null)).withRel("update"));
+        m.add(linkTo(methodOn(MesaController.class).findById(m.getId())).withRel("delete"));
+        m.add(linkTo(methodOn(MesaController.class).cambiarDisponibilidad(m.getId(), null)).withRel("cambiar-disponibilidad"));
+        m.add(linkTo(methodOn(MesaController.class).findAll()).withRel("all"));
         return m;
     }
 
