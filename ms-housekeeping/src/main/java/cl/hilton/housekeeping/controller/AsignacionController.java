@@ -36,10 +36,10 @@ public class AsignacionController {
 
     private AsignacionResponse addLinks(AsignacionResponse a) {
         a.add(linkTo(methodOn(AsignacionController.class).findById(a.getId())).withSelfRel());
-        a.add(linkTo(methodOn(AsignacionController.class).update(a.getId(), null)).withRel("update").withTitle("PUT - Actualizar asignacion"));
-        a.add(linkTo(methodOn(AsignacionController.class).deleteById(a.getId())).withRel("delete").withTitle("DELETE - Eliminar asignacion"));
-        a.add(linkTo(methodOn(AsignacionController.class).updateEstado(a.getId(), null)).withRel("cambiar-estado").withTitle("PATCH - Cambiar estado"));
-        a.add(linkTo(methodOn(AsignacionController.class).findAll()).withRel("all").withTitle("GET - Todas las asignaciones"));
+        a.add(linkTo(methodOn(AsignacionController.class).update(a.getId(), null)).withRel("update"));
+        a.add(linkTo(methodOn(AsignacionController.class).findById(a.getId())).withRel("delete"));
+        a.add(linkTo(methodOn(AsignacionController.class).updateEstado(a.getId(), null)).withRel("cambiar-estado"));
+        a.add(linkTo(methodOn(AsignacionController.class).findAll()).withRel("all"));
         return a;
     }
 
