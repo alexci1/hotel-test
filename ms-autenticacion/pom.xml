@@ -47,6 +47,13 @@
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
 
+        <!-- [HATEOAS-INI] -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-hateoas</artifactId>
+        </dependency>
+        <!-- [HATEOAS-FIN] -->
+
        <!-- Spring Web: Controladores REST -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
