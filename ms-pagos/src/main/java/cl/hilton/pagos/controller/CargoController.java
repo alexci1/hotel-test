@@ -34,7 +34,7 @@ public class CargoController {
     private CargoResponse addLinks(CargoResponse c) {
         c.add(linkTo(methodOn(CargoController.class).findById(c.getId())).withSelfRel());
         c.add(linkTo(methodOn(CargoController.class).update(c.getId(), null)).withRel("update").withTitle("PUT - Actualizar cargo"));
-        c.add(linkTo(methodOn(CargoController.class).deleteById(c.getId())).withRel("delete").withTitle("DELETE - Eliminar cargo"));
+        c.add(linkTo(CargoController.class).slash(c.getId()).withRel("delete"));
         c.add(linkTo(methodOn(CargoController.class).findAll()).withRel("all").withTitle("GET - Todos los cargos"));
         return c;
     }
