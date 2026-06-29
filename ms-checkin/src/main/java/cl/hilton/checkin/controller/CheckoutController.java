@@ -32,9 +32,9 @@ public class CheckoutController {
 
     private CheckoutResponse addLinks(CheckoutResponse c) {
         c.add(linkTo(methodOn(CheckoutController.class).findById(c.getId())).withSelfRel());
-        c.add(linkTo(methodOn(CheckoutController.class).update(c.getId(), null)).withRel("update").withTitle("PUT - Actualizar checkout"));
-        c.add(linkTo(methodOn(CheckoutController.class).deleteById(c.getId())).withRel("delete").withTitle("DELETE - Eliminar checkout"));
-        c.add(linkTo(methodOn(CheckoutController.class).findAll()).withRel("all").withTitle("GET - Todos los checkouts"));
+        c.add(linkTo(methodOn(CheckoutController.class).update(c.getId(), null)).withRel("update"));
+        c.add(linkTo(CheckoutController.class).slash(c.getId()).withRel("delete"));
+        c.add(linkTo(methodOn(CheckoutController.class).findAll()).withRel("all"));
         return c;
     }
 
