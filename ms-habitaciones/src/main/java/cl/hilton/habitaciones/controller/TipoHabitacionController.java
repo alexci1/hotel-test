@@ -2,6 +2,7 @@ package cl.hilton.habitaciones.controller;
 
 import java.util.List;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,9 @@ import cl.hilton.habitaciones.service.TipoHabitacionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/api/v1/tipos-habitacion")
 @RequiredArgsConstructor
@@ -27,52 +31,70 @@ public class TipoHabitacionController {
 
     private final TipoHabitacionService tipoHabitacionService;
 
+    private TipoHabitacionResponse addLinks(TipoHabitacionResponse t) {
+        t.add(linkTo(methodOn(TipoHabitacionController.class).findById(t.getId())).withSelfRel());
+        t.add(linkTo(methodOn(TipoHabitacionController.class).update(t.getId(), null)).withRel("update").withTitle("PUT - Actualizar tipo"));
+        t.add(linkTo(methodOn(TipoHabitacionController.class).deleteById(t.getId())).withRel("delete").withTitle("DELETE - Eliminar tipo"));
+        t.add(linkTo(methodOn(TipoHabitacionController.class).findAll()).withRel("all").withTitle("GET - Todos los tipos"));
+        return t;
+    }
+
     @GetMapping
-    public List<TipoHabitacionResponse> findAll() {
-        return tipoHabitacionService.findAll();
+    public CollectionModel<TipoHabitacionResponse> findAll() {
+        List<TipoHabitacionResponse> list = tipoHabitacionService.findAll();
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(TipoHabitacionController.class).findAll()).withSelfRel());
     }
 
     @GetMapping("/{id}")
     public TipoHabitacionResponse findById(@PathVariable Long id) {
-        return tipoHabitacionService.findById(id);
+        return addLinks(tipoHabitacionService.findById(id));
     }
 
     @GetMapping("/codigo/{codigo}")
     public TipoHabitacionResponse findByCodigo(@PathVariable String codigo) {
-        return tipoHabitacionService.findByCodigo(codigo);
+        return addLinks(tipoHabitacionService.findByCodigo(codigo));
     }
 
     @GetMapping("/activos/{activo}")
-    public List<TipoHabitacionResponse> findByActivo(@PathVariable Boolean activo) {
-        return tipoHabitacionService.findByActivo(activo);
+    public CollectionModel<TipoHabitacionResponse> findByActivo(@PathVariable Boolean activo) {
+        List<TipoHabitacionResponse> list = tipoHabitacionService.findByActivo(activo);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(TipoHabitacionController.class).findByActivo(activo)).withSelfRel());
     }
 
     @GetMapping("/capacidad/{capacidadMax}")
-    public List<TipoHabitacionResponse> findByCapacidadMax(@PathVariable Integer capacidadMax) {
-        return tipoHabitacionService.findByCapacidadMax(capacidadMax);
+    public CollectionModel<TipoHabitacionResponse> findByCapacidadMax(@PathVariable Integer capacidadMax) {
+        List<TipoHabitacionResponse> list = tipoHabitacionService.findByCapacidadMax(capacidadMax);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(TipoHabitacionController.class).findByCapacidadMax(capacidadMax)).withSelfRel());
     }
 
     @GetMapping("/capacidad-minima/{capacidadMax}")
-    public List<TipoHabitacionResponse> findByCapacidadMinima(@PathVariable Integer capacidadMax) {
-        return tipoHabitacionService.findByCapacidadMinima(capacidadMax);
+    public CollectionModel<TipoHabitacionResponse> findByCapacidadMinima(@PathVariable Integer capacidadMax) {
+        List<TipoHabitacionResponse> list = tipoHabitacionService.findByCapacidadMinima(capacidadMax);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(TipoHabitacionController.class).findByCapacidadMinima(capacidadMax)).withSelfRel());
     }
 
     @GetMapping("/buscar")
-    public List<TipoHabitacionResponse> findByDescripcion(@RequestParam String descripcion) {
-        return tipoHabitacionService.findByDescripcion(descripcion);
+    public CollectionModel<TipoHabitacionResponse> findByDescripcion(@RequestParam String descripcion) {
+        List<TipoHabitacionResponse> list = tipoHabitacionService.findByDescripcion(descripcion);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(TipoHabitacionController.class).findByDescripcion(descripcion)).withSelfRel());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TipoHabitacionResponse create(@Valid @RequestBody TipoHabitacionRequest request) {
-        return tipoHabitacionService.create(request);
+        return addLinks(tipoHabitacionService.create(request));
     }
 
     @PutMapping("/{id}")
     public TipoHabitacionResponse update(
             @PathVariable Long id,
             @Valid @RequestBody TipoHabitacionRequest request) {
-        return tipoHabitacionService.update(id, request);
+        return addLinks(tipoHabitacionService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
