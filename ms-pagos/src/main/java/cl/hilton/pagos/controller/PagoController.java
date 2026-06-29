@@ -34,7 +34,7 @@ public class PagoController {
     private PagoResponse addLinks(PagoResponse p) {
         p.add(linkTo(methodOn(PagoController.class).findById(p.getId())).withSelfRel());
         p.add(linkTo(methodOn(PagoController.class).update(p.getId(), null)).withRel("update").withTitle("PUT - Actualizar pago"));
-        p.add(linkTo(methodOn(PagoController.class).deleteById(p.getId())).withRel("delete").withTitle("DELETE - Eliminar pago"));
+        p.add(linkTo(PagoController.class).slash(p.getId()).withRel("delete"));
         p.add(linkTo(methodOn(PagoController.class).findAll()).withRel("all").withTitle("GET - Todos los pagos"));
         return p;
     }
