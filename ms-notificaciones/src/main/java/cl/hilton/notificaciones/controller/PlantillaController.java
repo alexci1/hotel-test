@@ -32,9 +32,9 @@ public class PlantillaController {
 
     private PlantillaResponse addLinks(PlantillaResponse p) {
         p.add(linkTo(methodOn(PlantillaController.class).findById(p.getId())).withSelfRel());
-        p.add(linkTo(methodOn(PlantillaController.class).update(p.getId(), null)).withRel("update").withTitle("PUT - Actualizar plantilla"));
-        p.add(linkTo(methodOn(PlantillaController.class).deleteById(p.getId())).withRel("delete").withTitle("DELETE - Eliminar plantilla"));
-        p.add(linkTo(methodOn(PlantillaController.class).findAll()).withRel("all").withTitle("GET - Todas las plantillas"));
+        p.add(linkTo(methodOn(PlantillaController.class).update(p.getId(), null)).withRel("update"));
+        p.add(linkTo(methodOn(PlantillaController.class).findById(p.getId())).withRel("delete"));
+        p.add(linkTo(methodOn(PlantillaController.class).findAll()).withRel("all"));
         return p;
     }
 
