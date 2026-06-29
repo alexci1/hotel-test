@@ -2,6 +2,7 @@ package cl.hilton.checkin.controller;
 
 import java.util.List;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,9 @@ import cl.hilton.checkin.service.CheckinService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/api/v1/checkins")
 @RequiredArgsConstructor
@@ -26,40 +30,54 @@ public class CheckinController {
 
     private final CheckinService checkinService;
 
+    private CheckinResponse addLinks(CheckinResponse c) {
+        c.add(linkTo(methodOn(CheckinController.class).findById(c.getId())).withSelfRel());
+        c.add(linkTo(methodOn(CheckinController.class).update(c.getId(), null)).withRel("update").withTitle("PUT - Actualizar checkin"));
+        c.add(linkTo(methodOn(CheckinController.class).deleteById(c.getId())).withRel("delete").withTitle("DELETE - Eliminar checkin"));
+        c.add(linkTo(methodOn(CheckinController.class).findAll()).withRel("all").withTitle("GET - Todos los checkins"));
+        return c;
+    }
+
     @GetMapping
-    public List<CheckinResponse> findAll() {
-        return checkinService.findAll();
+    public CollectionModel<CheckinResponse> findAll() {
+        List<CheckinResponse> list = checkinService.findAll();
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(CheckinController.class).findAll()).withSelfRel());
     }
 
     @GetMapping("/{id}")
     public CheckinResponse findById(@PathVariable Long id) {
-        return checkinService.findById(id);
+        return addLinks(checkinService.findById(id));
     }
 
     @GetMapping("/reserva/{codigoReserva}")
     public CheckinResponse findByCodigoReserva(@PathVariable String codigoReserva) {
-        return checkinService.findByCodigoReserva(codigoReserva);
+        return addLinks(checkinService.findByCodigoReserva(codigoReserva));
     }
 
     @GetMapping("/huesped/{emailHuesped}")
-    public List<CheckinResponse> findByEmailHuesped(@PathVariable String emailHuesped) {
-        return checkinService.findByEmailHuesped(emailHuesped);
+    public CollectionModel<CheckinResponse> findByEmailHuesped(@PathVariable String emailHuesped) {
+        List<CheckinResponse> list = checkinService.findByEmailHuesped(emailHuesped);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(CheckinController.class).findByEmailHuesped(emailHuesped)).withSelfRel());
     }
 
     @GetMapping("/habitacion/{numeroHabitacion}")
-    public List<CheckinResponse> findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
-        return checkinService.findByNumeroHabitacion(numeroHabitacion);
+    public CollectionModel<CheckinResponse> findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
+        List<CheckinResponse> list = checkinService.findByNumeroHabitacion(numeroHabitacion);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(CheckinController.class).findByNumeroHabitacion(numeroHabitacion)).withSelfRel());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CheckinResponse create(@Valid @RequestBody CheckinRequest request) {
-        return checkinService.create(request);
+        return addLinks(checkinService.create(request));
     }
 
     @PutMapping("/{id}")
     public CheckinResponse update(@PathVariable Long id, @Valid @RequestBody CheckinRequest request) {
-        return checkinService.update(id, request);
+        return addLinks(checkinService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
