@@ -33,9 +33,9 @@ public class TareaController {
 
     private TareaResponse addLinks(TareaResponse t) {
         t.add(linkTo(methodOn(TareaController.class).findById(t.getId())).withSelfRel());
-        t.add(linkTo(methodOn(TareaController.class).update(t.getId(), null)).withRel("update").withTitle("PUT - Actualizar tarea"));
-        t.add(linkTo(methodOn(TareaController.class).deleteById(t.getId())).withRel("delete").withTitle("DELETE - Eliminar tarea"));
-        t.add(linkTo(methodOn(TareaController.class).findAll()).withRel("all").withTitle("GET - Todas las tareas"));
+        t.add(linkTo(methodOn(TareaController.class).update(t.getId(), null)).withRel("update"));
+        t.add(linkTo(methodOn(TareaController.class).findById(t.getId())).withRel("delete"));
+        t.add(linkTo(methodOn(TareaController.class).findAll()).withRel("all"));
         return t;
     }
 
