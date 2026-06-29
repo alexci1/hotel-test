@@ -32,9 +32,9 @@ public class ReporteController {
 
     private ReporteResponse addLinks(ReporteResponse r) {
         r.add(linkTo(methodOn(ReporteController.class).findById(r.getId())).withSelfRel());
-        r.add(linkTo(methodOn(ReporteController.class).update(r.getId(), null)).withRel("update").withTitle("PUT - Actualizar reporte"));
-        r.add(linkTo(methodOn(ReporteController.class).deleteById(r.getId())).withRel("delete").withTitle("DELETE - Eliminar reporte"));
-        r.add(linkTo(methodOn(ReporteController.class).findAll()).withRel("all").withTitle("GET - Todos los reportes"));
+        r.add(linkTo(methodOn(ReporteController.class).update(r.getId(), null)).withRel("update"));
+        r.add(linkTo(methodOn(ReporteController.class).findById(r.getId())).withRel("delete"));
+        r.add(linkTo(methodOn(ReporteController.class).findAll()).withRel("all"));
         return r;
     }
 
