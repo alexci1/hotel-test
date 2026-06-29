@@ -2,6 +2,7 @@ package cl.hilton.tarifas.controller;
 
 import java.util.List;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,9 @@ import cl.hilton.tarifas.service.TarifaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/api/v1/tarifas")
 @RequiredArgsConstructor
@@ -26,48 +30,68 @@ public class TarifaController {
 
     private final TarifaService tarifaService;
 
+    private TarifaResponse addLinks(TarifaResponse t) {
+        t.add(linkTo(methodOn(TarifaController.class).findById(t.getId())).withSelfRel());
+        t.add(linkTo(methodOn(TarifaController.class).update(t.getId(), null)).withRel("update").withTitle("PUT - Actualizar tarifa"));
+        t.add(linkTo(methodOn(TarifaController.class).deleteById(t.getId())).withRel("delete").withTitle("DELETE - Eliminar tarifa"));
+        t.add(linkTo(methodOn(TarifaController.class).findAll()).withRel("all").withTitle("GET - Todas las tarifas"));
+        return t;
+    }
+
     @GetMapping
-    public List<TarifaResponse> findAll() {
-        return tarifaService.findAll();
+    public CollectionModel<TarifaResponse> findAll() {
+        List<TarifaResponse> list = tarifaService.findAll();
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(TarifaController.class).findAll()).withSelfRel());
     }
 
     @GetMapping("/{id}")
     public TarifaResponse findById(@PathVariable Long id) {
-        return tarifaService.findById(id);
+        return addLinks(tarifaService.findById(id));
     }
 
     @GetMapping("/temporada/{codigoTemporada}/tipo/{tipoHabitacion}")
     public TarifaResponse findByTemporadaAndTipoHabitacion(
             @PathVariable String codigoTemporada,
             @PathVariable String tipoHabitacion) {
-        return tarifaService.findByTemporadaAndTipoHabitacion(codigoTemporada, tipoHabitacion);
+        return addLinks(tarifaService.findByTemporadaAndTipoHabitacion(codigoTemporada, tipoHabitacion));
     }
 
     @GetMapping("/temporada/{codigoTemporada}")
-    public List<TarifaResponse> findByCodigoTemporada(@PathVariable String codigoTemporada) {
-        return tarifaService.findByCodigoTemporada(codigoTemporada);
+    public CollectionModel<TarifaResponse> findByCodigoTemporada(@PathVariable String codigoTemporada) {
+        List<TarifaResponse> list = tarifaService.findByCodigoTemporada(codigoTemporada);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(TarifaController.class).findByCodigoTemporada(codigoTemporada)).withSelfRel());
     }
 
     @GetMapping("/tipo/{tipoHabitacion}")
-    public List<TarifaResponse> findByTipoHabitacion(@PathVariable String tipoHabitacion) {
-        return tarifaService.findByTipoHabitacion(tipoHabitacion);
+    public CollectionModel<TarifaResponse> findByTipoHabitacion(@PathVariable String tipoHabitacion) {
+        List<TarifaResponse> list = tarifaService.findByTipoHabitacion(tipoHabitacion);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(TarifaController.class).findByTipoHabitacion(tipoHabitacion)).withSelfRel());
     }
 
     @GetMapping("/activa/{activa}")
-    public List<TarifaResponse> findByActiva(@PathVariable Boolean activa) {
-        return tarifaService.findByActiva(activa);
+    public CollectionModel<TarifaResponse> findByActiva(@PathVariable Boolean activa) {
+        List<TarifaResponse> list = tarifaService.findByActiva(activa);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(TarifaController.class).findByActiva(activa)).withSelfRel());
     }
 
     @GetMapping("/desayuno/{incluyeDesayuno}")
-    public List<TarifaResponse> findByIncluyeDesayuno(@PathVariable Boolean incluyeDesayuno) {
-        return tarifaService.findByIncluyeDesayuno(incluyeDesayuno);
+    public CollectionModel<TarifaResponse> findByIncluyeDesayuno(@PathVariable Boolean incluyeDesayuno) {
+        List<TarifaResponse> list = tarifaService.findByIncluyeDesayuno(incluyeDesayuno);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(TarifaController.class).findByIncluyeDesayuno(incluyeDesayuno)).withSelfRel());
     }
 
     @GetMapping("/tipo/{tipoHabitacion}/activa/{activa}")
-    public List<TarifaResponse> findByTipoHabitacionAndActiva(
+    public CollectionModel<TarifaResponse> findByTipoHabitacionAndActiva(
             @PathVariable String tipoHabitacion,
             @PathVariable Boolean activa) {
-        return tarifaService.findByTipoHabitacionAndActiva(tipoHabitacion, activa);
+        List<TarifaResponse> list = tarifaService.findByTipoHabitacionAndActiva(tipoHabitacion, activa);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(TarifaController.class).findByTipoHabitacionAndActiva(tipoHabitacion, activa)).withSelfRel());
     }
 
     @GetMapping("/exists/tipo/{tipoHabitacion}/activa")
@@ -78,14 +102,14 @@ public class TarifaController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TarifaResponse create(@Valid @RequestBody TarifaRequest request) {
-        return tarifaService.create(request);
+        return addLinks(tarifaService.create(request));
     }
 
     @PutMapping("/{id}")
     public TarifaResponse update(
             @PathVariable Long id,
             @Valid @RequestBody TarifaRequest request) {
-        return tarifaService.update(id, request);
+        return addLinks(tarifaService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
