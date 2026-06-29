@@ -34,9 +34,9 @@ public class DocumentoController {
 
     private DocumentoResponse addLinks(DocumentoResponse d) {
         d.add(linkTo(methodOn(DocumentoController.class).findById(d.getId())).withSelfRel());
-        d.add(linkTo(methodOn(DocumentoController.class).update(d.getId(), null)).withRel("update").withTitle("PUT - Actualizar documento"));
-        d.add(linkTo(methodOn(DocumentoController.class).deleteById(d.getId())).withRel("delete").withTitle("DELETE - Eliminar documento"));
-        d.add(linkTo(methodOn(DocumentoController.class).findAll()).withRel("all").withTitle("GET - Todos los documentos"));
+        d.add(linkTo(methodOn(DocumentoController.class).update(d.getId(), null)).withRel("update"));
+        d.add(linkTo(DocumentoController.class).slash(d.getId()).withRel("delete"));
+        d.add(linkTo(methodOn(DocumentoController.class).findAll()).withRel("all"));
         return d;
     }
 
