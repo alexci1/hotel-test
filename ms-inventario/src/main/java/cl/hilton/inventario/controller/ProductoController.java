@@ -34,10 +34,10 @@ public class ProductoController {
 
     private ProductoResponse addLinks(ProductoResponse p) {
         p.add(linkTo(methodOn(ProductoController.class).findById(p.getId())).withSelfRel());
-        p.add(linkTo(methodOn(ProductoController.class).update(p.getId(), null)).withRel("update").withTitle("PUT - Actualizar producto"));
-        p.add(linkTo(methodOn(ProductoController.class).deleteById(p.getId())).withRel("delete").withTitle("DELETE - Eliminar producto"));
-        p.add(linkTo(methodOn(ProductoController.class).ajustarStock(p.getId(), null)).withRel("ajustar-stock").withTitle("PATCH - Ajustar stock"));
-        p.add(linkTo(methodOn(ProductoController.class).findAll()).withRel("all").withTitle("GET - Todos los productos"));
+        p.add(linkTo(methodOn(ProductoController.class).update(p.getId(), null)).withRel("update"));
+        p.add(linkTo(methodOn(ProductoController.class).findById(p.getId())).withRel("delete"));
+        p.add(linkTo(methodOn(ProductoController.class).ajustarStock(p.getId(), null)).withRel("ajustar-stock"));
+        p.add(linkTo(methodOn(ProductoController.class).findAll()).withRel("all"));
         return p;
     }
 
