@@ -36,9 +36,9 @@ public class TemporadaController {
 
     private TemporadaResponse addLinks(TemporadaResponse t) {
         t.add(linkTo(methodOn(TemporadaController.class).findById(t.getId())).withSelfRel());
-        t.add(linkTo(methodOn(TemporadaController.class).update(t.getId(), null)).withRel("update").withTitle("PUT - Actualizar temporada"));
-        t.add(linkTo(methodOn(TemporadaController.class).deleteById(t.getId())).withRel("delete").withTitle("DELETE - Eliminar temporada"));
-        t.add(linkTo(methodOn(TemporadaController.class).findAll()).withRel("all").withTitle("GET - Todas las temporadas"));
+        t.add(linkTo(methodOn(TemporadaController.class).update(t.getId(), null)).withRel("update"));
+        t.add(linkTo(methodOn(TemporadaController.class).findById(t.getId())).withRel("delete"));
+        t.add(linkTo(methodOn(TemporadaController.class).findAll()).withRel("all"));
         return t;
     }
 
