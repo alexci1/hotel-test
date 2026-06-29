@@ -2,6 +2,7 @@ package cl.hilton.inventario.controller;
 
 import java.util.List;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,9 @@ import cl.hilton.inventario.service.ProductoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/api/v1/productos")
 @RequiredArgsConstructor
@@ -28,65 +32,88 @@ public class ProductoController {
 
     private final ProductoService productoService;
 
+    private ProductoResponse addLinks(ProductoResponse p) {
+        p.add(linkTo(methodOn(ProductoController.class).findById(p.getId())).withSelfRel());
+        p.add(linkTo(methodOn(ProductoController.class).update(p.getId(), null)).withRel("update").withTitle("PUT - Actualizar producto"));
+        p.add(linkTo(methodOn(ProductoController.class).deleteById(p.getId())).withRel("delete").withTitle("DELETE - Eliminar producto"));
+        p.add(linkTo(methodOn(ProductoController.class).ajustarStock(p.getId(), null)).withRel("ajustar-stock").withTitle("PATCH - Ajustar stock"));
+        p.add(linkTo(methodOn(ProductoController.class).findAll()).withRel("all").withTitle("GET - Todos los productos"));
+        return p;
+    }
+
     @GetMapping
-    public List<ProductoResponse> findAll() {
-        return productoService.findAll();
+    public CollectionModel<ProductoResponse> findAll() {
+        List<ProductoResponse> list = productoService.findAll();
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ProductoController.class).findAll()).withSelfRel());
     }
 
     @GetMapping("/{id}")
     public ProductoResponse findById(@PathVariable Long id) {
-        return productoService.findById(id);
+        return addLinks(productoService.findById(id));
     }
 
     @GetMapping("/codigo/{codigoProducto}")
     public ProductoResponse findByCodigoProducto(@PathVariable String codigoProducto) {
-        return productoService.findByCodigoProducto(codigoProducto);
+        return addLinks(productoService.findByCodigoProducto(codigoProducto));
     }
 
     @GetMapping("/categoria/{categoria}")
-    public List<ProductoResponse> findByCategoria(@PathVariable String categoria) {
-        return productoService.findByCategoria(categoria);
+    public CollectionModel<ProductoResponse> findByCategoria(@PathVariable String categoria) {
+        List<ProductoResponse> list = productoService.findByCategoria(categoria);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ProductoController.class).findByCategoria(categoria)).withSelfRel());
     }
 
     @GetMapping("/unidad/{unidad}")
-    public List<ProductoResponse> findByUnidad(@PathVariable String unidad) {
-        return productoService.findByUnidad(unidad);
+    public CollectionModel<ProductoResponse> findByUnidad(@PathVariable String unidad) {
+        List<ProductoResponse> list = productoService.findByUnidad(unidad);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ProductoController.class).findByUnidad(unidad)).withSelfRel());
     }
 
     @GetMapping("/buscar")
-    public List<ProductoResponse> findByNombre(@RequestParam String nombre) {
-        return productoService.findByNombre(nombre);
+    public CollectionModel<ProductoResponse> findByNombre(@RequestParam String nombre) {
+        List<ProductoResponse> list = productoService.findByNombre(nombre);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ProductoController.class).findByNombre(nombre)).withSelfRel());
     }
 
     @GetMapping("/stock-menor-igual/{stockActual}")
-    public List<ProductoResponse> findByStockActualLessThanEqual(@PathVariable Integer stockActual) {
-        return productoService.findByStockActualLessThanEqual(stockActual);
+    public CollectionModel<ProductoResponse> findByStockActualLessThanEqual(@PathVariable Integer stockActual) {
+        List<ProductoResponse> list = productoService.findByStockActualLessThanEqual(stockActual);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ProductoController.class).findByStockActualLessThanEqual(stockActual)).withSelfRel());
     }
 
     @GetMapping("/stock-menor/{stockActual}")
-    public List<ProductoResponse> findByStockActualLessThan(@PathVariable Integer stockActual) {
-        return productoService.findByStockActualLessThan(stockActual);
+    public CollectionModel<ProductoResponse> findByStockActualLessThan(@PathVariable Integer stockActual) {
+        List<ProductoResponse> list = productoService.findByStockActualLessThan(stockActual);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ProductoController.class).findByStockActualLessThan(stockActual)).withSelfRel());
     }
 
     @GetMapping("/stock-mayor/{stockActual}")
-    public List<ProductoResponse> findByStockActualGreaterThan(@PathVariable Integer stockActual) {
-        return productoService.findByStockActualGreaterThan(stockActual);
+    public CollectionModel<ProductoResponse> findByStockActualGreaterThan(@PathVariable Integer stockActual) {
+        List<ProductoResponse> list = productoService.findByStockActualGreaterThan(stockActual);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ProductoController.class).findByStockActualGreaterThan(stockActual)).withSelfRel());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProductoResponse create(@Valid @RequestBody ProductoRequest request) {
-        return productoService.create(request);
+        return addLinks(productoService.create(request));
     }
 
     @PutMapping("/{id}")
     public ProductoResponse update(@PathVariable Long id, @Valid @RequestBody ProductoRequest request) {
-        return productoService.update(id, request);
+        return addLinks(productoService.update(id, request));
     }
 
     @PatchMapping("/{id}/stock")
     public ProductoResponse ajustarStock(@PathVariable Long id, @RequestParam Integer cantidad) {
-        return productoService.ajustarStock(id, cantidad);
+        return addLinks(productoService.ajustarStock(id, cantidad));
     }
 
     @DeleteMapping("/{id}")
