@@ -36,7 +36,7 @@ public class MovimientoController {
     private MovimientoResponse addLinks(MovimientoResponse m) {
         m.add(linkTo(methodOn(MovimientoController.class).findById(m.getId())).withSelfRel());
         m.add(linkTo(methodOn(MovimientoController.class).update(m.getId(), null)).withRel("update"));
-        m.add(linkTo(methodOn(MovimientoController.class).deleteById(m.getId())).withRel("delete"));
+        m.add(linkTo(MovimientoController.class).slash(m.getId()).withRel("delete"));
         m.add(linkTo(methodOn(MovimientoController.class).findAll()).withRel("all"));
         return m;
     }
