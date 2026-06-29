@@ -2,6 +2,7 @@ package cl.hilton.reportes.controller;
 
 import java.util.List;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,9 @@ import cl.hilton.reportes.service.ReporteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/api/v1/reportes")
 @RequiredArgsConstructor
@@ -27,52 +31,70 @@ public class ReporteController {
 
     private final ReporteService reporteService;
 
+    private ReporteResponse addLinks(ReporteResponse r) {
+        r.add(linkTo(methodOn(ReporteController.class).findById(r.getId())).withSelfRel());
+        r.add(linkTo(methodOn(ReporteController.class).update(r.getId(), null)).withRel("update").withTitle("PUT - Actualizar reporte"));
+        r.add(linkTo(methodOn(ReporteController.class).deleteById(r.getId())).withRel("delete").withTitle("DELETE - Eliminar reporte"));
+        r.add(linkTo(methodOn(ReporteController.class).findAll()).withRel("all").withTitle("GET - Todos los reportes"));
+        return r;
+    }
+
     @GetMapping
-    public List<ReporteResponse> findAll() {
-        return reporteService.findAll();
+    public CollectionModel<ReporteResponse> findAll() {
+        List<ReporteResponse> list = reporteService.findAll();
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ReporteController.class).findAll()).withSelfRel());
     }
 
     @GetMapping("/{id}")
     public ReporteResponse findById(@PathVariable Long id) {
-        return reporteService.findById(id);
+        return addLinks(reporteService.findById(id));
     }
 
     @GetMapping("/codigo/{codigo}")
     public ReporteResponse findByCodigo(@PathVariable String codigo) {
-        return reporteService.findByCodigo(codigo);
+        return addLinks(reporteService.findByCodigo(codigo));
     }
 
     @GetMapping("/tipo/{tipo}")
-    public List<ReporteResponse> findByTipo(@PathVariable String tipo) {
-        return reporteService.findByTipo(tipo);
+    public CollectionModel<ReporteResponse> findByTipo(@PathVariable String tipo) {
+        List<ReporteResponse> list = reporteService.findByTipo(tipo);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ReporteController.class).findByTipo(tipo)).withSelfRel());
     }
 
     @GetMapping("/frecuencia/{frecuencia}")
-    public List<ReporteResponse> findByFrecuencia(@PathVariable String frecuencia) {
-        return reporteService.findByFrecuencia(frecuencia);
+    public CollectionModel<ReporteResponse> findByFrecuencia(@PathVariable String frecuencia) {
+        List<ReporteResponse> list = reporteService.findByFrecuencia(frecuencia);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ReporteController.class).findByFrecuencia(frecuencia)).withSelfRel());
     }
 
     @GetMapping("/activo/{activo}")
-    public List<ReporteResponse> findByActivo(@PathVariable Boolean activo) {
-        return reporteService.findByActivo(activo);
+    public CollectionModel<ReporteResponse> findByActivo(@PathVariable Boolean activo) {
+        List<ReporteResponse> list = reporteService.findByActivo(activo);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ReporteController.class).findByActivo(activo)).withSelfRel());
     }
 
     @GetMapping("/buscar")
-    public List<ReporteResponse> findByNombre(@RequestParam String nombre) {
-        return reporteService.findByNombre(nombre);
+    public CollectionModel<ReporteResponse> findByNombre(@RequestParam String nombre) {
+        List<ReporteResponse> list = reporteService.findByNombre(nombre);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ReporteController.class).findByNombre(nombre)).withSelfRel());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReporteResponse create(@Valid @RequestBody ReporteRequest request) {
-        return reporteService.create(request);
+        return addLinks(reporteService.create(request));
     }
 
     @PutMapping("/{id}")
     public ReporteResponse update(
             @PathVariable Long id,
             @Valid @RequestBody ReporteRequest request) {
-        return reporteService.update(id, request);
+        return addLinks(reporteService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
