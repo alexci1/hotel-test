@@ -35,9 +35,9 @@ public class KpiController {
 
     private KpiResponse addLinks(KpiResponse k) {
         k.add(linkTo(methodOn(KpiController.class).findById(k.getId())).withSelfRel());
-        k.add(linkTo(methodOn(KpiController.class).update(k.getId(), null)).withRel("update").withTitle("PUT - Actualizar KPI"));
-        k.add(linkTo(methodOn(KpiController.class).deleteById(k.getId())).withRel("delete").withTitle("DELETE - Eliminar KPI"));
-        k.add(linkTo(methodOn(KpiController.class).findAll()).withRel("all").withTitle("GET - Todos los KPIs"));
+        k.add(linkTo(methodOn(KpiController.class).update(k.getId(), null)).withRel("update"));
+        k.add(linkTo(KpiController.class).slash(k.getId()).withRel("delete"));
+        k.add(linkTo(methodOn(KpiController.class).findAll()).withRel("all"));
         return k;
     }
 
