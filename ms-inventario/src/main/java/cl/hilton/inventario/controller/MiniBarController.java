@@ -34,10 +34,10 @@ public class MiniBarController {
 
     private MiniBarResponse addLinks(MiniBarResponse m) {
         m.add(linkTo(methodOn(MiniBarController.class).findById(m.getId())).withSelfRel());
-        m.add(linkTo(methodOn(MiniBarController.class).update(m.getId(), null)).withRel("update").withTitle("PUT - Actualizar minibar"));
-        m.add(linkTo(methodOn(MiniBarController.class).deleteById(m.getId())).withRel("delete").withTitle("DELETE - Eliminar minibar"));
-        m.add(linkTo(methodOn(MiniBarController.class).actualizarCantidad(m.getId(), null)).withRel("actualizar-cantidad").withTitle("PATCH - Actualizar cantidad"));
-        m.add(linkTo(methodOn(MiniBarController.class).findAll()).withRel("all").withTitle("GET - Todos los minibares"));
+        m.add(linkTo(methodOn(MiniBarController.class).update(m.getId(), null)).withRel("update"));
+        m.add(linkTo(methodOn(MiniBarController.class).findById(m.getId())).withRel("delete"));
+        m.add(linkTo(methodOn(MiniBarController.class).actualizarCantidad(m.getId(), null)).withRel("actualizar-cantidad"));
+        m.add(linkTo(methodOn(MiniBarController.class).findAll()).withRel("all"));
         return m;
     }
 
