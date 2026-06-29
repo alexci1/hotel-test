@@ -36,10 +36,10 @@ public class HuespedController {
 
     private HuespedResponse addLinks(HuespedResponse h) {
         h.add(linkTo(methodOn(HuespedController.class).findById(h.getId())).withSelfRel());
-        h.add(linkTo(methodOn(HuespedController.class).update(h.getId(), null)).withRel("update").withTitle("PUT - Actualizar huesped"));
-        h.add(linkTo(methodOn(HuespedController.class).deleteById(h.getId())).withRel("delete").withTitle("DELETE - Eliminar huesped"));
-        h.add(linkTo(methodOn(HuespedController.class).cambiarActivo(h.getId(), null)).withRel("cambiar-activo").withTitle("PATCH - Cambiar estado activo"));
-        h.add(linkTo(methodOn(HuespedController.class).findAll()).withRel("all").withTitle("GET - Todos los huespedes"));
+        h.add(linkTo(methodOn(HuespedController.class).update(h.getId(), null)).withRel("update"));
+        h.add(linkTo(HuespedController.class).slash(h.getId()).withRel("delete"));
+        h.add(linkTo(methodOn(HuespedController.class).cambiarActivo(h.getId(), null)).withRel("cambiar-activo"));
+        h.add(linkTo(methodOn(HuespedController.class).findAll()).withRel("all"));
         return h;
     }
 
