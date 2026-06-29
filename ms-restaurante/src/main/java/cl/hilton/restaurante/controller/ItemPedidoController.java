@@ -2,6 +2,7 @@ package cl.hilton.restaurante.controller;
 
 import java.util.List;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,9 @@ import cl.hilton.restaurante.service.ItemPedidoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/api/v1/items-pedidos")
 @RequiredArgsConstructor
@@ -26,42 +30,58 @@ public class ItemPedidoController {
 
     private final ItemPedidoService itemPedidoService;
 
+    private ItemPedidoResponse addLinks(ItemPedidoResponse i) {
+        i.add(linkTo(methodOn(ItemPedidoController.class).findById(i.getId())).withSelfRel());
+        i.add(linkTo(methodOn(ItemPedidoController.class).update(i.getId(), null)).withRel("update").withTitle("PUT - Actualizar item"));
+        i.add(linkTo(methodOn(ItemPedidoController.class).deleteById(i.getId())).withRel("delete").withTitle("DELETE - Eliminar item"));
+        i.add(linkTo(methodOn(ItemPedidoController.class).findAll()).withRel("all").withTitle("GET - Todos los items"));
+        return i;
+    }
+
     @GetMapping
-    public List<ItemPedidoResponse> findAll() {
-        return itemPedidoService.findAll();
+    public CollectionModel<ItemPedidoResponse> findAll() {
+        List<ItemPedidoResponse> list = itemPedidoService.findAll();
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ItemPedidoController.class).findAll()).withSelfRel());
     }
 
     @GetMapping("/{id}")
     public ItemPedidoResponse findById(@PathVariable Long id) {
-        return itemPedidoService.findById(id);
+        return addLinks(itemPedidoService.findById(id));
     }
 
     @GetMapping("/pedido/{numeroPedido}")
-    public List<ItemPedidoResponse> findByNumeroPedido(@PathVariable String numeroPedido) {
-        return itemPedidoService.findByNumeroPedido(numeroPedido);
+    public CollectionModel<ItemPedidoResponse> findByNumeroPedido(@PathVariable String numeroPedido) {
+        List<ItemPedidoResponse> list = itemPedidoService.findByNumeroPedido(numeroPedido);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ItemPedidoController.class).findByNumeroPedido(numeroPedido)).withSelfRel());
     }
 
     @GetMapping("/producto/{nombreProducto}")
-    public List<ItemPedidoResponse> findByNombreProducto(@PathVariable String nombreProducto) {
-        return itemPedidoService.findByNombreProducto(nombreProducto);
+    public CollectionModel<ItemPedidoResponse> findByNombreProducto(@PathVariable String nombreProducto) {
+        List<ItemPedidoResponse> list = itemPedidoService.findByNombreProducto(nombreProducto);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ItemPedidoController.class).findByNombreProducto(nombreProducto)).withSelfRel());
     }
 
     @GetMapping("/cantidad-mayor-que/{cantidad}")
-    public List<ItemPedidoResponse> findByCantidadMayorQue(@PathVariable Integer cantidad) {
-        return itemPedidoService.findByCantidadMayorQue(cantidad);
+    public CollectionModel<ItemPedidoResponse> findByCantidadMayorQue(@PathVariable Integer cantidad) {
+        List<ItemPedidoResponse> list = itemPedidoService.findByCantidadMayorQue(cantidad);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(ItemPedidoController.class).findByCantidadMayorQue(cantidad)).withSelfRel());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ItemPedidoResponse create(@Valid @RequestBody ItemPedidoRequest request) {
-        return itemPedidoService.create(request);
+        return addLinks(itemPedidoService.create(request));
     }
 
     @PutMapping("/{id}")
     public ItemPedidoResponse update(
             @PathVariable Long id,
             @Valid @RequestBody ItemPedidoRequest request) {
-        return itemPedidoService.update(id, request);
+        return addLinks(itemPedidoService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
