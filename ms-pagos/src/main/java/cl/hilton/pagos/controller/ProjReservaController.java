@@ -21,7 +21,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/pagos/reservas")
+@RequestMapping("/api/v1/reservas")
 @RequiredArgsConstructor
 public class ProjReservaController {
 

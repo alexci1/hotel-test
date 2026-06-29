@@ -22,7 +22,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/tarifas/descuentos")
+@RequestMapping("/api/v1/descuentos")
 @RequiredArgsConstructor
 public class DescuentoController {
 

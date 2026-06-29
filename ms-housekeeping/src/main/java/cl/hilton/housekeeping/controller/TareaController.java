@@ -21,7 +21,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/housekeeping/tareas")
+@RequestMapping("/api/v1/tareas")
 @RequiredArgsConstructor
 public class TareaController {
 

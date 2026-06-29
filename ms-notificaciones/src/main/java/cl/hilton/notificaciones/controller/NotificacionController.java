@@ -21,7 +21,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/notificaciones/notificaciones")
+@RequestMapping("/api/v1/notificaciones")
 @RequiredArgsConstructor
 public class NotificacionController {
 

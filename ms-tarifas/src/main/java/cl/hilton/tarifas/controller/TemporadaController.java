@@ -23,7 +23,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/tarifas/temporadas")
+@RequestMapping("/api/v1/temporadas")
 @RequiredArgsConstructor
 public class TemporadaController {
 

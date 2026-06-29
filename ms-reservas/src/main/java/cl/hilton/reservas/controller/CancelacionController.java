@@ -22,7 +22,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/reservas/cancelaciones")
+@RequestMapping("/api/v1/cancelaciones")
 @RequiredArgsConstructor
 public class CancelacionController {
 

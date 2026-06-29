@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/checkin/checkins")
+@RequestMapping("/api/v1/checkins")
 @RequiredArgsConstructor
 public class CheckinController {
 

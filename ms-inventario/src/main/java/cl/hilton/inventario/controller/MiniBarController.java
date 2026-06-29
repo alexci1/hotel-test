@@ -22,7 +22,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/inventario/minibares")
+@RequestMapping("/api/v1/minibares")
 @RequiredArgsConstructor
 public class MiniBarController {
 

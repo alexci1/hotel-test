@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/autenticacion/roles")
+@RequestMapping("/api/v1/roles")
 @RequiredArgsConstructor
 public class RolController {
 

@@ -23,7 +23,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/reportes/kpis")
+@RequestMapping("/api/v1/kpis")
 @RequiredArgsConstructor
 public class KpiController {
 

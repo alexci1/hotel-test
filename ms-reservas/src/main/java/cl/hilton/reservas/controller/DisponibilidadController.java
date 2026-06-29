@@ -23,7 +23,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/reservas/disponibilidades")
+@RequestMapping("/api/v1/disponibilidades")
 @RequiredArgsConstructor
 public class DisponibilidadController {
 

@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/huespedes/preferencias")
+@RequestMapping("/api/v1/preferencias")
 @RequiredArgsConstructor
 public class PreferenciaController {
 
