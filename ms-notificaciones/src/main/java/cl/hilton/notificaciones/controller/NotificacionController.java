@@ -33,10 +33,10 @@ public class NotificacionController {
 
     private NotificacionResponse addLinks(NotificacionResponse n) {
         n.add(linkTo(methodOn(NotificacionController.class).findById(n.getId())).withSelfRel());
-        n.add(linkTo(methodOn(NotificacionController.class).update(n.getId(), null)).withRel("update").withTitle("PUT - Actualizar notificacion"));
-        n.add(linkTo(methodOn(NotificacionController.class).deleteById(n.getId())).withRel("delete").withTitle("DELETE - Eliminar notificacion"));
-        n.add(linkTo(methodOn(NotificacionController.class).findByEmailHuesped(n.getEmailHuesped())).withRel("notificaciones-huesped").withTitle("GET - Notificaciones del huesped"));
-        n.add(linkTo(methodOn(NotificacionController.class).findAll()).withRel("all").withTitle("GET - Todas las notificaciones"));
+        n.add(linkTo(methodOn(NotificacionController.class).update(n.getId(), null)).withRel("update"));
+        n.add(linkTo(methodOn(NotificacionController.class).findById(n.getId())).withRel("delete"));
+        n.add(linkTo(methodOn(NotificacionController.class).findByEmailHuesped(n.getEmailHuesped())).withRel("notificaciones-huesped"));
+        n.add(linkTo(methodOn(NotificacionController.class).findAll()).withRel("all"));
         return n;
     }
 
