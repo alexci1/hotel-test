@@ -36,9 +36,9 @@ public class DisponibilidadController {
 
     private DisponibilidadResponse addLinks(DisponibilidadResponse d) {
         d.add(linkTo(methodOn(DisponibilidadController.class).findById(d.getId())).withSelfRel());
-        d.add(linkTo(methodOn(DisponibilidadController.class).update(d.getId(), null)).withRel("update").withTitle("PUT - Actualizar disponibilidad"));
-        d.add(linkTo(methodOn(DisponibilidadController.class).deleteById(d.getId())).withRel("delete").withTitle("DELETE - Eliminar disponibilidad"));
-        d.add(linkTo(methodOn(DisponibilidadController.class).findAll()).withRel("all").withTitle("GET - Todas las disponibilidades"));
+        d.add(linkTo(methodOn(DisponibilidadController.class).update(d.getId(), null)).withRel("update"));
+        d.add(linkTo(methodOn(DisponibilidadController.class).findById(d.getId())).withRel("delete"));
+        d.add(linkTo(methodOn(DisponibilidadController.class).findAll()).withRel("all"));
         return d;
     }
 
