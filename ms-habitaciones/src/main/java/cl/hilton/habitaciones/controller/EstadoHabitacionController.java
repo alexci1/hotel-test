@@ -36,9 +36,9 @@ public class EstadoHabitacionController {
 
     private EstadoHabitacionResponse addLinks(EstadoHabitacionResponse e) {
         e.add(linkTo(methodOn(EstadoHabitacionController.class).findById(e.getId())).withSelfRel());
-        e.add(linkTo(methodOn(EstadoHabitacionController.class).update(e.getId(), null)).withRel("update").withTitle("PUT - Actualizar estado"));
-        e.add(linkTo(methodOn(EstadoHabitacionController.class).deleteById(e.getId())).withRel("delete").withTitle("DELETE - Eliminar estado"));
-        e.add(linkTo(methodOn(EstadoHabitacionController.class).findAll()).withRel("all").withTitle("GET - Todos los estados"));
+        e.add(linkTo(methodOn(EstadoHabitacionController.class).update(e.getId(), null)).withRel("update"));
+        e.add(linkTo(methodOn(EstadoHabitacionController.class).findById(e.getId())).withRel("delete"));
+        e.add(linkTo(methodOn(EstadoHabitacionController.class).findAll()).withRel("all"));
         return e;
     }
 
