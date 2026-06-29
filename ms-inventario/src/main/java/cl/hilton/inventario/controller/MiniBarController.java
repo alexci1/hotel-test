@@ -2,6 +2,7 @@ package cl.hilton.inventario.controller;
 
 import java.util.List;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,9 @@ import cl.hilton.inventario.service.MinibarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/api/v1/minibares")
 @RequiredArgsConstructor
@@ -28,62 +32,83 @@ public class MiniBarController {
 
     private final MinibarService miniBarService;
 
+    private MiniBarResponse addLinks(MiniBarResponse m) {
+        m.add(linkTo(methodOn(MiniBarController.class).findById(m.getId())).withSelfRel());
+        m.add(linkTo(methodOn(MiniBarController.class).update(m.getId(), null)).withRel("update").withTitle("PUT - Actualizar minibar"));
+        m.add(linkTo(methodOn(MiniBarController.class).deleteById(m.getId())).withRel("delete").withTitle("DELETE - Eliminar minibar"));
+        m.add(linkTo(methodOn(MiniBarController.class).actualizarCantidad(m.getId(), null)).withRel("actualizar-cantidad").withTitle("PATCH - Actualizar cantidad"));
+        m.add(linkTo(methodOn(MiniBarController.class).findAll()).withRel("all").withTitle("GET - Todos los minibares"));
+        return m;
+    }
+
     @GetMapping
-    public List<MiniBarResponse> findAll() {
-        return miniBarService.findAll();
+    public CollectionModel<MiniBarResponse> findAll() {
+        List<MiniBarResponse> list = miniBarService.findAll();
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(MiniBarController.class).findAll()).withSelfRel());
     }
 
     @GetMapping("/{id}")
     public MiniBarResponse findById(@PathVariable Long id) {
-        return miniBarService.findById(id);
+        return addLinks(miniBarService.findById(id));
     }
 
     @GetMapping("/habitacion/{numeroHabitacion}")
-    public List<MiniBarResponse> findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
-        return miniBarService.findByNumeroHabitacion(numeroHabitacion);
+    public CollectionModel<MiniBarResponse> findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
+        List<MiniBarResponse> list = miniBarService.findByNumeroHabitacion(numeroHabitacion);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(MiniBarController.class).findByNumeroHabitacion(numeroHabitacion)).withSelfRel());
     }
 
     @GetMapping("/producto/{codigoProducto}")
-    public List<MiniBarResponse> findByCodigoProducto(@PathVariable String codigoProducto) {
-        return miniBarService.findByCodigoProducto(codigoProducto);
+    public CollectionModel<MiniBarResponse> findByCodigoProducto(@PathVariable String codigoProducto) {
+        List<MiniBarResponse> list = miniBarService.findByCodigoProducto(codigoProducto);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(MiniBarController.class).findByCodigoProducto(codigoProducto)).withSelfRel());
     }
 
     @GetMapping("/habitacion/{numeroHabitacion}/producto/{codigoProducto}")
     public MiniBarResponse findByHabitacionAndProducto(
             @PathVariable String numeroHabitacion,
             @PathVariable String codigoProducto) {
-        return miniBarService.findByHabitacionAndProducto(numeroHabitacion, codigoProducto);
+        return addLinks(miniBarService.findByHabitacionAndProducto(numeroHabitacion, codigoProducto));
     }
 
     @GetMapping("/cantidad/{cantidad}")
-    public List<MiniBarResponse> findByCantidad(@PathVariable Integer cantidad) {
-        return miniBarService.findByCantidad(cantidad);
+    public CollectionModel<MiniBarResponse> findByCantidad(@PathVariable Integer cantidad) {
+        List<MiniBarResponse> list = miniBarService.findByCantidad(cantidad);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(MiniBarController.class).findByCantidad(cantidad)).withSelfRel());
     }
 
     @GetMapping("/cantidad-mayor/{cantidad}")
-    public List<MiniBarResponse> findByCantidadGreaterThan(@PathVariable Integer cantidad) {
-        return miniBarService.findByCantidadGreaterThan(cantidad);
+    public CollectionModel<MiniBarResponse> findByCantidadGreaterThan(@PathVariable Integer cantidad) {
+        List<MiniBarResponse> list = miniBarService.findByCantidadGreaterThan(cantidad);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(MiniBarController.class).findByCantidadGreaterThan(cantidad)).withSelfRel());
     }
 
     @GetMapping("/precio-mayor/{precioUnitUsd}")
-    public List<MiniBarResponse> findByPrecioUnitUsdGreaterThan(@PathVariable Integer precioUnitUsd) {
-        return miniBarService.findByPrecioUnitUsdGreaterThan(precioUnitUsd);
+    public CollectionModel<MiniBarResponse> findByPrecioUnitUsdGreaterThan(@PathVariable Integer precioUnitUsd) {
+        List<MiniBarResponse> list = miniBarService.findByPrecioUnitUsdGreaterThan(precioUnitUsd);
+        list.forEach(this::addLinks);
+        return CollectionModel.of(list, linkTo(methodOn(MiniBarController.class).findByPrecioUnitUsdGreaterThan(precioUnitUsd)).withSelfRel());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MiniBarResponse create(@Valid @RequestBody MiniBarRequest request) {
-        return miniBarService.create(request);
+        return addLinks(miniBarService.create(request));
     }
 
     @PutMapping("/{id}")
     public MiniBarResponse update(@PathVariable Long id, @Valid @RequestBody MiniBarRequest request) {
-        return miniBarService.update(id, request);
+        return addLinks(miniBarService.update(id, request));
     }
 
     @PatchMapping("/{id}/cantidad")
     public MiniBarResponse actualizarCantidad(@PathVariable Long id, @RequestParam Integer cantidad) {
-        return miniBarService.actualizarCantidad(id, cantidad);
+        return addLinks(miniBarService.actualizarCantidad(id, cantidad));
     }
 
     @DeleteMapping("/{id}")
