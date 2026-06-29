@@ -1,29 +1,54 @@
 package cl.hilton.checkin.mapper;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.springframework.stereotype.Component;
 
 import cl.hilton.checkin.dto.ProjHuespedRequest;
 import cl.hilton.checkin.dto.ProjHuespedResponse;
 import cl.hilton.checkin.model.ProjHuesped;
 
-@Mapper(componentModel = "spring")
-public interface ProjHuespedMapper {
+@Component
+public class ProjHuespedMapper {
 
-    @Mapping(target = "email", ignore = true)
-    @Mapping(target = "actualizadoEn", ignore = true)
-    @Mapping(target = "checkins", ignore = true)
-    ProjHuesped toEntity(ProjHuespedRequest request);
+    public ProjHuesped toEntity(ProjHuespedRequest request) {
+        if (request == null) {
+            return null;
+        }
 
-    ProjHuespedResponse toResponse(ProjHuesped huesped);
+        ProjHuesped huesped = new ProjHuesped();
+        huesped.setNombreCompleto(request.getNombreCompleto());
+        return huesped;
+    }
 
-    List<ProjHuespedResponse> toResponseList(List<ProjHuesped> huespedes);
+    public ProjHuespedResponse toResponse(ProjHuesped huesped) {
+        if (huesped == null) {
+            return null;
+        }
 
-    @Mapping(target = "email", ignore = true)
-    @Mapping(target = "checkins", ignore = true)
-    @Mapping(target = "actualizadoEn", ignore = true)
-    void updateEntity(ProjHuespedRequest request, @MappingTarget ProjHuesped huesped);
+        ProjHuespedResponse response = new ProjHuespedResponse();
+        response.setEmail(huesped.getEmail());
+        response.setNombreCompleto(huesped.getNombreCompleto());
+        response.setActualizadoEn(huesped.getActualizadoEn());
+        return response;
+    }
+
+    public List<ProjHuespedResponse> toResponseList(List<ProjHuesped> huespedes) {
+        if (huespedes == null) {
+            return null;
+        }
+
+        return huespedes.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public void updateEntity(ProjHuespedRequest request, ProjHuesped huesped) {
+        if (request == null || huesped == null) {
+            return;
+        }
+
+        huesped.setNombreCompleto(request.getNombreCompleto());
+    }
 }
