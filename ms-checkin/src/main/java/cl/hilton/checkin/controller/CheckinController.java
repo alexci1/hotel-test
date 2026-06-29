@@ -32,9 +32,9 @@ public class CheckinController {
 
     private CheckinResponse addLinks(CheckinResponse c) {
         c.add(linkTo(methodOn(CheckinController.class).findById(c.getId())).withSelfRel());
-        c.add(linkTo(methodOn(CheckinController.class).update(c.getId(), null)).withRel("update").withTitle("PUT - Actualizar checkin"));
-        c.add(linkTo(methodOn(CheckinController.class).deleteById(c.getId())).withRel("delete").withTitle("DELETE - Eliminar checkin"));
-        c.add(linkTo(methodOn(CheckinController.class).findAll()).withRel("all").withTitle("GET - Todos los checkins"));
+        c.add(linkTo(methodOn(CheckinController.class).update(c.getId(), null)).withRel("update"));
+        c.add(linkTo(CheckinController.class).slash(c.getId()).withRel("delete"));
+        c.add(linkTo(methodOn(CheckinController.class).findAll()).withRel("all"));
         return c;
     }
 
