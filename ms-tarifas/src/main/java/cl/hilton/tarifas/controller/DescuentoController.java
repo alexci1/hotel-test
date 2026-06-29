@@ -34,9 +34,9 @@ public class DescuentoController {
 
     private DescuentoResponse addLinks(DescuentoResponse d) {
         d.add(linkTo(methodOn(DescuentoController.class).findById(d.getId())).withSelfRel());
-        d.add(linkTo(methodOn(DescuentoController.class).update(d.getId(), null)).withRel("update").withTitle("PUT - Actualizar descuento"));
-        d.add(linkTo(methodOn(DescuentoController.class).deleteById(d.getId())).withRel("delete").withTitle("DELETE - Eliminar descuento"));
-        d.add(linkTo(methodOn(DescuentoController.class).findAll()).withRel("all").withTitle("GET - Todos los descuentos"));
+        d.add(linkTo(methodOn(DescuentoController.class).update(d.getId(), null)).withRel("update"));
+        d.add(linkTo(methodOn(DescuentoController.class).findById(d.getId())).withRel("delete"));
+        d.add(linkTo(methodOn(DescuentoController.class).findAll()).withRel("all"));
         return d;
     }
 
