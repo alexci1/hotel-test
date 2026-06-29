@@ -32,9 +32,9 @@ public class ItemPedidoController {
 
     private ItemPedidoResponse addLinks(ItemPedidoResponse i) {
         i.add(linkTo(methodOn(ItemPedidoController.class).findById(i.getId())).withSelfRel());
-        i.add(linkTo(methodOn(ItemPedidoController.class).update(i.getId(), null)).withRel("update").withTitle("PUT - Actualizar item"));
-        i.add(linkTo(methodOn(ItemPedidoController.class).deleteById(i.getId())).withRel("delete").withTitle("DELETE - Eliminar item"));
-        i.add(linkTo(methodOn(ItemPedidoController.class).findAll()).withRel("all").withTitle("GET - Todos los items"));
+        i.add(linkTo(methodOn(ItemPedidoController.class).update(i.getId(), null)).withRel("update"));
+        i.add(linkTo(ItemPedidoController.class).slash(i.getId()).withRel("delete"));
+        i.add(linkTo(methodOn(ItemPedidoController.class).findAll()).withRel("all"));
         return i;
     }
 
