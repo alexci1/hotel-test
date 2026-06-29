@@ -35,9 +35,9 @@ public class MetricaController {
 
     private MetricaResponse addLinks(MetricaResponse m) {
         m.add(linkTo(methodOn(MetricaController.class).findById(m.getId())).withSelfRel());
-        m.add(linkTo(methodOn(MetricaController.class).update(m.getId(), null)).withRel("update").withTitle("PUT - Actualizar metrica"));
-        m.add(linkTo(methodOn(MetricaController.class).deleteById(m.getId())).withRel("delete").withTitle("DELETE - Eliminar metrica"));
-        m.add(linkTo(methodOn(MetricaController.class).findAll()).withRel("all").withTitle("GET - Todas las metricas"));
+        m.add(linkTo(methodOn(MetricaController.class).update(m.getId(), null)).withRel("update"));
+        m.add(linkTo(methodOn(MetricaController.class).findById(m.getId())).withRel("delete"));
+        m.add(linkTo(methodOn(MetricaController.class).findAll()).withRel("all"));
         return m;
     }
 
