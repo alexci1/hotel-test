@@ -33,9 +33,9 @@ public class TipoHabitacionController {
 
     private TipoHabitacionResponse addLinks(TipoHabitacionResponse t) {
         t.add(linkTo(methodOn(TipoHabitacionController.class).findById(t.getId())).withSelfRel());
-        t.add(linkTo(methodOn(TipoHabitacionController.class).update(t.getId(), null)).withRel("update").withTitle("PUT - Actualizar tipo"));
-        t.add(linkTo(methodOn(TipoHabitacionController.class).deleteById(t.getId())).withRel("delete").withTitle("DELETE - Eliminar tipo"));
-        t.add(linkTo(methodOn(TipoHabitacionController.class).findAll()).withRel("all").withTitle("GET - Todos los tipos"));
+        t.add(linkTo(methodOn(TipoHabitacionController.class).update(t.getId(), null)).withRel("update"));
+        t.add(linkTo(methodOn(TipoHabitacionController.class).findById(t.getId())).withRel("delete"));
+        t.add(linkTo(methodOn(TipoHabitacionController.class).findAll()).withRel("all"));
         return t;
     }
 
