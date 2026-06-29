@@ -33,9 +33,9 @@ public class EnvioController {
 
     private EnvioResponse addLinks(EnvioResponse e) {
         e.add(linkTo(methodOn(EnvioController.class).findById(e.getId())).withSelfRel());
-        e.add(linkTo(methodOn(EnvioController.class).update(e.getId(), null)).withRel("update").withTitle("PUT - Actualizar envio"));
-        e.add(linkTo(methodOn(EnvioController.class).deleteById(e.getId())).withRel("delete").withTitle("DELETE - Eliminar envio"));
-        e.add(linkTo(methodOn(EnvioController.class).findAll()).withRel("all").withTitle("GET - Todos los envios"));
+        e.add(linkTo(methodOn(EnvioController.class).update(e.getId(), null)).withRel("update"));
+        e.add(linkTo(methodOn(EnvioController.class).findById(e.getId())).withRel("delete"));
+        e.add(linkTo(methodOn(EnvioController.class).findAll()).withRel("all"));
         return e;
     }
 
