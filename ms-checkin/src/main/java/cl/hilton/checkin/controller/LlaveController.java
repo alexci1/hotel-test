@@ -34,10 +34,10 @@ public class LlaveController {
 
     private LlaveResponse addLinks(LlaveResponse l) {
         l.add(linkTo(methodOn(LlaveController.class).findById(l.getId())).withSelfRel());
-        l.add(linkTo(methodOn(LlaveController.class).update(l.getId(), null)).withRel("update").withTitle("PUT - Actualizar llave"));
-        l.add(linkTo(methodOn(LlaveController.class).deleteById(l.getId())).withRel("delete").withTitle("DELETE - Eliminar llave"));
-        l.add(linkTo(methodOn(LlaveController.class).updateEstado(l.getId(), null)).withRel("cambiar-estado").withTitle("PATCH - Cambiar estado llave"));
-        l.add(linkTo(methodOn(LlaveController.class).findAll()).withRel("all").withTitle("GET - Todas las llaves"));
+        l.add(linkTo(methodOn(LlaveController.class).update(l.getId(), null)).withRel("update"));
+        l.add(linkTo(LlaveController.class).slash(l.getId()).withRel("delete"));
+        l.add(linkTo(methodOn(LlaveController.class).updateEstado(l.getId(), null)).withRel("cambiar-estado"));
+        l.add(linkTo(methodOn(LlaveController.class).findAll()).withRel("all"));
         return l;
     }
 
