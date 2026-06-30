@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!-- Modelo base de Maven -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- [GATEWAY-INI] -->
+    <!-- Herencia del proyecto padre que centraliza configuracion, BOM y versiones -->
+    <parent>
+        <groupId>cl.hilton</groupId>
+        <artifactId>hotel</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <!-- Coordenadas GAV del modulo API Gateway -->
+    <groupId>cl.hilton</groupId>
+    <artifactId>cl-hilton-api-gateway</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <name>Modulo API Gateway</name>
+    <description>API Gateway para enrutar peticiones hacia los microservicios Hilton usando Eureka.</description>
+
+    <packaging>jar</packaging>
+
+    <dependencies>
+
+        <!-- Spring Cloud Gateway: puerta de entrada unica para enrutar peticiones -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+
+        <!-- Cliente Eureka: permite que el Gateway descubra microservicios por nombre -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!-- Actuator: endpoints de salud y monitoreo -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- DevTools: recarga automatica en desarrollo -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>cl.hilton.gateway.HotelApiGatewayApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <!-- [GATEWAY-FIN] -->
+
+</project>
