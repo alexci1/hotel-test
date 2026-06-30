@@ -18,6 +18,7 @@
     <modules>
         <module>eureka</module>      <!-- Servidor Eureka -->
         <module>common</module>      <!-- Libreria comun Hilton -->
+        <module>api-gateway</module>      <!-- API Gateway -->
         <module>ms-reservas</module>      <!-- Microservicio reservas -->
         <module>ms-habitaciones</module>      <!-- Microservicio habitaciones -->
         <module>ms-huespedes</module>      <!-- Microservicio huespedes -->
