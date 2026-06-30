@@ -1,0 +1,47 @@
+# ============================================================
+# API GATEWAY - Configuración principal
+# ============================================================
+# El Gateway será la puerta de entrada única del sistema Hilton.
+# En este primer paso queda configurado en el puerto 9000 y conectado a Eureka.
+# Las rutas hacia los microservicios se agregarán en el siguiente paso.
+# ============================================================
+
+server:
+  port: 9000
+  error:
+    include-stacktrace: never
+
+spring:
+  application:
+    name: api-gateway
+
+# Actuator: monitoreo y salud del Gateway
+management:
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+
+info:
+  app:
+    name: ${spring.application.name}
+    version: "@project.version@"
+    description: "API Gateway para microservicios Hilton"
+
+# Eureka: permite que el Gateway descubra los microservicios registrados
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
+    instance-id: "${spring.application.name}:${random.value}"
+    lease-renewal-interval-in-seconds: 15
+    lease-expiration-duration-in-seconds: 60
