@@ -36,7 +36,9 @@ public class AuthService {
     @Transactional
     public LoginResponse login(LoginRequest request) {
 
-        Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
+        String correo = request.getEmail();
+
+        Usuario usuario = usuarioRepository.findByEmail(correo)
                 .orElseThrow(() -> {
                     log.warn("Intento de login con email inexistente: {}", request.getEmail());
                     return new RuntimeException("Credenciales inválidas");

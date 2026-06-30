@@ -63,27 +63,29 @@ INSERT INTO roles (codigo, descripcion, activo) VALUES
 ('SOLO_LECTURA', 'Acceso de solo lectura para auditoría',               TRUE),
 ('INACTIVO',     'Rol dado de baja',                                    FALSE);
 
+--La password es: Biblio@2026
+
 INSERT INTO usuarios (email, nombre_completo, rol_codigo, hash_password, activo, ultimo_acceso) VALUES
 ('admin@hotel.com',      'Administrador Principal', 'ADMIN',
- '$2b$12$ADMINHASHADMINHASHADMINHASHADMINHASHADMIN', TRUE, '2026-05-19'),
+ '$2b$10$1hnbaMR7iTsdn3D0gG5Q8eUw5aSh9O2at2e4u1iAlzdhD6m4dzVZO', TRUE, '2026-05-19'),
 
 ('gerente@hotel.com',    'María Fernández', 'GERENCIA',
- '$2b$12$GERENTEGERENTEGERENTEGERENTEGERENTEGERENT', TRUE, '2026-05-19'),
+ '$2b$10$1hnbaMR7iTsdn3D0gG5Q8eUw5aSh9O2at2e4u1iAlzdhD6m4dzVZO', TRUE, '2026-05-19'),
 
 ('recepcion@hotel.com',  'Juan Recepcionista', 'RECEPCION',
- '$2b$12$RECEPCIONHASHRECEPCIONHASHRECEPCIONHASHRE', TRUE, '2026-05-19'),
+ '$2b$10$1hnbaMR7iTsdn3D0gG5Q8eUw5aSh9O2at2e4u1iAlzdhD6m4dzVZO', TRUE, '2026-05-19'),
 
 ('supervisor@hotel.com', 'Supervisora HK', 'HOUSEKEEPING',
- '$2b$12$SUPERVHASHSUPERVHASHSUPERVHASHSUPERVHASH', TRUE, '2026-05-19'),
+ '$2b$10$1hnbaMR7iTsdn3D0gG5Q8eUw5aSh9O2at2e4u1iAlzdhD6m4dzVZO', TRUE, '2026-05-19'),
 
 ('agente@hotel.com',     'Agente de Ventas', 'RECEPCION',
- '$2b$12$AGENTEHASHAGENTEHASHAGENTEHASHAGENTEHASH', TRUE, '2026-05-16'),
+ '$2b$10$1hnbaMR7iTsdn3D0gG5Q8eUw5aSh9O2at2e4u1iAlzdhD6m4dzVZO', TRUE, '2026-05-16'),
 
 ('bodega@hotel.com',     'Encargado Bodega', 'BODEGA',
- '$2b$12$BODEGAHASHBODEGAHASHBODEGAHASHBODEGAHASH', TRUE, NULL),
+ '$2b$10$1hnbaMR7iTsdn3D0gG5Q8eUw5aSh9O2at2e4u1iAlzdhD6m4dzVZO', TRUE, NULL),
 
 ('baja@hotel.com',       'Empleado Dado de Baja', 'SOLO_LECTURA',
- '$2b$12$BAJAHASHBAJAHASHBAJAHASHBAJAHASHBAJAHASH', FALSE, '2023-12-01');
+ '$2b$10$1hnbaMR7iTsdn3D0gG5Q8eUw5aSh9O2at2e4u1iAlzdhD6m4dzVZO', FALSE, '2023-12-01');
 
 INSERT INTO sesiones (usuario_email, token_hash, ip_origen, user_agent, expira_en, invalidada) VALUES
 ('admin@hotel.com',

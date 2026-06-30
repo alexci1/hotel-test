@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.autenticacion.dto.UsuarioRequest;
 import cl.hilton.autenticacion.dto.UsuarioResponse;
 import cl.hilton.autenticacion.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +36,12 @@ public class UsuarioController {
         return usuarioService.findAll();
     }
 
+    @Operation(summary = "Obtener usuario por ID", description = "Retorna un usuario según su identificador único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuario encontrado",
+            content = @Content(schema = @Schema(implementation = UsuarioResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public UsuarioResponse findById(@PathVariable Long id) {
         return usuarioService.findById(id);

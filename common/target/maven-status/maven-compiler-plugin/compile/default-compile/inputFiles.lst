@@ -7,6 +7,7 @@ C:\hotel-test\common\src\main\java\cl\hilton\common\event\TarifaDeletedEvent.jav
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\HabitacionCreatedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\CheckoutCreatedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\MesaRestauranteUpdatedEvent.java
+C:\hotel-test\common\src\main\java\cl\hilton\common\security\JwtAuthenticationFilter.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\NotificacionDeletedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\exception\ApiError.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\DescuentoCreatedEvent.java
@@ -16,7 +17,9 @@ C:\hotel-test\common\src\main\java\cl\hilton\common\event\HabitacionEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\TarifaEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\PagoDeletedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\ProductoDeletedEvent.java
+C:\hotel-test\common\src\main\java\cl\hilton\common\config\OpenApiConfig.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\HuespedDeletedEvent.java
+C:\hotel-test\common\src\main\java\cl\hilton\common\security\FeignClientInterceptor.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\ProductoEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\ReporteHabitacionCreatedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\TareaDeletedEvent.java
@@ -55,6 +58,7 @@ C:\hotel-test\common\src\main\java\cl\hilton\common\event\AsignacionEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\TipoHabitacionCreatedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\PedidoCreatedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\SesionEvent.java
+C:\hotel-test\common\src\main\java\cl\hilton\common\security\JwtProperties.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\SesionDeletedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\DescuentoDeletedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\MovimientoUpdatedEvent.java
@@ -70,9 +74,11 @@ C:\hotel-test\common\src\main\java\cl\hilton\common\event\AsignacionDeletedEvent
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\MovimientoCreatedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\TareaUpdatedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\NotificacionUpdatedEvent.java
+C:\hotel-test\common\src\main\java\cl\hilton\common\security\TokenBlacklistService.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\AsignacionUpdatedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\MesaRestauranteDeletedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\NotificacionEvent.java
+C:\hotel-test\common\src\main\java\cl\hilton\common\security\JwtTokenProvider.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\PedidoUpdatedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\ProductoCreatedEvent.java
 C:\hotel-test\common\src\main\java\cl\hilton\common\event\TemporadaDeletedEvent.java
