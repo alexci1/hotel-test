@@ -2,8 +2,8 @@
 # API GATEWAY - Configuración principal
 # ============================================================
 # El Gateway será la puerta de entrada única del sistema Hilton.
-# En este primer paso queda configurado en el puerto 9000 y conectado a Eureka.
-# Las rutas hacia los microservicios se agregarán en el siguiente paso.
+# Corre en el puerto 9000 y redirige peticiones hacia los microservicios
+# registrados en Eureka usando lb://nombre-del-servicio.
 # ============================================================
 
 server:
@@ -14,6 +14,78 @@ server:
 spring:
   application:
     name: api-gateway
+
+  cloud:
+    gateway:
+      # Permite descubrir servicios registrados en Eureka.
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      # [GATEWAY-INI]
+      # Rutas principales hacia los microservicios del sistema Hilton.
+      routes:
+        - id: ms-autenticacion
+          uri: lb://ms-autenticacion
+          predicates:
+            - Path=/api/v1/auth/**,/api/v1/sesiones/**
+
+        - id: ms-habitaciones
+          uri: lb://ms-habitaciones
+          predicates:
+            - Path=/api/v1/habitaciones/**,/api/v1/tipos-habitacion/**,/api/v1/estados/**
+
+        - id: ms-reservas
+          uri: lb://ms-reservas
+          predicates:
+            - Path=/api/v1/reservas/**,/api/v1/disponibilidad/**,/api/v1/cancelaciones/**
+
+        - id: ms-huespedes
+          uri: lb://ms-huespedes
+          predicates:
+            - Path=/api/v1/huespedes/**,/api/v1/documentos/**,/api/v1/preferencias/**
+
+        - id: ms-checkin
+          uri: lb://ms-checkin
+          predicates:
+            - Path=/api/v1/checkins/**,/api/v1/checkin/**,/api/v1/checkouts/**,/api/v1/checkout/**,/api/v1/llaves/**
+
+        - id: ms-pagos
+          uri: lb://ms-pagos
+          predicates:
+            - Path=/api/v1/pagos/**,/api/v1/cargos/**,/api/v1/facturas/**
+
+        - id: ms-housekeeping
+          uri: lb://ms-housekeeping
+          predicates:
+            - Path=/api/v1/tareas/**,/api/v1/asignaciones/**,/api/v1/proj-habitaciones/**
+
+        - id: ms-restaurante
+          uri: lb://ms-restaurante
+          predicates:
+            - Path=/api/v1/mesas/**,/api/v1/pedidos/**,/api/v1/items-pedido/**
+
+        - id: ms-inventario
+          uri: lb://ms-inventario
+          predicates:
+            - Path=/api/v1/productos/**,/api/v1/movimientos/**,/api/v1/minibares/**,/api/v1/mini-bares/**
+
+        - id: ms-notificaciones
+          uri: lb://ms-notificaciones
+          predicates:
+            - Path=/api/v1/notificaciones/**,/api/v1/plantillas/**,/api/v1/envios/**
+
+        - id: ms-tarifas
+          uri: lb://ms-tarifas
+          predicates:
+            - Path=/api/v1/tarifas/**,/api/v1/temporadas/**,/api/v1/descuentos/**
+
+        - id: ms-reportes
+          uri: lb://ms-reportes
+          predicates:
+            - Path=/api/v1/reportes/**,/api/v1/metricas/**,/api/v1/kpis/**
+      # [GATEWAY-FIN]
 
 # Actuator: monitoreo y salud del Gateway
 management:
