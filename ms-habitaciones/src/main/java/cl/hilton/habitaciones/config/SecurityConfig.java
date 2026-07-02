@@ -42,8 +42,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
 
+                // Permiso temporal para probar Gateway y lectura de habitaciones sin depender del JWT.
                 .requestMatchers(HttpMethod.GET, "/api/v1/habitaciones", "/api/v1/habitaciones/**")
-                    .hasAnyRole("ADMIN", "GERENCIA", "RECEPCION", "HOUSEKEEPING")
+                    .permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/habitaciones", "/api/v1/habitaciones/**")
                     .hasAnyRole("ADMIN", "GERENCIA")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/habitaciones", "/api/v1/habitaciones/**")
