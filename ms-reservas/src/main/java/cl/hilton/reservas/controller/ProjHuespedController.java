@@ -26,6 +26,7 @@ public class ProjHuespedController {
 
     private final ProjHuespedService huespedService;
 
+    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros")
     @GetMapping
     public List<ProjHuespedResponse> findAll() {
         return huespedService.findAll();
