@@ -21,6 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.housekeeping.dto.AsignacionRequest;
 import cl.hilton.housekeeping.dto.AsignacionResponse;
 import cl.hilton.housekeeping.service.AsignacionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -43,6 +49,12 @@ public class AsignacionController {
         return a;
     }
 
+    @Operation(summary = "Listar asignaciones", description = "Retorna todas las asignaciones de housekeeping registradas en el sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Asignaciones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = AsignacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron asignaciones", content = @Content)
+    })
     @GetMapping
     public CollectionModel<AsignacionResponse> findAll() {
         List<AsignacionResponse> list = asignacionService.findAll();
@@ -50,11 +62,23 @@ public class AsignacionController {
         return CollectionModel.of(list, linkTo(methodOn(AsignacionController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener asignación por ID", description = "Retorna una asignación según su identificador único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Asignación encontrada",
+            content = @Content(schema = @Schema(implementation = AsignacionResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Asignación no encontrada", content = @Content)
+    })
     @GetMapping("/{id}")
     public AsignacionResponse findById(@PathVariable Long id) {
         return addLinks(asignacionService.findById(id));
     }
 
+    @Operation(summary = "Listar asignaciones por habitación", description = "Retorna las asignaciones asociadas a un número de habitación")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Asignaciones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = AsignacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron asignaciones para la habitación indicada", content = @Content)
+    })
     @GetMapping("/habitacion/{numeroHabitacion}")
     public CollectionModel<AsignacionResponse> findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
         List<AsignacionResponse> list = asignacionService.findByNumeroHabitacion(numeroHabitacion);
@@ -62,6 +86,12 @@ public class AsignacionController {
         return CollectionModel.of(list, linkTo(methodOn(AsignacionController.class).findByNumeroHabitacion(numeroHabitacion)).withSelfRel());
     }
 
+    @Operation(summary = "Listar asignaciones por tarea", description = "Retorna las asignaciones asociadas a un código de tarea")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Asignaciones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = AsignacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron asignaciones para la tarea indicada", content = @Content)
+    })
     @GetMapping("/tarea/{codigoTarea}")
     public CollectionModel<AsignacionResponse> findByCodigoTarea(@PathVariable String codigoTarea) {
         List<AsignacionResponse> list = asignacionService.findByCodigoTarea(codigoTarea);
@@ -69,6 +99,12 @@ public class AsignacionController {
         return CollectionModel.of(list, linkTo(methodOn(AsignacionController.class).findByCodigoTarea(codigoTarea)).withSelfRel());
     }
 
+    @Operation(summary = "Listar asignaciones por camarero", description = "Retorna las asignaciones asociadas al email de un camarero")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Asignaciones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = AsignacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron asignaciones para el camarero indicado", content = @Content)
+    })
     @GetMapping("/camarero/{emailCamarero}")
     public CollectionModel<AsignacionResponse> findByEmailCamarero(@PathVariable String emailCamarero) {
         List<AsignacionResponse> list = asignacionService.findByEmailCamarero(emailCamarero);
@@ -76,6 +112,12 @@ public class AsignacionController {
         return CollectionModel.of(list, linkTo(methodOn(AsignacionController.class).findByEmailCamarero(emailCamarero)).withSelfRel());
     }
 
+    @Operation(summary = "Listar asignaciones por fecha programada", description = "Retorna las asignaciones asociadas a una fecha programada")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Asignaciones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = AsignacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron asignaciones para la fecha indicada", content = @Content)
+    })
     @GetMapping("/fecha/{fechaProgramada}")
     public CollectionModel<AsignacionResponse> findByFechaProgramada(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaProgramada) {
@@ -84,6 +126,12 @@ public class AsignacionController {
         return CollectionModel.of(list, linkTo(methodOn(AsignacionController.class).findByFechaProgramada(fechaProgramada)).withSelfRel());
     }
 
+    @Operation(summary = "Listar asignaciones por estado", description = "Retorna las asignaciones filtradas por estado")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Asignaciones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = AsignacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron asignaciones con el estado indicado", content = @Content)
+    })
     @GetMapping("/estado/{estado}")
     public CollectionModel<AsignacionResponse> findByEstado(@PathVariable String estado) {
         List<AsignacionResponse> list = asignacionService.findByEstado(estado);
@@ -91,6 +139,12 @@ public class AsignacionController {
         return CollectionModel.of(list, linkTo(methodOn(AsignacionController.class).findByEstado(estado)).withSelfRel());
     }
 
+    @Operation(summary = "Listar asignaciones por prioridad", description = "Retorna las asignaciones filtradas por prioridad")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Asignaciones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = AsignacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron asignaciones con la prioridad indicada", content = @Content)
+    })
     @GetMapping("/prioridad/{prioridad}")
     public CollectionModel<AsignacionResponse> findByPrioridad(@PathVariable Integer prioridad) {
         List<AsignacionResponse> list = asignacionService.findByPrioridad(prioridad);
