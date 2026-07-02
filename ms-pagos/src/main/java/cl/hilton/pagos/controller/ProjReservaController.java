@@ -17,6 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.pagos.dto.ProjReservaRequest;
 import cl.hilton.pagos.dto.ProjReservaResponse;
 import cl.hilton.pagos.service.ProjReservaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -27,31 +33,67 @@ public class ProjReservaController {
 
     private final ProjReservaService reservaService;
 
+    @Operation(summary = "Listar registros", description = "Retorna todos los registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProjReservaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping
     public List<ProjReservaResponse> findAll() {
         return reservaService.findAll();
     }
 
+    @Operation(summary = "Obtener registro por codigo", description = "Retorna un registro por codigo")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registro encontrado",
+            content = @Content(schema = @Schema(implementation = ProjReservaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Registro no encontrado", content = @Content)
+    })
     @GetMapping("/codigo/{codigoReserva}")
     public ProjReservaResponse findByCodigoReserva(@PathVariable String codigoReserva) {
         return reservaService.findByCodigoReserva(codigoReserva);
     }
 
+    @Operation(summary = "Listar registros por huesped", description = "Retorna registros por huesped")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProjReservaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/huesped/{emailHuesped}")
     public List<ProjReservaResponse> findByEmailHuesped(@PathVariable String emailHuesped) {
         return reservaService.findByEmailHuesped(emailHuesped);
     }
 
+    @Operation(summary = "Listar registros por habitacion", description = "Retorna registros por habitacion")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProjReservaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/habitacion/{numeroHabitacion}")
     public List<ProjReservaResponse> findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
         return reservaService.findByNumeroHabitacion(numeroHabitacion);
     }
 
+    @Operation(summary = "Listar registros por entrada", description = "Retorna registros por entrada")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProjReservaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/fecha-entrada/{fechaEntrada}")
     public List<ProjReservaResponse> findByFechaEntrada(@PathVariable LocalDate fechaEntrada) {
         return reservaService.findByFechaEntrada(fechaEntrada);
     }
 
+    @Operation(summary = "Listar registros por salida", description = "Retorna registros por salida")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProjReservaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/fecha-salida/{fechaSalida}")
     public List<ProjReservaResponse> findByFechaSalida(@PathVariable LocalDate fechaSalida) {
         return reservaService.findByFechaSalida(fechaSalida);
