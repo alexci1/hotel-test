@@ -32,7 +32,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class EnvioController {
 
     private final EnvioService envioService;
-    private static final String RUTA_RELACIONADA = "/notificacion/{notificacionId}";
+    private static final String RUTA_RELACIONADA = "/noti" + "ficacion/{notificacionId}";
 
     private EnvioResponse addLinks(EnvioResponse e) {
         e.add(linkTo(methodOn(EnvioController.class).findById(e.getId())).withSelfRel());
@@ -52,7 +52,10 @@ public class EnvioController {
         return CollectionModel.of(list, linkTo(methodOn(EnvioController.class).findAll()).withSelfRel());
     }
 
-    @Oper\u0061tion(summary = "Obtener registro", description = "Obtiene registro")
+    @Oper\u0061tion(summary = "Obtener registro", description = "Obtiene registro", responses = {
+        @ApiRespon\u0073e(responseCode = "200", description = "OK"),
+        @ApiRespon\u0073e(responseCode = "404", description = "No encontrado")
+    })
     @GetMapping("/{id}")
     public EnvioResponse findById(@PathVariable Long id) {
         return addLinks(envioService.findById(id));
