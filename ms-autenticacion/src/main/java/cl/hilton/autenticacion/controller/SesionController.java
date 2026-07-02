@@ -16,6 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.autenticacion.dto.SesionRequest;
 import cl.hilton.autenticacion.dto.SesionResponse;
 import cl.hilton.autenticacion.service.SesionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -26,31 +32,67 @@ public class SesionController {
 
     private final SesionService sesionService;
 
+    @Operation(summary = "Listar sesiones", description = "Retorna todas las sesiones registradas en el sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Sesiones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = SesionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron sesiones", content = @Content)
+    })
     @GetMapping
     public List<SesionResponse> findAll() {
         return sesionService.findAll();
     }
 
+    @Operation(summary = "Obtener sesión por ID", description = "Retorna una sesión según su identificador único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Sesión encontrada",
+            content = @Content(schema = @Schema(implementation = SesionResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Sesión no encontrada", content = @Content)
+    })
     @GetMapping("/{id}")
     public SesionResponse findById(@PathVariable Long id) {
         return sesionService.findById(id);
     }
 
+    @Operation(summary = "Obtener sesión por token", description = "Retorna una sesión según el hash del token")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Sesión encontrada",
+            content = @Content(schema = @Schema(implementation = SesionResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Sesión no encontrada", content = @Content)
+    })
     @GetMapping("/token/{tokenHash}")
     public SesionResponse findByTokenHash(@PathVariable String tokenHash) {
         return sesionService.findByTokenHash(tokenHash);
     }
 
+    @Operation(summary = "Obtener sesión por email de usuario", description = "Retorna una sesión asociada al correo electrónico de un usuario")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Sesión encontrada",
+            content = @Content(schema = @Schema(implementation = SesionResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Sesión no encontrada para el usuario indicado", content = @Content)
+    })
     @GetMapping("/usuario/{usuarioEmail}")
     public SesionResponse findByUsuarioEmail(@PathVariable String usuarioEmail) {
         return sesionService.findByUsuarioEmail(usuarioEmail);
     }
 
+    @Operation(summary = "Listar sesiones por estado de invalidación", description = "Retorna las sesiones filtradas por si están invalidadas o no")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Sesiones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = SesionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron sesiones con el estado indicado", content = @Content)
+    })
     @GetMapping("/invalidada/{invalidada}")
     public List<SesionResponse> findByInvalidada(@PathVariable Boolean invalidada) {
         return sesionService.findByInvalidada(invalidada);
     }
 
+    @Operation(summary = "Listar sesiones activas", description = "Retorna todas las sesiones activas del sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Sesiones activas encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = SesionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron sesiones activas", content = @Content)
+    })
     @GetMapping("/activas")
     public List<SesionResponse> findActivas() {
         return sesionService.findActivas();
