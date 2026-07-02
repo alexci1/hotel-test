@@ -21,6 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.restaurante.dto.PedidoRequest;
 import cl.hilton.restaurante.dto.PedidoResponse;
 import cl.hilton.restaurante.service.PedidoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -44,6 +50,12 @@ public class PedidoController {
         return p;
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PedidoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping
     public CollectionModel<PedidoResponse> findAll() {
         List<PedidoResponse> list = pedidoService.findAll();
@@ -51,16 +63,34 @@ public class PedidoController {
         return CollectionModel.of(list, linkTo(methodOn(PedidoController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = PedidoResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public PedidoResponse findById(@PathVariable Long id) {
         return addLinks(pedidoService.findById(id));
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = PedidoResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/numero/{numeroPedido}")
     public PedidoResponse findByNumeroPedido(@PathVariable String numeroPedido) {
         return addLinks(pedidoService.findByNumeroPedido(numeroPedido));
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PedidoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/estado/{estado}")
     public CollectionModel<PedidoResponse> findByEstado(@PathVariable String estado) {
         List<PedidoResponse> list = pedidoService.findByEstado(estado);
@@ -68,6 +98,12 @@ public class PedidoController {
         return CollectionModel.of(list, linkTo(methodOn(PedidoController.class).findByEstado(estado)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PedidoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/mesa/{numeroMesa}")
     public CollectionModel<PedidoResponse> findByNumeroMesa(@PathVariable String numeroMesa) {
         List<PedidoResponse> list = pedidoService.findByNumeroMesa(numeroMesa);
@@ -75,6 +111,12 @@ public class PedidoController {
         return CollectionModel.of(list, linkTo(methodOn(PedidoController.class).findByNumeroMesa(numeroMesa)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PedidoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/huesped/{emailHuesped}")
     public CollectionModel<PedidoResponse> findByEmailHuesped(@PathVariable String emailHuesped) {
         List<PedidoResponse> list = pedidoService.findByEmailHuesped(emailHuesped);
@@ -82,6 +124,12 @@ public class PedidoController {
         return CollectionModel.of(list, linkTo(methodOn(PedidoController.class).findByEmailHuesped(emailHuesped)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PedidoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/rango")
     public CollectionModel<PedidoResponse> findByRangoCreadoEn(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
@@ -91,6 +139,12 @@ public class PedidoController {
         return CollectionModel.of(list, linkTo(methodOn(PedidoController.class).findByRangoCreadoEn(desde, hasta)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PedidoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/mesa/{numeroMesa}/estado/{estado}")
     public CollectionModel<PedidoResponse> findByNumeroMesaAndEstado(
             @PathVariable String numeroMesa,
@@ -100,6 +154,12 @@ public class PedidoController {
         return CollectionModel.of(list, linkTo(methodOn(PedidoController.class).findByNumeroMesaAndEstado(numeroMesa, estado)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PedidoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/huesped/{emailHuesped}/estado/{estado}")
     public CollectionModel<PedidoResponse> findByEmailHuespedAndEstado(
             @PathVariable String emailHuesped,
