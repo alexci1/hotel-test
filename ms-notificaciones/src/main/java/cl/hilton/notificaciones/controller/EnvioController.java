@@ -43,6 +43,8 @@ public class EnvioController {
     }
 
     @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiRespon\u0073e(responseCode = "200", description = "OK")
+    @ApiRespon\u0073e(responseCode = "404", description = "No encontrado")
     @GetMapping
     public CollectionModel<EnvioResponse> findAll() {
         List<EnvioResponse> list = envioService.findAll();
