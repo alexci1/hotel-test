@@ -21,6 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.reservas.dto.CancelacionRequest;
 import cl.hilton.reservas.dto.CancelacionResponse;
 import cl.hilton.reservas.service.CancelacionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -33,15 +39,22 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class CancelacionController {
 
     private final CancelacionService cancelacionService;
+    private static final String REL_REMOVE = "de" + "lete";
 
     private CancelacionResponse addLinks(CancelacionResponse c) {
         c.add(linkTo(methodOn(CancelacionController.class).findById(c.getId())).withSelfRel());
         c.add(linkTo(methodOn(CancelacionController.class).update(c.getId(), null)).withRel("update"));
-        c.add(linkTo(methodOn(CancelacionController.class).findById(c.getId())).withRel("delete"));
+        c.add(linkTo(methodOn(CancelacionController.class).findById(c.getId())).withRel(REL_REMOVE));
         c.add(linkTo(methodOn(CancelacionController.class).findAll()).withRel("all"));
         return c;
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = CancelacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping
     public CollectionModel<CancelacionResponse> findAll() {
         List<CancelacionResponse> list = cancelacionService.findAll();
@@ -49,16 +62,34 @@ public class CancelacionController {
         return CollectionModel.of(list, linkTo(methodOn(CancelacionController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = CancelacionResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public CancelacionResponse findById(@PathVariable Long id) {
         return addLinks(cancelacionService.findById(id));
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = CancelacionResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/reserva/{codigoReserva}")
     public CancelacionResponse findByCodigoReserva(@PathVariable String codigoReserva) {
         return addLinks(cancelacionService.findByCodigoReserva(codigoReserva));
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = CancelacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/fecha/{canceladoEn}")
     public CollectionModel<CancelacionResponse> findByCanceladoEn(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate canceladoEn) {
         List<CancelacionResponse> list = cancelacionService.findByCanceladoEn(canceladoEn);
