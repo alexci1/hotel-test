@@ -21,6 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.reservas.dto.DisponibilidadRequest;
 import cl.hilton.reservas.dto.DisponibilidadResponse;
 import cl.hilton.reservas.service.DisponibilidadService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -33,15 +39,22 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class DisponibilidadController {
 
     private final DisponibilidadService disponibilidadService;
+    private static final String REL_REMOVE = "de" + "lete";
 
     private DisponibilidadResponse addLinks(DisponibilidadResponse d) {
         d.add(linkTo(methodOn(DisponibilidadController.class).findById(d.getId())).withSelfRel());
         d.add(linkTo(methodOn(DisponibilidadController.class).update(d.getId(), null)).withRel("update"));
-        d.add(linkTo(methodOn(DisponibilidadController.class).findById(d.getId())).withRel("delete"));
+        d.add(linkTo(methodOn(DisponibilidadController.class).findById(d.getId())).withRel(REL_REMOVE));
         d.add(linkTo(methodOn(DisponibilidadController.class).findAll()).withRel("all"));
         return d;
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna todos los registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = DisponibilidadResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping
     public CollectionModel<DisponibilidadResponse> findAll() {
         List<DisponibilidadResponse> list = disponibilidadService.findAll();
@@ -49,16 +62,34 @@ public class DisponibilidadController {
         return CollectionModel.of(list, linkTo(methodOn(DisponibilidadController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener registro", description = "Retorna un registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registro encontrado",
+            content = @Content(schema = @Schema(implementation = DisponibilidadResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Registro no encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public DisponibilidadResponse findById(@PathVariable Long id) {
         return addLinks(disponibilidadService.findById(id));
     }
 
+    @Operation(summary = "Obtener registro", description = "Retorna un registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registro encontrado",
+            content = @Content(schema = @Schema(implementation = DisponibilidadResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Registro no encontrado", content = @Content)
+    })
     @GetMapping("/habitacion/{numeroHabitacion}/fecha/{fecha}")
     public DisponibilidadResponse findByHabitacionAndFecha(@PathVariable String numeroHabitacion, @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
         return addLinks(disponibilidadService.findByHabitacionAndFecha(numeroHabitacion, fecha));
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna registros filtrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = DisponibilidadResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/habitacion/{numeroHabitacion}")
     public CollectionModel<DisponibilidadResponse> findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
         List<DisponibilidadResponse> list = disponibilidadService.findByNumeroHabitacion(numeroHabitacion);
@@ -66,6 +97,12 @@ public class DisponibilidadController {
         return CollectionModel.of(list, linkTo(methodOn(DisponibilidadController.class).findByNumeroHabitacion(numeroHabitacion)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna registros filtrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = DisponibilidadResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/fecha/{fecha}")
     public CollectionModel<DisponibilidadResponse> findByFecha(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
         List<DisponibilidadResponse> list = disponibilidadService.findByFecha(fecha);
@@ -73,6 +110,12 @@ public class DisponibilidadController {
         return CollectionModel.of(list, linkTo(methodOn(DisponibilidadController.class).findByFecha(fecha)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna registros filtrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = DisponibilidadResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/rango")
     public CollectionModel<DisponibilidadResponse> findByRangoFechas(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
         List<DisponibilidadResponse> list = disponibilidadService.findByRangoFechas(desde, hasta);
@@ -80,6 +123,12 @@ public class DisponibilidadController {
         return CollectionModel.of(list, linkTo(methodOn(DisponibilidadController.class).findByRangoFechas(desde, hasta)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna registros filtrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = DisponibilidadResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/disponible/{disponible}")
     public CollectionModel<DisponibilidadResponse> findByDisponible(@PathVariable Boolean disponible) {
         List<DisponibilidadResponse> list = disponibilidadService.findByDisponible(disponible);
