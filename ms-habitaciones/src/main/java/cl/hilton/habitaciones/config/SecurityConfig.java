@@ -42,13 +42,13 @@ public class SecurityConfig {
                 .requestMatchers("/api/v1/auth/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
 
-                .requestMatchers(HttpMethod.GET, "/api/v1/habitaciones/**")
+                .requestMatchers(HttpMethod.GET, "/api/v1/habitaciones", "/api/v1/habitaciones/**")
                     .hasAnyRole("ADMIN", "GERENCIA", "RECEPCION", "HOUSEKEEPING")
-                .requestMatchers(HttpMethod.POST, "/api/v1/habitaciones/**")
+                .requestMatchers(HttpMethod.POST, "/api/v1/habitaciones", "/api/v1/habitaciones/**")
                     .hasAnyRole("ADMIN", "GERENCIA")
-                .requestMatchers(HttpMethod.PUT, "/api/v1/habitaciones/**")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/habitaciones", "/api/v1/habitaciones/**")
                     .hasAnyRole("ADMIN", "GERENCIA")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/habitaciones/**")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/habitaciones", "/api/v1/habitaciones/**")
                     .hasRole("ADMIN")
 
                 .anyRequest().authenticated()
