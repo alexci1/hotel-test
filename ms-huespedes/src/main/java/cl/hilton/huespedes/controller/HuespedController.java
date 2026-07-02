@@ -21,6 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.huespedes.dto.HuespedRequest;
 import cl.hilton.huespedes.dto.HuespedResponse;
 import cl.hilton.huespedes.service.HuespedService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -43,6 +49,12 @@ public class HuespedController {
         return h;
     }
 
+    @Operation(summary = "Listar huéspedes", description = "Retorna todos los huéspedes registrados en el sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Huéspedes encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = HuespedResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron huéspedes", content = @Content)
+    })
     @GetMapping
     public CollectionModel<HuespedResponse> findAll() {
         List<HuespedResponse> list = huespedService.findAll();
@@ -50,16 +62,34 @@ public class HuespedController {
         return CollectionModel.of(list, linkTo(methodOn(HuespedController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener huésped por ID", description = "Retorna un huésped según su identificador único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Huésped encontrado",
+            content = @Content(schema = @Schema(implementation = HuespedResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Huésped no encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public HuespedResponse findById(@PathVariable Long id) {
         return addLinks(huespedService.findById(id));
     }
 
+    @Operation(summary = "Obtener huésped por email", description = "Retorna un huésped según su correo electrónico")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Huésped encontrado",
+            content = @Content(schema = @Schema(implementation = HuespedResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Huésped no encontrado", content = @Content)
+    })
     @GetMapping("/email/{email}")
     public HuespedResponse findByEmail(@PathVariable String email) {
         return addLinks(huespedService.findByEmail(email));
     }
 
+    @Operation(summary = "Listar huéspedes por nombre", description = "Retorna los huéspedes que coinciden con el nombre completo indicado")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Huéspedes encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = HuespedResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron huéspedes con el nombre indicado", content = @Content)
+    })
     @GetMapping("/nombre/{nombreCompleto}")
     public CollectionModel<HuespedResponse> findByNombreCompleto(@PathVariable String nombreCompleto) {
         List<HuespedResponse> list = huespedService.findByNombreCompleto(nombreCompleto);
@@ -67,6 +97,12 @@ public class HuespedController {
         return CollectionModel.of(list, linkTo(methodOn(HuespedController.class).findByNombreCompleto(nombreCompleto)).withSelfRel());
     }
 
+    @Operation(summary = "Listar huéspedes por estado activo", description = "Retorna los huéspedes filtrados por su estado activo o inactivo")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Huéspedes encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = HuespedResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron huéspedes con el estado indicado", content = @Content)
+    })
     @GetMapping("/activo/{activo}")
     public CollectionModel<HuespedResponse> findByActivo(@PathVariable Boolean activo) {
         List<HuespedResponse> list = huespedService.findByActivo(activo);
@@ -74,6 +110,12 @@ public class HuespedController {
         return CollectionModel.of(list, linkTo(methodOn(HuespedController.class).findByActivo(activo)).withSelfRel());
     }
 
+    @Operation(summary = "Listar huéspedes por fecha de creación", description = "Retorna los huéspedes creados en una fecha específica")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Huéspedes encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = HuespedResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron huéspedes para la fecha indicada", content = @Content)
+    })
     @GetMapping("/creado/{creadoEn}")
     public CollectionModel<HuespedResponse> findByCreadoEn(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate creadoEn) {
