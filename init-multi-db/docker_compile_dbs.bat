@@ -1,13 +1,13 @@
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 01-init.sql
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 02-habitaciones.sql
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 03-huespedes.sql
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 04-checkin.sql
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 05-pagos.sql
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 06-housekeeping.sql
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 07-reserva.sql
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 08-inventario.sql
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 09-notificaciones.sql
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 10-restaurante.sql
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 11-reportes.sql
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 12-autenticacion.sql
-docker exec -i postgres_rdbms psql -U postgres -d postgres < 13-tarifas.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/01-init.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/02-habitaciones.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/03-huespedes.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/04-checkin.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/05-pagos.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/06-housekeeping.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/07-reservas.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/08-inventario.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/09-notificaciones.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/10-restaurante.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/11-reportes.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/12-autenticacion.sql
+docker exec postgres-rdbms psql -U postgres -d postgres -f /docker-entrypoint-initdb.d/13-tarifas.sql
