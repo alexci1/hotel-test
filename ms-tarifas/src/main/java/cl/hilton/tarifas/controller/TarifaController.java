@@ -17,6 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.tarifas.dto.TarifaRequest;
 import cl.hilton.tarifas.dto.TarifaResponse;
 import cl.hilton.tarifas.service.TarifaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +43,12 @@ public class TarifaController {
         return t;
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TarifaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping
     public CollectionModel<TarifaResponse> findAll() {
         List<TarifaResponse> list = tarifaService.findAll();
@@ -44,11 +56,23 @@ public class TarifaController {
         return CollectionModel.of(list, linkTo(methodOn(TarifaController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = TarifaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public TarifaResponse findById(@PathVariable Long id) {
         return addLinks(tarifaService.findById(id));
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = TarifaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/temporada/{codigoTemporada}/tipo/{tipoHabitacion}")
     public TarifaResponse findByTemporadaAndTipoHabitacion(
             @PathVariable String codigoTemporada,
@@ -56,6 +80,12 @@ public class TarifaController {
         return addLinks(tarifaService.findByTemporadaAndTipoHabitacion(codigoTemporada, tipoHabitacion));
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TarifaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/temporada/{codigoTemporada}")
     public CollectionModel<TarifaResponse> findByCodigoTemporada(@PathVariable String codigoTemporada) {
         List<TarifaResponse> list = tarifaService.findByCodigoTemporada(codigoTemporada);
@@ -63,6 +93,12 @@ public class TarifaController {
         return CollectionModel.of(list, linkTo(methodOn(TarifaController.class).findByCodigoTemporada(codigoTemporada)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TarifaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/tipo/{tipoHabitacion}")
     public CollectionModel<TarifaResponse> findByTipoHabitacion(@PathVariable String tipoHabitacion) {
         List<TarifaResponse> list = tarifaService.findByTipoHabitacion(tipoHabitacion);
@@ -70,6 +106,12 @@ public class TarifaController {
         return CollectionModel.of(list, linkTo(methodOn(TarifaController.class).findByTipoHabitacion(tipoHabitacion)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TarifaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/activa/{activa}")
     public CollectionModel<TarifaResponse> findByActiva(@PathVariable Boolean activa) {
         List<TarifaResponse> list = tarifaService.findByActiva(activa);
@@ -77,6 +119,12 @@ public class TarifaController {
         return CollectionModel.of(list, linkTo(methodOn(TarifaController.class).findByActiva(activa)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TarifaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/desayuno/{incluyeDesayuno}")
     public CollectionModel<TarifaResponse> findByIncluyeDesayuno(@PathVariable Boolean incluyeDesayuno) {
         List<TarifaResponse> list = tarifaService.findByIncluyeDesayuno(incluyeDesayuno);
@@ -84,6 +132,12 @@ public class TarifaController {
         return CollectionModel.of(list, linkTo(methodOn(TarifaController.class).findByIncluyeDesayuno(incluyeDesayuno)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TarifaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/tipo/{tipoHabitacion}/activa/{activa}")
     public CollectionModel<TarifaResponse> findByTipoHabitacionAndActiva(
             @PathVariable String tipoHabitacion,
@@ -93,6 +147,12 @@ public class TarifaController {
         return CollectionModel.of(list, linkTo(methodOn(TarifaController.class).findByTipoHabitacionAndActiva(tipoHabitacion, activa)).withSelfRel());
     }
 
+    @Operation(summary = "Verificar registro", description = "Verifica existencia de registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = Boolean.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/exists/tipo/{tipoHabitacion}/activa")
     public boolean existsTarifaActivaByTipoHabitacion(@PathVariable String tipoHabitacion) {
         return tarifaService.existsTarifaActivaByTipoHabitacion(tipoHabitacion);
