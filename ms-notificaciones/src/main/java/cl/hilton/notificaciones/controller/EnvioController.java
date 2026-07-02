@@ -32,7 +32,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class EnvioController {
 
     private final EnvioService envioService;
-    private static final String RUTA_RELACIONADA = "/noti" + "ficacion/{notificacionId}";
+    private static final String RUTA_RELACIONADA = "/notificacion/{notificacionId}";
 
     private EnvioResponse addLinks(EnvioResponse e) {
         e.add(linkTo(methodOn(EnvioController.class).findById(e.getId())).withSelfRel());
