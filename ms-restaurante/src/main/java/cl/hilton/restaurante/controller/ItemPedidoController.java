@@ -17,6 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.restaurante.dto.ItemPedidoRequest;
 import cl.hilton.restaurante.dto.ItemPedidoResponse;
 import cl.hilton.restaurante.service.ItemPedidoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +44,12 @@ public class ItemPedidoController {
         return i;
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ItemPedidoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping
     public CollectionModel<ItemPedidoResponse> findAll() {
         List<ItemPedidoResponse> list = itemPedidoService.findAll();
@@ -45,11 +57,23 @@ public class ItemPedidoController {
         return CollectionModel.of(list, linkTo(methodOn(ItemPedidoController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = ItemPedidoResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public ItemPedidoResponse findById(@PathVariable Long id) {
         return addLinks(itemPedidoService.findById(id));
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ItemPedidoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/pedido/{numeroPedido}")
     public CollectionModel<ItemPedidoResponse> findByNumeroPedido(@PathVariable String numeroPedido) {
         List<ItemPedidoResponse> list = itemPedidoService.findByNumeroPedido(numeroPedido);
@@ -57,6 +81,12 @@ public class ItemPedidoController {
         return CollectionModel.of(list, linkTo(methodOn(ItemPedidoController.class).findByNumeroPedido(numeroPedido)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ItemPedidoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/producto/{nombreProducto}")
     public CollectionModel<ItemPedidoResponse> findByNombreProducto(@PathVariable String nombreProducto) {
         List<ItemPedidoResponse> list = itemPedidoService.findByNombreProducto(nombreProducto);
@@ -64,6 +94,12 @@ public class ItemPedidoController {
         return CollectionModel.of(list, linkTo(methodOn(ItemPedidoController.class).findByNombreProducto(nombreProducto)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ItemPedidoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/cantidad-mayor-que/{cantidad}")
     public CollectionModel<ItemPedidoResponse> findByCantidadMayorQue(@PathVariable Integer cantidad) {
         List<ItemPedidoResponse> list = itemPedidoService.findByCantidadMayorQue(cantidad);
