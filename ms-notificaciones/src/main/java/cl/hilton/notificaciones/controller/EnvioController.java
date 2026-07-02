@@ -61,13 +61,19 @@ public class EnvioController {
         return addLinks(envioService.findById(id));
     }
 
-    @Oper\u0061tion(summary = "Obtener registro", description = "Obtiene registro")
+    @Oper\u0061tion(summary = "Obtener registro", description = "Obtiene registro", responses = {
+        @ApiRespon\u0073e(responseCode = "200", description = "OK"),
+        @ApiRespon\u0073e(responseCode = "404", description = "No encontrado")
+    })
     @GetMapping(RUTA_RELACIONADA)
     public EnvioResponse findByNotificacionId(@PathVariable Long notificacionId) {
         return addLinks(envioService.findByNotificacionId(notificacionId));
     }
 
-    @Oper\u0061tion(summary = "Listar registros", description = "Lista registros")
+    @Oper\u0061tion(summary = "Listar registros", description = "Lista registros", responses = {
+        @ApiRespon\u0073e(responseCode = "200", description = "OK"),
+        @ApiRespon\u0073e(responseCode = "404", description = "No encontrado")
+    })
     @GetMapping("/estado/{estado}")
     public CollectionModel<EnvioResponse> findByEstado(@PathVariable String estado) {
         List<EnvioResponse> list = envioService.findByEstado(estado);
@@ -75,7 +81,10 @@ public class EnvioController {
         return CollectionModel.of(list, linkTo(methodOn(EnvioController.class).findByEstado(estado)).withSelfRel());
     }
 
-    @Oper\u0061tion(summary = "Listar registros", description = "Lista registros")
+    @Oper\u0061tion(summary = "Listar registros", description = "Lista registros", responses = {
+        @ApiRespon\u0073e(responseCode = "200", description = "OK"),
+        @ApiRespon\u0073e(responseCode = "404", description = "No encontrado")
+    })
     @GetMapping("/fecha/{enviadoEn}")
     public CollectionModel<EnvioResponse> findByEnviadoEn(@PathVariable LocalDate enviadoEn) {
         List<EnvioResponse> list = envioService.findByEnviadoEn(enviadoEn);
