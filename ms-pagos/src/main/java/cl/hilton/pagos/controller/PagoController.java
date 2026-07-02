@@ -18,6 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.pagos.dto.PagoRequest;
 import cl.hilton.pagos.dto.PagoResponse;
 import cl.hilton.pagos.service.PagoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -39,6 +45,12 @@ public class PagoController {
         return p;
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna todos los registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PagoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping
     public CollectionModel<PagoResponse> findAll() {
         List<PagoResponse> list = pagoService.findAll();
@@ -46,11 +58,23 @@ public class PagoController {
         return CollectionModel.of(list, linkTo(methodOn(PagoController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener registro", description = "Retorna un registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registro encontrado",
+            content = @Content(schema = @Schema(implementation = PagoResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Registro no encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public PagoResponse findById(@PathVariable Long id) {
         return addLinks(pagoService.findById(id));
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna registros filtrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PagoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/factura/{numeroFactura}")
     public CollectionModel<PagoResponse> findByNumeroFactura(@PathVariable String numeroFactura) {
         List<PagoResponse> list = pagoService.findByNumeroFactura(numeroFactura);
@@ -58,6 +82,12 @@ public class PagoController {
         return CollectionModel.of(list, linkTo(methodOn(PagoController.class).findByNumeroFactura(numeroFactura)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna registros filtrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PagoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/metodo/{metodo}")
     public CollectionModel<PagoResponse> findByMetodo(@PathVariable String metodo) {
         List<PagoResponse> list = pagoService.findByMetodo(metodo);
@@ -65,6 +95,12 @@ public class PagoController {
         return CollectionModel.of(list, linkTo(methodOn(PagoController.class).findByMetodo(metodo)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna registros filtrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PagoResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/fecha/{pagadoEn}")
     public CollectionModel<PagoResponse> findByPagadoEn(@PathVariable LocalDate pagadoEn) {
         List<PagoResponse> list = pagoService.findByPagadoEn(pagadoEn);
