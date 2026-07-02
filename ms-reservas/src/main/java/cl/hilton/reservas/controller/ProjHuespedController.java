@@ -32,11 +32,13 @@ public class ProjHuespedController {
         return huespedService.findAll();
     }
 
+    @io.swagger.v3.oas.annotations.Operation(summary = "Obtener registro", description = "Obtiene registro")
     @GetMapping("/email/{email}")
     public ProjHuespedResponse findByEmail(@PathVariable String email) {
         return huespedService.findByEmail(email);
     }
 
+    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros")
     @GetMapping("/nombre/{nombreCompleto}")
     public List<ProjHuespedResponse> findByNombreCompleto(@PathVariable String nombreCompleto) {
         return huespedService.findByNombreCompleto(nombreCompleto);
