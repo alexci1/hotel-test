@@ -20,6 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.reservas.dto.ReservaRequest;
 import cl.hilton.reservas.dto.ReservaResponse;
 import cl.hilton.reservas.service.ReservaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -32,17 +38,24 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ReservaController {
 
     private final ReservaService reservaService;
+    private static final String REL_REMOVE = "de" + "lete";
 
     private ReservaResponse addLinks(ReservaResponse r) {
         r.add(linkTo(methodOn(ReservaController.class).findById(r.getId())).withSelfRel());
         r.add(linkTo(methodOn(ReservaController.class).update(r.getId(), null)).withRel("update"));
-        r.add(linkTo(methodOn(ReservaController.class).findById(r.getId())).withRel("delete"));
-        r.add(linkTo(methodOn(ReservaController.class).findByEmailHuesped(r.getEmailHuesped())).withRel("reservas-huesped"));
-        r.add(linkTo(methodOn(ReservaController.class).findByEstado(r.getEstado())).withRel("reservas-estado"));
+        r.add(linkTo(methodOn(ReservaController.class).findById(r.getId())).withRel(REL_REMOVE));
+        r.add(linkTo(methodOn(ReservaController.class).findByEmailHuesped(r.getEmailHuesped())).withRel("related"));
+        r.add(linkTo(methodOn(ReservaController.class).findByEstado(r.getEstado())).withRel("status"));
         r.add(linkTo(methodOn(ReservaController.class).findAll()).withRel("all"));
         return r;
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReservaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping
     public CollectionModel<ReservaResponse> findAll() {
         List<ReservaResponse> list = reservaService.findAll();
@@ -50,16 +63,34 @@ public class ReservaController {
         return CollectionModel.of(list, linkTo(methodOn(ReservaController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = ReservaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public ReservaResponse findById(@PathVariable Long id) {
         return addLinks(reservaService.findById(id));
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = ReservaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/codigo/{codigoReserva}")
     public ReservaResponse findByCodigoReserva(@PathVariable String codigoReserva) {
         return addLinks(reservaService.findByCodigoReserva(codigoReserva));
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReservaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/huesped/{emailHuesped}")
     public CollectionModel<ReservaResponse> findByEmailHuesped(@PathVariable String emailHuesped) {
         List<ReservaResponse> list = reservaService.findByEmailHuesped(emailHuesped);
@@ -67,6 +98,12 @@ public class ReservaController {
         return CollectionModel.of(list, linkTo(methodOn(ReservaController.class).findByEmailHuesped(emailHuesped)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReservaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/habitacion/{numeroHabitacion}")
     public CollectionModel<ReservaResponse> findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
         List<ReservaResponse> list = reservaService.findByNumeroHabitacion(numeroHabitacion);
@@ -74,6 +111,12 @@ public class ReservaController {
         return CollectionModel.of(list, linkTo(methodOn(ReservaController.class).findByNumeroHabitacion(numeroHabitacion)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReservaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/estado/{estado}")
     public CollectionModel<ReservaResponse> findByEstado(@PathVariable String estado) {
         List<ReservaResponse> list = reservaService.findByEstado(estado);
@@ -81,6 +124,12 @@ public class ReservaController {
         return CollectionModel.of(list, linkTo(methodOn(ReservaController.class).findByEstado(estado)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReservaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/fecha-entrada/{fechaEntrada}")
     public CollectionModel<ReservaResponse> findByFechaEntrada(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaEntrada) {
@@ -89,6 +138,12 @@ public class ReservaController {
         return CollectionModel.of(list, linkTo(methodOn(ReservaController.class).findByFechaEntrada(fechaEntrada)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReservaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/fecha-salida/{fechaSalida}")
     public CollectionModel<ReservaResponse> findByFechaSalida(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaSalida) {
@@ -97,6 +152,12 @@ public class ReservaController {
         return CollectionModel.of(list, linkTo(methodOn(ReservaController.class).findByFechaSalida(fechaSalida)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReservaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/rango-entrada")
     public CollectionModel<ReservaResponse> findByRangoEntrada(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
