@@ -19,6 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.habitaciones.dto.HabitacionRequest;
 import cl.hilton.habitaciones.dto.HabitacionResponse;
 import cl.hilton.habitaciones.service.HabitacionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +47,12 @@ public class HabitacionController {
         return h;
     }
 
+    @Operation(summary = "Listar habitaciones", description = "Retorna todas las habitaciones registradas en el sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Habitaciones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = HabitacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron habitaciones", content = @Content)
+    })
     @GetMapping
     public CollectionModel<HabitacionResponse> findAll() {
         List<HabitacionResponse> list = habitacionService.findAll();
@@ -48,16 +60,34 @@ public class HabitacionController {
         return CollectionModel.of(list, linkTo(methodOn(HabitacionController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener habitación por ID", description = "Retorna una habitación según su identificador único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Habitación encontrada",
+            content = @Content(schema = @Schema(implementation = HabitacionResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Habitación no encontrada", content = @Content)
+    })
     @GetMapping("/{id}")
     public HabitacionResponse findById(@PathVariable Long id) {
         return addLinks(habitacionService.findById(id));
     }
 
+    @Operation(summary = "Obtener habitación por número", description = "Retorna una habitación según su número de habitación")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Habitación encontrada",
+            content = @Content(schema = @Schema(implementation = HabitacionResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Habitación no encontrada", content = @Content)
+    })
     @GetMapping("/numero/{numeroHabitacion}")
     public HabitacionResponse findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
         return addLinks(habitacionService.findByNumeroHabitacion(numeroHabitacion));
     }
 
+    @Operation(summary = "Listar habitaciones por piso", description = "Retorna las habitaciones asociadas a un piso")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Habitaciones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = HabitacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron habitaciones para el piso indicado", content = @Content)
+    })
     @GetMapping("/piso/{piso}")
     public CollectionModel<HabitacionResponse> findByPiso(@PathVariable Integer piso) {
         List<HabitacionResponse> list = habitacionService.findByPiso(piso);
@@ -65,6 +95,12 @@ public class HabitacionController {
         return CollectionModel.of(list, linkTo(methodOn(HabitacionController.class).findByPiso(piso)).withSelfRel());
     }
 
+    @Operation(summary = "Listar habitaciones por estado activo", description = "Retorna las habitaciones filtradas por su estado activo o inactivo")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Habitaciones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = HabitacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron habitaciones con el estado indicado", content = @Content)
+    })
     @GetMapping("/activas/{activa}")
     public CollectionModel<HabitacionResponse> findByActiva(@PathVariable Boolean activa) {
         List<HabitacionResponse> list = habitacionService.findByActiva(activa);
@@ -72,6 +108,12 @@ public class HabitacionController {
         return CollectionModel.of(list, linkTo(methodOn(HabitacionController.class).findByActiva(activa)).withSelfRel());
     }
 
+    @Operation(summary = "Listar habitaciones por tipo", description = "Retorna las habitaciones asociadas a un código de tipo de habitación")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Habitaciones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = HabitacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron habitaciones para el tipo indicado", content = @Content)
+    })
     @GetMapping("/tipo/{codigoTipo}")
     public CollectionModel<HabitacionResponse> findByCodigoTipo(@PathVariable String codigoTipo) {
         List<HabitacionResponse> list = habitacionService.findByCodigoTipo(codigoTipo);
@@ -79,6 +121,12 @@ public class HabitacionController {
         return CollectionModel.of(list, linkTo(methodOn(HabitacionController.class).findByCodigoTipo(codigoTipo)).withSelfRel());
     }
 
+    @Operation(summary = "Listar habitaciones por tipo y estado activo", description = "Retorna las habitaciones filtradas por código de tipo y estado activo")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Habitaciones encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = HabitacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron habitaciones con los filtros indicados", content = @Content)
+    })
     @GetMapping("/tipo/{codigoTipo}/activa/{activa}")
     public CollectionModel<HabitacionResponse> findByCodigoTipoAndActiva(
             @PathVariable String codigoTipo,
