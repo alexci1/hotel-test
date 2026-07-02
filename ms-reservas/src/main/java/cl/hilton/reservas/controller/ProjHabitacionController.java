@@ -26,6 +26,7 @@ public class ProjHabitacionController {
 
     private final ProjHabitacionService habitacionService;
 
+    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros")
     @GetMapping
     public List<ProjHabitacionResponse> findAll() {
         return habitacionService.findAll();
