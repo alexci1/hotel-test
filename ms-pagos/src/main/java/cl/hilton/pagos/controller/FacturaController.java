@@ -18,6 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.pagos.dto.FacturaRequest;
 import cl.hilton.pagos.dto.FacturaResponse;
 import cl.hilton.pagos.service.FacturaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -33,13 +39,19 @@ public class FacturaController {
 
     private FacturaResponse addLinks(FacturaResponse f) {
         f.add(linkTo(methodOn(FacturaController.class).findById(f.getId())).withSelfRel());
-        f.add(linkTo(methodOn(FacturaController.class).update(f.getId(), null)).withRel("update").withTitle("PUT - Actualizar factura"));
+        f.add(linkTo(methodOn(FacturaController.class).update(f.getId(), null)).withRel("update"));
         f.add(linkTo(FacturaController.class).slash(f.getId()).withRel("delete"));
-        f.add(linkTo(methodOn(FacturaController.class).findByEmailHuesped(f.getEmailHuesped())).withRel("facturas-huesped").withTitle("GET - Facturas del huesped"));
-        f.add(linkTo(methodOn(FacturaController.class).findAll()).withRel("all").withTitle("GET - Todas las facturas"));
+        f.add(linkTo(methodOn(FacturaController.class).findByEmailHuesped(f.getEmailHuesped())).withRel("related"));
+        f.add(linkTo(methodOn(FacturaController.class).findAll()).withRel("all"));
         return f;
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna todos los registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = FacturaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping
     public CollectionModel<FacturaResponse> findAll() {
         List<FacturaResponse> list = facturaService.findAll();
@@ -47,21 +59,45 @@ public class FacturaController {
         return CollectionModel.of(list, linkTo(methodOn(FacturaController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener registro", description = "Retorna un registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registro encontrado",
+            content = @Content(schema = @Schema(implementation = FacturaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Registro no encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public FacturaResponse findById(@PathVariable Long id) {
         return addLinks(facturaService.findById(id));
     }
 
+    @Operation(summary = "Obtener registro", description = "Retorna un registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registro encontrado",
+            content = @Content(schema = @Schema(implementation = FacturaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Registro no encontrado", content = @Content)
+    })
     @GetMapping("/numero/{numeroFactura}")
     public FacturaResponse findByNumeroFactura(@PathVariable String numeroFactura) {
         return addLinks(facturaService.findByNumeroFactura(numeroFactura));
     }
 
+    @Operation(summary = "Obtener registro", description = "Retorna un registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registro encontrado",
+            content = @Content(schema = @Schema(implementation = FacturaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Registro no encontrado", content = @Content)
+    })
     @GetMapping("/reserva/{codigoReserva}")
     public FacturaResponse findByCodigoReserva(@PathVariable String codigoReserva) {
         return addLinks(facturaService.findByCodigoReserva(codigoReserva));
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna registros filtrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = FacturaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/huesped/{emailHuesped}")
     public CollectionModel<FacturaResponse> findByEmailHuesped(@PathVariable String emailHuesped) {
         List<FacturaResponse> list = facturaService.findByEmailHuesped(emailHuesped);
@@ -69,6 +105,12 @@ public class FacturaController {
         return CollectionModel.of(list, linkTo(methodOn(FacturaController.class).findByEmailHuesped(emailHuesped)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna registros filtrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = FacturaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/estado/{estado}")
     public CollectionModel<FacturaResponse> findByEstado(@PathVariable String estado) {
         List<FacturaResponse> list = facturaService.findByEstado(estado);
@@ -76,6 +118,12 @@ public class FacturaController {
         return CollectionModel.of(list, linkTo(methodOn(FacturaController.class).findByEstado(estado)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna registros filtrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = FacturaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/fecha/{emitidaEn}")
     public CollectionModel<FacturaResponse> findByEmitidaEn(@PathVariable LocalDate emitidaEn) {
         List<FacturaResponse> list = facturaService.findByEmitidaEn(emitidaEn);
