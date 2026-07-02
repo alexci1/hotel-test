@@ -18,6 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.tarifas.dto.ProjTipoHabitacionRequest;
 import cl.hilton.tarifas.dto.ProjTipoHabitacionResponse;
 import cl.hilton.tarifas.service.ProjTipoHabitacionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -28,31 +34,67 @@ public class ProjTipoHabitacionController {
 
     private final ProjTipoHabitacionService tipoHabitacionService;
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProjTipoHabitacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping
     public List<ProjTipoHabitacionResponse> findAll() {
         return tipoHabitacionService.findAll();
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = ProjTipoHabitacionResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/codigo/{codigo}")
     public ProjTipoHabitacionResponse findByCodigo(@PathVariable String codigo) {
         return tipoHabitacionService.findByCodigo(codigo);
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProjTipoHabitacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/capacidad/{capacidadMax}")
     public List<ProjTipoHabitacionResponse> findByCapacidadMax(@PathVariable Integer capacidadMax) {
         return tipoHabitacionService.findByCapacidadMax(capacidadMax);
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProjTipoHabitacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/capacidad-minima/{capacidadMax}")
     public List<ProjTipoHabitacionResponse> findByCapacidadMinima(@PathVariable Integer capacidadMax) {
         return tipoHabitacionService.findByCapacidadMinima(capacidadMax);
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProjTipoHabitacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/descripcion/{descripcion}")
     public List<ProjTipoHabitacionResponse> findByDescripcion(@PathVariable String descripcion) {
         return tipoHabitacionService.findByDescripcion(descripcion);
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProjTipoHabitacionResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/actualizado/{actualizadoEn}")
     public List<ProjTipoHabitacionResponse> findByActualizadoEn(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate actualizadoEn) {
