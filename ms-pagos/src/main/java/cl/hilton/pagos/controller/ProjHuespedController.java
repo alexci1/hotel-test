@@ -16,6 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.pagos.dto.ProjHuespedRequest;
 import cl.hilton.pagos.dto.ProjHuespedResponse;
 import cl.hilton.pagos.service.ProjHuespedService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -26,16 +32,34 @@ public class ProjHuespedController {
 
     private final ProjHuespedService huespedService;
 
+    @Operation(summary = "Listar registros", description = "Retorna todos los registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProjHuespedResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping
     public List<ProjHuespedResponse> findAll() {
         return huespedService.findAll();
     }
 
+    @Operation(summary = "Obtener registro", description = "Retorna un registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registro encontrado",
+            content = @Content(schema = @Schema(implementation = ProjHuespedResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Registro no encontrado", content = @Content)
+    })
     @GetMapping("/email/{email}")
     public ProjHuespedResponse findByEmail(@PathVariable String email) {
         return huespedService.findByEmail(email);
     }
 
+    @Operation(summary = "Listar registros", description = "Retorna registros filtrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Registros encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProjHuespedResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "Registros no encontrados", content = @Content)
+    })
     @GetMapping("/nombre/{nombreCompleto}")
     public List<ProjHuespedResponse> findByNombreCompleto(@PathVariable String nombreCompleto) {
         return huespedService.findByNombreCompleto(nombreCompleto);
