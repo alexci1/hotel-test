@@ -49,6 +49,7 @@ public class EnvioController {
         return CollectionModel.of(list, linkTo(methodOn(EnvioController.class).findAll()).withSelfRel());
     }
 
+    @Oper\u0061tion(summary = "Obtener registro", description = "Obtiene registro")
     @GetMapping("/{id}")
     public EnvioResponse findById(@PathVariable Long id) {
         return addLinks(envioService.findById(id));
