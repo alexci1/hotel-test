@@ -21,6 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.tarifas.dto.TemporadaRequest;
 import cl.hilton.tarifas.dto.TemporadaResponse;
 import cl.hilton.tarifas.service.TemporadaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -42,6 +48,12 @@ public class TemporadaController {
         return t;
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TemporadaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping
     public CollectionModel<TemporadaResponse> findAll() {
         List<TemporadaResponse> list = temporadaService.findAll();
@@ -49,16 +61,34 @@ public class TemporadaController {
         return CollectionModel.of(list, linkTo(methodOn(TemporadaController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = TemporadaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public TemporadaResponse findById(@PathVariable Long id) {
         return addLinks(temporadaService.findById(id));
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = TemporadaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/codigo/{codigo}")
     public TemporadaResponse findByCodigo(@PathVariable String codigo) {
         return addLinks(temporadaService.findByCodigo(codigo));
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TemporadaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/buscar")
     public CollectionModel<TemporadaResponse> findByNombre(@RequestParam String nombre) {
         List<TemporadaResponse> list = temporadaService.findByNombre(nombre);
@@ -66,6 +96,12 @@ public class TemporadaController {
         return CollectionModel.of(list, linkTo(methodOn(TemporadaController.class).findByNombre(nombre)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TemporadaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/inicio-antes-de/{fechaInicio}")
     public CollectionModel<TemporadaResponse> findByFechaInicioBefore(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio) {
         List<TemporadaResponse> list = temporadaService.findByFechaInicioBefore(fechaInicio);
@@ -73,6 +109,12 @@ public class TemporadaController {
         return CollectionModel.of(list, linkTo(methodOn(TemporadaController.class).findByFechaInicioBefore(fechaInicio)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TemporadaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/fin-despues-de/{fechaFin}")
     public CollectionModel<TemporadaResponse> findByFechaFinAfter(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
         List<TemporadaResponse> list = temporadaService.findByFechaFinAfter(fechaFin);
