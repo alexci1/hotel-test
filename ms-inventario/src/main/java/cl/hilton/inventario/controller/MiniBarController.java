@@ -19,6 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.inventario.dto.MiniBarRequest;
 import cl.hilton.inventario.dto.MiniBarResponse;
 import cl.hilton.inventario.service.MinibarService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +47,12 @@ public class MiniBarController {
         return m;
     }
 
+    @Operation(summary = "Listar minibares", description = "Retorna todos los registros de minibar del inventario")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Minibares encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = MiniBarResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron minibares", content = @Content)
+    })
     @GetMapping
     public CollectionModel<MiniBarResponse> findAll() {
         List<MiniBarResponse> list = miniBarService.findAll();
@@ -48,11 +60,23 @@ public class MiniBarController {
         return CollectionModel.of(list, linkTo(methodOn(MiniBarController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener minibar por ID", description = "Retorna un registro de minibar según su identificador único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Minibar encontrado",
+            content = @Content(schema = @Schema(implementation = MiniBarResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Minibar no encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public MiniBarResponse findById(@PathVariable Long id) {
         return addLinks(miniBarService.findById(id));
     }
 
+    @Operation(summary = "Listar minibares por habitación", description = "Retorna los registros de minibar asociados a un número de habitación")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Minibares encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = MiniBarResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron minibares para la habitación indicada", content = @Content)
+    })
     @GetMapping("/habitacion/{numeroHabitacion}")
     public CollectionModel<MiniBarResponse> findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
         List<MiniBarResponse> list = miniBarService.findByNumeroHabitacion(numeroHabitacion);
@@ -60,6 +84,12 @@ public class MiniBarController {
         return CollectionModel.of(list, linkTo(methodOn(MiniBarController.class).findByNumeroHabitacion(numeroHabitacion)).withSelfRel());
     }
 
+    @Operation(summary = "Listar minibares por producto", description = "Retorna los registros de minibar asociados a un código de producto")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Minibares encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = MiniBarResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron minibares para el producto indicado", content = @Content)
+    })
     @GetMapping("/producto/{codigoProducto}")
     public CollectionModel<MiniBarResponse> findByCodigoProducto(@PathVariable String codigoProducto) {
         List<MiniBarResponse> list = miniBarService.findByCodigoProducto(codigoProducto);
@@ -67,6 +97,12 @@ public class MiniBarController {
         return CollectionModel.of(list, linkTo(methodOn(MiniBarController.class).findByCodigoProducto(codigoProducto)).withSelfRel());
     }
 
+    @Operation(summary = "Obtener minibar por habitación y producto", description = "Retorna un registro de minibar según habitación y código de producto")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Minibar encontrado",
+            content = @Content(schema = @Schema(implementation = MiniBarResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Minibar no encontrado para la habitación y producto indicados", content = @Content)
+    })
     @GetMapping("/habitacion/{numeroHabitacion}/producto/{codigoProducto}")
     public MiniBarResponse findByHabitacionAndProducto(
             @PathVariable String numeroHabitacion,
@@ -74,6 +110,12 @@ public class MiniBarController {
         return addLinks(miniBarService.findByHabitacionAndProducto(numeroHabitacion, codigoProducto));
     }
 
+    @Operation(summary = "Listar minibares por cantidad", description = "Retorna los registros de minibar filtrados por cantidad")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Minibares encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = MiniBarResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron minibares con la cantidad indicada", content = @Content)
+    })
     @GetMapping("/cantidad/{cantidad}")
     public CollectionModel<MiniBarResponse> findByCantidad(@PathVariable Integer cantidad) {
         List<MiniBarResponse> list = miniBarService.findByCantidad(cantidad);
@@ -81,6 +123,12 @@ public class MiniBarController {
         return CollectionModel.of(list, linkTo(methodOn(MiniBarController.class).findByCantidad(cantidad)).withSelfRel());
     }
 
+    @Operation(summary = "Listar minibares con cantidad mayor", description = "Retorna los registros de minibar cuya cantidad es mayor al valor indicado")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Minibares encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = MiniBarResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron minibares sobre la cantidad indicada", content = @Content)
+    })
     @GetMapping("/cantidad-mayor/{cantidad}")
     public CollectionModel<MiniBarResponse> findByCantidadGreaterThan(@PathVariable Integer cantidad) {
         List<MiniBarResponse> list = miniBarService.findByCantidadGreaterThan(cantidad);
@@ -88,6 +136,12 @@ public class MiniBarController {
         return CollectionModel.of(list, linkTo(methodOn(MiniBarController.class).findByCantidadGreaterThan(cantidad)).withSelfRel());
     }
 
+    @Operation(summary = "Listar minibares con precio mayor", description = "Retorna los registros de minibar cuyo precio unitario USD es mayor al valor indicado")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Minibares encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = MiniBarResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron minibares sobre el precio indicado", content = @Content)
+    })
     @GetMapping("/precio-mayor/{precioUnitUsd}")
     public CollectionModel<MiniBarResponse> findByPrecioUnitUsdGreaterThan(@PathVariable Integer precioUnitUsd) {
         List<MiniBarResponse> list = miniBarService.findByPrecioUnitUsdGreaterThan(precioUnitUsd);
