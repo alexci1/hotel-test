@@ -32,16 +32,19 @@ public class ProjHabitacionController {
         return habitacionService.findAll();
     }
 
+    @io.swagger.v3.oas.annotations.Operation(summary = "Obtener registro", description = "Obtiene registro")
     @GetMapping("/numero/{numeroHabitacion}")
     public ProjHabitacionResponse findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
         return habitacionService.findByNumeroHabitacion(numeroHabitacion);
     }
 
+    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros")
     @GetMapping("/tipo/{tipo}")
     public List<ProjHabitacionResponse> findByTipo(@PathVariable String tipo) {
         return habitacionService.findByTipo(tipo);
     }
 
+    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros")
     @GetMapping("/activa/{activa}")
     public List<ProjHabitacionResponse> findByActiva(@PathVariable Boolean activa) {
         return habitacionService.findByActiva(activa);
