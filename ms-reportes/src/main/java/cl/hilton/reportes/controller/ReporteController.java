@@ -18,6 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.reportes.dto.ReporteRequest;
 import cl.hilton.reportes.dto.ReporteResponse;
 import cl.hilton.reportes.service.ReporteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -39,6 +45,12 @@ public class ReporteController {
         return r;
     }
 
+    @Operation(summary = "Listar reportes", description = "Retorna todos los reportes registrados")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Reportes encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReporteResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron reportes", content = @Content)
+    })
     @GetMapping
     public CollectionModel<ReporteResponse> findAll() {
         List<ReporteResponse> list = reporteService.findAll();
@@ -46,16 +58,34 @@ public class ReporteController {
         return CollectionModel.of(list, linkTo(methodOn(ReporteController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener reporte por ID", description = "Retorna un reporte segun su identificador unico")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Reporte encontrado",
+            content = @Content(schema = @Schema(implementation = ReporteResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Reporte no encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public ReporteResponse findById(@PathVariable Long id) {
         return addLinks(reporteService.findById(id));
     }
 
+    @Operation(summary = "Obtener reporte por codigo", description = "Retorna un reporte segun su codigo")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Reporte encontrado",
+            content = @Content(schema = @Schema(implementation = ReporteResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Reporte no encontrado", content = @Content)
+    })
     @GetMapping("/codigo/{codigo}")
     public ReporteResponse findByCodigo(@PathVariable String codigo) {
         return addLinks(reporteService.findByCodigo(codigo));
     }
 
+    @Operation(summary = "Listar reportes por tipo", description = "Retorna reportes filtrados por tipo")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Reportes encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReporteResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron reportes", content = @Content)
+    })
     @GetMapping("/tipo/{tipo}")
     public CollectionModel<ReporteResponse> findByTipo(@PathVariable String tipo) {
         List<ReporteResponse> list = reporteService.findByTipo(tipo);
@@ -63,6 +93,12 @@ public class ReporteController {
         return CollectionModel.of(list, linkTo(methodOn(ReporteController.class).findByTipo(tipo)).withSelfRel());
     }
 
+    @Operation(summary = "Listar reportes por frecuencia", description = "Retorna reportes filtrados por frecuencia")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Reportes encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReporteResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron reportes", content = @Content)
+    })
     @GetMapping("/frecuencia/{frecuencia}")
     public CollectionModel<ReporteResponse> findByFrecuencia(@PathVariable String frecuencia) {
         List<ReporteResponse> list = reporteService.findByFrecuencia(frecuencia);
@@ -70,6 +106,12 @@ public class ReporteController {
         return CollectionModel.of(list, linkTo(methodOn(ReporteController.class).findByFrecuencia(frecuencia)).withSelfRel());
     }
 
+    @Operation(summary = "Listar reportes por estado activo", description = "Retorna reportes filtrados por estado activo")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Reportes encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReporteResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron reportes", content = @Content)
+    })
     @GetMapping("/activo/{activo}")
     public CollectionModel<ReporteResponse> findByActivo(@PathVariable Boolean activo) {
         List<ReporteResponse> list = reporteService.findByActivo(activo);
@@ -77,6 +119,12 @@ public class ReporteController {
         return CollectionModel.of(list, linkTo(methodOn(ReporteController.class).findByActivo(activo)).withSelfRel());
     }
 
+    @Operation(summary = "Buscar reportes por nombre", description = "Retorna reportes segun nombre")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Reportes encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReporteResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron reportes", content = @Content)
+    })
     @GetMapping("/buscar")
     public CollectionModel<ReporteResponse> findByNombre(@RequestParam String nombre) {
         List<ReporteResponse> list = reporteService.findByNombre(nombre);
