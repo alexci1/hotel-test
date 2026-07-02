@@ -19,6 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.restaurante.dto.MesaRequest;
 import cl.hilton.restaurante.dto.MesaResponse;
 import cl.hilton.restaurante.service.MesaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +47,12 @@ public class MesaController {
         return m;
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = MesaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping
     public CollectionModel<MesaResponse> findAll() {
         List<MesaResponse> list = mesaService.findAll();
@@ -48,16 +60,34 @@ public class MesaController {
         return CollectionModel.of(list, linkTo(methodOn(MesaController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = MesaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public MesaResponse findById(@PathVariable Long id) {
         return addLinks(mesaService.findById(id));
     }
 
+    @Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(schema = @Schema(implementation = MesaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/numero/{numeroMesa}")
     public MesaResponse findByNumeroMesa(@PathVariable String numeroMesa) {
         return addLinks(mesaService.findByNumeroMesa(numeroMesa));
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = MesaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/zona/{zona}")
     public CollectionModel<MesaResponse> findByZona(@PathVariable String zona) {
         List<MesaResponse> list = mesaService.findByZona(zona);
@@ -65,6 +95,12 @@ public class MesaController {
         return CollectionModel.of(list, linkTo(methodOn(MesaController.class).findByZona(zona)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = MesaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/disponible/{disponible}")
     public CollectionModel<MesaResponse> findByDisponible(@PathVariable Boolean disponible) {
         List<MesaResponse> list = mesaService.findByDisponible(disponible);
@@ -72,6 +108,12 @@ public class MesaController {
         return CollectionModel.of(list, linkTo(methodOn(MesaController.class).findByDisponible(disponible)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = MesaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/capacidad-minima/{capacidad}")
     public CollectionModel<MesaResponse> findByCapacidadMinima(@PathVariable Integer capacidad) {
         List<MesaResponse> list = mesaService.findByCapacidadMinima(capacidad);
@@ -79,6 +121,12 @@ public class MesaController {
         return CollectionModel.of(list, linkTo(methodOn(MesaController.class).findByCapacidadMinima(capacidad)).withSelfRel());
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = MesaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No encontrado", content = @Content)
+    })
     @GetMapping("/zona/{zona}/disponible/{disponible}")
     public CollectionModel<MesaResponse> findByZonaAndDisponible(
             @PathVariable String zona,
