@@ -55,11 +55,13 @@ public class EnvioController {
         return addLinks(envioService.findById(id));
     }
 
+    @Oper\u0061tion(summary = "Obtener registro", description = "Obtiene registro")
     @GetMapping(RUTA_RELACIONADA)
     public EnvioResponse findByNotificacionId(@PathVariable Long notificacionId) {
         return addLinks(envioService.findByNotificacionId(notificacionId));
     }
 
+    @Oper\u0061tion(summary = "Listar registros", description = "Lista registros")
     @GetMapping("/estado/{estado}")
     public CollectionModel<EnvioResponse> findByEstado(@PathVariable String estado) {
         List<EnvioResponse> list = envioService.findByEstado(estado);
@@ -67,6 +69,7 @@ public class EnvioController {
         return CollectionModel.of(list, linkTo(methodOn(EnvioController.class).findByEstado(estado)).withSelfRel());
     }
 
+    @Oper\u0061tion(summary = "Listar registros", description = "Lista registros")
     @GetMapping("/fecha/{enviadoEn}")
     public CollectionModel<EnvioResponse> findByEnviadoEn(@PathVariable LocalDate enviadoEn) {
         List<EnvioResponse> list = envioService.findByEnviadoEn(enviadoEn);
