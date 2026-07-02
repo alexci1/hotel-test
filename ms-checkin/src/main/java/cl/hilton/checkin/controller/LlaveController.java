@@ -19,6 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.checkin.dto.LlaveRequest;
 import cl.hilton.checkin.dto.LlaveResponse;
 import cl.hilton.checkin.service.LlaveService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +47,12 @@ public class LlaveController {
         return l;
     }
 
+    @Operation(summary = "Listar llaves", description = "Retorna todas las llaves registradas en el sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Llaves encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = LlaveResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron llaves", content = @Content)
+    })
     @GetMapping
     public CollectionModel<LlaveResponse> findAll() {
         List<LlaveResponse> list = llaveService.findAll();
@@ -48,16 +60,34 @@ public class LlaveController {
         return CollectionModel.of(list, linkTo(methodOn(LlaveController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener llave por ID", description = "Retorna una llave según su identificador único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Llave encontrada",
+            content = @Content(schema = @Schema(implementation = LlaveResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Llave no encontrada", content = @Content)
+    })
     @GetMapping("/{id}")
     public LlaveResponse findById(@PathVariable Long id) {
         return addLinks(llaveService.findById(id));
     }
 
+    @Operation(summary = "Obtener llave por código", description = "Retorna una llave según su código único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Llave encontrada",
+            content = @Content(schema = @Schema(implementation = LlaveResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Llave no encontrada", content = @Content)
+    })
     @GetMapping("/codigo/{codigoLlave}")
     public LlaveResponse findByCodigoLlave(@PathVariable String codigoLlave) {
         return addLinks(llaveService.findByCodigoLlave(codigoLlave));
     }
 
+    @Operation(summary = "Listar llaves por habitación", description = "Retorna las llaves asociadas a un número de habitación")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Llaves encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = LlaveResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron llaves para la habitación indicada", content = @Content)
+    })
     @GetMapping("/habitacion/{numeroHabitacion}")
     public CollectionModel<LlaveResponse> findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
         List<LlaveResponse> list = llaveService.findByNumeroHabitacion(numeroHabitacion);
@@ -65,6 +95,12 @@ public class LlaveController {
         return CollectionModel.of(list, linkTo(methodOn(LlaveController.class).findByNumeroHabitacion(numeroHabitacion)).withSelfRel());
     }
 
+    @Operation(summary = "Listar llaves por estado activo", description = "Retorna las llaves filtradas por su estado activo o inactivo")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Llaves encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = LlaveResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron llaves con el estado indicado", content = @Content)
+    })
     @GetMapping("/activa/{activa}")
     public CollectionModel<LlaveResponse> findByActiva(@PathVariable Boolean activa) {
         List<LlaveResponse> list = llaveService.findByActiva(activa);
@@ -72,6 +108,12 @@ public class LlaveController {
         return CollectionModel.of(list, linkTo(methodOn(LlaveController.class).findByActiva(activa)).withSelfRel());
     }
 
+    @Operation(summary = "Listar llaves por reserva", description = "Retorna las llaves asociadas a un código de reserva")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Llaves encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = LlaveResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron llaves para la reserva indicada", content = @Content)
+    })
     @GetMapping("/reserva/{codigoReserva}")
     public CollectionModel<LlaveResponse> findByCodigoReserva(@PathVariable String codigoReserva) {
         List<LlaveResponse> list = llaveService.findByCodigoReserva(codigoReserva);
