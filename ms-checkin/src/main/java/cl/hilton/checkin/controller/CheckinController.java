@@ -17,6 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.checkin.dto.CheckinRequest;
 import cl.hilton.checkin.dto.CheckinResponse;
 import cl.hilton.checkin.service.CheckinService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +44,12 @@ public class CheckinController {
         return c;
     }
 
+    @Operation(summary = "Listar checkins", description = "Retorna todos los checkins registrados en el sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Checkins encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = CheckinResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron checkins", content = @Content)
+    })
     @GetMapping
     public CollectionModel<CheckinResponse> findAll() {
         List<CheckinResponse> list = checkinService.findAll();
@@ -45,16 +57,34 @@ public class CheckinController {
         return CollectionModel.of(list, linkTo(methodOn(CheckinController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener checkin por ID", description = "Retorna un checkin según su identificador único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Checkin encontrado",
+            content = @Content(schema = @Schema(implementation = CheckinResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Checkin no encontrado", content = @Content)
+    })
     @GetMapping("/{id}")
     public CheckinResponse findById(@PathVariable Long id) {
         return addLinks(checkinService.findById(id));
     }
 
+    @Operation(summary = "Obtener checkin por reserva", description = "Retorna un checkin según el código de reserva")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Checkin encontrado",
+            content = @Content(schema = @Schema(implementation = CheckinResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Checkin no encontrado para la reserva indicada", content = @Content)
+    })
     @GetMapping("/reserva/{codigoReserva}")
     public CheckinResponse findByCodigoReserva(@PathVariable String codigoReserva) {
         return addLinks(checkinService.findByCodigoReserva(codigoReserva));
     }
 
+    @Operation(summary = "Listar checkins por huésped", description = "Retorna los checkins asociados al email de un huésped")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Checkins encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = CheckinResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron checkins para el huésped indicado", content = @Content)
+    })
     @GetMapping("/huesped/{emailHuesped}")
     public CollectionModel<CheckinResponse> findByEmailHuesped(@PathVariable String emailHuesped) {
         List<CheckinResponse> list = checkinService.findByEmailHuesped(emailHuesped);
@@ -62,6 +92,12 @@ public class CheckinController {
         return CollectionModel.of(list, linkTo(methodOn(CheckinController.class).findByEmailHuesped(emailHuesped)).withSelfRel());
     }
 
+    @Operation(summary = "Listar checkins por habitación", description = "Retorna los checkins asociados a un número de habitación")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Checkins encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = CheckinResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron checkins para la habitación indicada", content = @Content)
+    })
     @GetMapping("/habitacion/{numeroHabitacion}")
     public CollectionModel<CheckinResponse> findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
         List<CheckinResponse> list = checkinService.findByNumeroHabitacion(numeroHabitacion);
