@@ -66,10 +66,10 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <!-- Common: excepciones y clases compartidas -->
-    <dependency>
-    <groupId>cl.hilton</groupId>
-    <artifactId>cl-hilton-common</artifactId>
-    </dependency>
+        <dependency>
+            <groupId>cl.hilton</groupId>
+            <artifactId>cl-hilton-common</artifactId>
+        </dependency>
 
         <!-- Spring JPA: acceso a base de datos con Hibernate -->
         <dependency>
@@ -152,6 +152,17 @@
     <!-- Empaquetado ejecutable con Spring Boot -->
     <build>
         <plugins>
+            <!-- [TEST-INI] Permite ejecutar pruebas JUnit 5 con Maven -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+            <!-- [TEST-FIN] -->
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
