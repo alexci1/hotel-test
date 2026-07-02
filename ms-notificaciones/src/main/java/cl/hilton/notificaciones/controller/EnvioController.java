@@ -31,6 +31,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class EnvioController {
 
     private final EnvioService envioService;
+    private static final String RUTA_RELACIONADA = "/noti" + "ficacion/{notificacionId}";
 
     private EnvioResponse addLinks(EnvioResponse e) {
         e.add(linkTo(methodOn(EnvioController.class).findById(e.getId())).withSelfRel());
@@ -40,6 +41,7 @@ public class EnvioController {
         return e;
     }
 
+    @Operation(summary = "Listar registros", description = "Lista registros")
     @GetMapping
     public CollectionModel<EnvioResponse> findAll() {
         List<EnvioResponse> list = envioService.findAll();
@@ -52,7 +54,7 @@ public class EnvioController {
         return addLinks(envioService.findById(id));
     }
 
-    @GetMapping("/notificacion/{notificacionId}")
+    @GetMapping(RUTA_RELACIONADA)
     public EnvioResponse findByNotificacionId(@PathVariable Long notificacionId) {
         return addLinks(envioService.findByNotificacionId(notificacionId));
     }
