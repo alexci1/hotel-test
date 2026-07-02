@@ -17,6 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import cl.hilton.huespedes.dto.PreferenciaRequest;
 import cl.hilton.huespedes.dto.PreferenciaResponse;
 import cl.hilton.huespedes.service.PreferenciaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +44,12 @@ public class PreferenciaController {
         return p;
     }
 
+    @Operation(summary = "Listar preferencias", description = "Retorna todas las preferencias registradas")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Preferencias encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PreferenciaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron preferencias", content = @Content)
+    })
     @GetMapping
     public CollectionModel<PreferenciaResponse> findAll() {
         List<PreferenciaResponse> list = preferenciaService.findAll();
@@ -45,16 +57,34 @@ public class PreferenciaController {
         return CollectionModel.of(list, linkTo(methodOn(PreferenciaController.class).findAll()).withSelfRel());
     }
 
+    @Operation(summary = "Obtener preferencia por ID", description = "Retorna una preferencia según su identificador único")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Preferencia encontrada",
+            content = @Content(schema = @Schema(implementation = PreferenciaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Preferencia no encontrada", content = @Content)
+    })
     @GetMapping("/{id}")
     public PreferenciaResponse findById(@PathVariable Long id) {
         return addLinks(preferenciaService.findById(id));
     }
 
+    @Operation(summary = "Obtener preferencia por huésped", description = "Retorna una preferencia asociada al email de un huésped")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Preferencia encontrada",
+            content = @Content(schema = @Schema(implementation = PreferenciaResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Preferencia no encontrada para el huésped indicado", content = @Content)
+    })
     @GetMapping("/huesped/{emailHuesped}")
     public PreferenciaResponse findByEmailHuesped(@PathVariable String emailHuesped) {
         return addLinks(preferenciaService.findByEmailHuesped(emailHuesped));
     }
 
+    @Operation(summary = "Listar preferencias por tipo de cama", description = "Retorna las preferencias asociadas a un tipo de cama")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Preferencias encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PreferenciaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron preferencias para el tipo indicado", content = @Content)
+    })
     @GetMapping("/tipo-cama/{tipoCama}")
     public CollectionModel<PreferenciaResponse> findByTipoCama(@PathVariable String tipoCama) {
         List<PreferenciaResponse> list = preferenciaService.findByTipoCama(tipoCama);
@@ -62,6 +92,12 @@ public class PreferenciaController {
         return CollectionModel.of(list, linkTo(methodOn(PreferenciaController.class).findByTipoCama(tipoCama)).withSelfRel());
     }
 
+    @Operation(summary = "Listar preferencias por piso", description = "Retorna las preferencias asociadas a un piso")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Preferencias encontradas",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = PreferenciaResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron preferencias para el piso indicado", content = @Content)
+    })
     @GetMapping("/piso/{pisoPreferido}")
     public CollectionModel<PreferenciaResponse> findByPisoPreferido(@PathVariable Integer pisoPreferido) {
         List<PreferenciaResponse> list = preferenciaService.findByPisoPreferido(pisoPreferido);
