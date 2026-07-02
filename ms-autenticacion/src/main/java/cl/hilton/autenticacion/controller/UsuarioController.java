@@ -17,6 +17,7 @@ import cl.hilton.autenticacion.dto.UsuarioRequest;
 import cl.hilton.autenticacion.dto.UsuarioResponse;
 import cl.hilton.autenticacion.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,6 +32,12 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
+    @Operation(summary = "Listar usuarios", description = "Retorna todos los usuarios registrados en el sistema")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuarios encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = UsuarioResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron usuarios", content = @Content)
+    })
     @GetMapping
     public List<UsuarioResponse> findAll() {
         return usuarioService.findAll();
@@ -47,16 +54,34 @@ public class UsuarioController {
         return usuarioService.findById(id);
     }
 
+    @Operation(summary = "Obtener usuario por email", description = "Retorna un usuario según su correo electrónico")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuario encontrado",
+            content = @Content(schema = @Schema(implementation = UsuarioResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content)
+    })
     @GetMapping("/email/{email}")
     public UsuarioResponse findByEmail(@PathVariable String email) {
         return usuarioService.findByEmail(email);
     }
 
+    @Operation(summary = "Listar usuarios por rol", description = "Retorna los usuarios asociados a un código de rol")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuarios encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = UsuarioResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron usuarios para el rol indicado", content = @Content)
+    })
     @GetMapping("/rol/{rolCodigo}")
     public List<UsuarioResponse> findByRolCodigo(@PathVariable String rolCodigo) {
         return usuarioService.findByRolCodigo(rolCodigo);
     }
 
+    @Operation(summary = "Listar usuarios por estado activo", description = "Retorna los usuarios filtrados por su estado activo o inactivo")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Usuarios encontrados",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = UsuarioResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "No se encontraron usuarios con el estado indicado", content = @Content)
+    })
     @GetMapping("/activo/{activo}")
     public List<UsuarioResponse> findByActivo(@PathVariable Boolean activo) {
         return usuarioService.findByActivo(activo);
