@@ -26,19 +26,28 @@ public class ProjHuespedController {
 
     private final ProjHuespedService huespedService;
 
-    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros")
+    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros", responses = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "No encontrado")
+    })
     @GetMapping
     public List<ProjHuespedResponse> findAll() {
         return huespedService.findAll();
     }
 
-    @io.swagger.v3.oas.annotations.Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @io.swagger.v3.oas.annotations.Operation(summary = "Obtener registro", description = "Obtiene registro", responses = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "No encontrado")
+    })
     @GetMapping("/email/{email}")
     public ProjHuespedResponse findByEmail(@PathVariable String email) {
         return huespedService.findByEmail(email);
     }
 
-    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros")
+    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros", responses = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "No encontrado")
+    })
     @GetMapping("/nombre/{nombreCompleto}")
     public List<ProjHuespedResponse> findByNombreCompleto(@PathVariable String nombreCompleto) {
         return huespedService.findByNombreCompleto(nombreCompleto);
