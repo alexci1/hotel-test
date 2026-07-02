@@ -26,25 +26,37 @@ public class ProjHabitacionController {
 
     private final ProjHabitacionService habitacionService;
 
-    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros")
+    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros", responses = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "No encontrado")
+    })
     @GetMapping
     public List<ProjHabitacionResponse> findAll() {
         return habitacionService.findAll();
     }
 
-    @io.swagger.v3.oas.annotations.Operation(summary = "Obtener registro", description = "Obtiene registro")
+    @io.swagger.v3.oas.annotations.Operation(summary = "Obtener registro", description = "Obtiene registro", responses = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "No encontrado")
+    })
     @GetMapping("/numero/{numeroHabitacion}")
     public ProjHabitacionResponse findByNumeroHabitacion(@PathVariable String numeroHabitacion) {
         return habitacionService.findByNumeroHabitacion(numeroHabitacion);
     }
 
-    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros")
+    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros", responses = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "No encontrado")
+    })
     @GetMapping("/tipo/{tipo}")
     public List<ProjHabitacionResponse> findByTipo(@PathVariable String tipo) {
         return habitacionService.findByTipo(tipo);
     }
 
-    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros")
+    @io.swagger.v3.oas.annotations.Operation(summary = "Listar registros", description = "Lista registros", responses = {
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "OK"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "No encontrado")
+    })
     @GetMapping("/activa/{activa}")
     public List<ProjHabitacionResponse> findByActiva(@PathVariable Boolean activa) {
         return habitacionService.findByActiva(activa);
