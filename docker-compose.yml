@@ -103,6 +103,8 @@ services:
     build: ./ms-reservas
     image: hotel-ms-reservas
     container_name: ms-reservas
+    ports:
+      - "9001:9001"
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -125,6 +127,8 @@ services:
     build: ./ms-habitaciones
     image: hotel-ms-habitaciones
     container_name: ms-habitaciones
+    ports:
+      - "9002:9002"
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -150,6 +154,8 @@ services:
     build: ./ms-huespedes
     image: hotel-ms-huespedes
     container_name: ms-huespedes
+    ports:
+      - "9003:9003"
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -172,6 +178,8 @@ services:
     build: ./ms-checkin
     image: hotel-ms-checkin
     container_name: ms-checkin
+    ports:
+      - "9004:9004"
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -194,6 +202,8 @@ services:
     build: ./ms-pagos
     image: hotel-ms-pagos
     container_name: ms-pagos
+    ports:
+      - "9005:9005"
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -216,6 +226,8 @@ services:
     build: ./ms-housekeeping
     image: hotel-ms-housekeeping
     container_name: ms-housekeeping
+    ports:
+      - "9006:9006"
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -241,6 +253,8 @@ services:
     build: ./ms-restaurante
     image: hotel-ms-restaurante
     container_name: ms-restaurante
+    ports:
+      - "9007:9007"
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -263,6 +277,8 @@ services:
     build: ./ms-inventario
     image: hotel-ms-inventario
     container_name: ms-inventario
+    ports:
+      - "9008:9008"
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -288,6 +304,8 @@ services:
     build: ./ms-notificaciones
     image: hotel-ms-notificaciones
     container_name: ms-notificaciones
+    ports:
+      - "9009:9009"
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -310,6 +328,8 @@ services:
     build: ./ms-tarifas
     image: hotel-ms-tarifas
     container_name: ms-tarifas
+    ports:
+      - "9010:9010"
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -332,6 +352,8 @@ services:
     build: ./ms-reportes
     image: hotel-ms-reportes
     container_name: ms-reportes
+    ports:
+      - "9011:9011"
     depends_on:
       eureka-server:
         condition: service_healthy
@@ -354,6 +376,8 @@ services:
     build: ./ms-autenticacion
     image: hotel-ms-autenticacion
     container_name: ms-autenticacion
+    ports:
+      - "9012:9012"
     depends_on:
       eureka-server:
         condition: service_healthy
