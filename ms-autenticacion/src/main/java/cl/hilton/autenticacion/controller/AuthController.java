@@ -9,6 +9,7 @@ import cl.hilton.autenticacion.dto.LoginResponse;
 import cl.hilton.autenticacion.dto.RegisterRequest;
 import cl.hilton.autenticacion.dto.UsuarioResponse;
 import cl.hilton.autenticacion.service.AuthService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +19,7 @@ import cl.hilton.common.security.TokenBlacklistService;
 import java.util.Date;
 import java.util.Map;
 
+@Tag(name = "Autenticación", description = "API para la gestión de autenticación")
 @Slf4j
 @RestController
 @RequiredArgsConstructor
