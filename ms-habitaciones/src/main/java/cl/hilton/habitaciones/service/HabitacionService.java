@@ -12,6 +12,7 @@ import cl.hilton.habitaciones.event.HabitacionEventProducer;
 import cl.hilton.habitaciones.mapper.HabitacionMapper;
 import cl.hilton.habitaciones.model.Habitacion;
 import cl.hilton.habitaciones.model.TipoHabitacion;
+import cl.hilton.habitaciones.repository.EstadoHabitacionRepository;
 import cl.hilton.habitaciones.repository.HabitacionRepository;
 import cl.hilton.habitaciones.repository.TipoHabitacionRepository;
 import cl.hilton.common.event.HabitacionCreatedEvent;
@@ -27,6 +28,7 @@ public class HabitacionService {
 
     private final HabitacionRepository habitacionRepository;
     private final TipoHabitacionRepository tipoHabitacionRepository;
+    private final EstadoHabitacionRepository estadoHabitacionRepository;
     private final HabitacionMapper habitacionMapper;
     private final HabitacionEventProducer habitacionEventProducer;
     private final TarifaLookupClient tarifaLookupClient;
@@ -138,8 +140,14 @@ public class HabitacionService {
     @Transactional
     public void deleteById(Long id) {
         Long habitacionId = validarId(id);
-        getHabitacionById(habitacionId);
-        habitacionRepository.deleteById(habitacionId);
+        Habitacion habitacion = getHabitacionById(habitacionId);
+
+        estadoHabitacionRepository
+                .findByHabitacionNumeroHabitacion(habitacion.getNumeroHabitacion())
+                .ifPresent(estadoHabitacionRepository::delete);
+
+        estadoHabitacionRepository.flush();
+        habitacionRepository.delete(habitacion);
     }
 
     private Habitacion getHabitacionById(Long id) {
