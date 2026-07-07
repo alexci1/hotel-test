@@ -142,12 +142,11 @@ public class HabitacionService {
         Long habitacionId = validarId(id);
         Habitacion habitacion = getHabitacionById(habitacionId);
 
-        estadoHabitacionRepository
-                .findByHabitacionNumeroHabitacion(habitacion.getNumeroHabitacion())
-                .ifPresent(estadoHabitacionRepository::delete);
-
+        estadoHabitacionRepository.deleteByHabitacionNumeroHabitacion(habitacion.getNumeroHabitacion());
         estadoHabitacionRepository.flush();
+
         habitacionRepository.delete(habitacion);
+        habitacionRepository.flush();
     }
 
     private Habitacion getHabitacionById(Long id) {
