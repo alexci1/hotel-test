@@ -49,7 +49,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/v1/habitaciones", "/api/v1/habitaciones/**")
                     .hasAnyRole("ADMIN", "GERENCIA")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/habitaciones", "/api/v1/habitaciones/**")
-                    .hasRole("ADMIN")
+                    .hasAnyRole("ADMIN", "GERENCIA")
 
                 .anyRequest().authenticated()
             )
