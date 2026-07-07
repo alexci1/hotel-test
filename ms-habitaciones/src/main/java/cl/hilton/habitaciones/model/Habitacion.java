@@ -3,7 +3,6 @@ package cl.hilton.habitaciones.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -53,7 +52,7 @@ public class Habitacion {
     @Column(name = "activa", nullable = false)
     private Boolean activa;
 
-    @OneToMany(mappedBy = "habitacion", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "habitacion")
     @Builder.Default
     private List<EstadoHabitacion> estadosHabitacion = new ArrayList<>();
 }
