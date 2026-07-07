@@ -16,6 +16,8 @@ public interface EstadoHabitacionRepository extends JpaRepository<EstadoHabitaci
 
     boolean existsByHabitacionNumeroHabitacion(String numeroHabitacion);
 
+    void deleteByHabitacionNumeroHabitacion(String numeroHabitacion);
+
     List<EstadoHabitacion> findByEstado(String estado);
 
     List<EstadoHabitacion> findByActualizadoEn(LocalDate actualizadoEn);
